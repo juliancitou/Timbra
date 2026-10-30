@@ -4,19 +4,18 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -37,12 +36,12 @@ enum class IconMotion {
     NudgeBack,
 }
 
-private val IconButtonShape = RoundedCornerShape(ControlCornerRadius + 2.dp)
 private const val SPIN_DEGREES = 180f
 private const val SPIN_MS = 600
 private const val SPIN_ACTION_DELAY_MS = 140L
 private val NudgeDistance = 6.dp
 
+/** Solo el ícono, sin fondo ni contorno; el área táctil sigue siendo de 48 dp. */
 @Composable
 fun GlassIconButton(
     @DrawableRes iconRes: Int,
@@ -60,10 +59,11 @@ fun GlassIconButton(
     Box(
         modifier = modifier
             .size(Spacing.minTouchTarget)
-            .glassSurface(shape = IconButtonShape, elevated = false)
-            .border(1.dp, Color.White.copy(alpha = 0.10f), IconButtonShape)
-            .bracketCorners(MaterialTheme.colorScheme.primary.copy(alpha = 0.7f), inset = { 4.dp }, length = 6.dp)
-            .clickable(role = Role.Button) {
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(bounded = false, radius = Spacing.minTouchTarget / 2),
+                role = Role.Button,
+            ) {
                 haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                 if (!animate) {
                     onClick()
