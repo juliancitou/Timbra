@@ -14,9 +14,8 @@ val Orange = Color(0xFFFF8A3D)
 val OrangeDeep = Color(0xFF2E1200)
 val OrangeContainer = Color(0xFF4A2410)
 
-val AuroraAmber = Color(0xFFFFB020)
-val AuroraOrange = Color(0xFFFF6A1A)
-val AuroraSmoke = Color(0xFF9A9AA0)
+val SmokeLight = Color(0xFFB4B4BA)
+val SmokeDark = Color(0xFF6B6B73)
 
 val TextPrimary = Color(0xFFF4F4F5)
 val TextSecondary = Color(0xFFA1A1AA)

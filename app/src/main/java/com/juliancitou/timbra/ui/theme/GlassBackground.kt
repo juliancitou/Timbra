@@ -44,43 +44,33 @@ private data class AuroraBlob(
 
 private val AuroraBlobs = listOf(
     AuroraBlob(
-        AuroraAmber,
-        alpha = 0.20f,
-        centerX = 0.15f,
-        centerY = 0.18f,
-        driftX = 0.12f,
-        driftY = 0.08f,
-        radius = 0.55f,
+        SmokeLight,
+        alpha = 0.07f,
+        centerX = 0.20f,
+        centerY = 0.15f,
+        driftX = 0.10f,
+        driftY = 0.06f,
+        radius = 0.70f,
         phase = 0f,
     ),
     AuroraBlob(
-        AuroraOrange,
-        alpha = 0.15f,
-        centerX = 0.85f,
-        centerY = 0.45f,
-        driftX = 0.10f,
-        driftY = 0.12f,
-        radius = 0.60f,
-        phase = 2.1f,
-    ),
-    AuroraBlob(
-        AuroraSmoke,
-        alpha = 0.09f,
-        centerX = 0.30f,
-        centerY = 0.85f,
-        driftX = 0.14f,
-        driftY = 0.06f,
-        radius = 0.50f,
-        phase = 4.2f,
+        SmokeDark,
+        alpha = 0.10f,
+        centerX = 0.80f,
+        centerY = 0.75f,
+        driftX = 0.08f,
+        driftY = 0.08f,
+        radius = 0.80f,
+        phase = 3.1f,
     ),
 )
 
-private const val AURORA_CYCLE_MS = 28_000
+private const val AURORA_CYCLE_MS = 40_000
 
 private val NightGradient = Brush.verticalGradient(listOf(Ink, Graphite, Charcoal))
 
 /**
- * Fondo de todas las pantallas: degradado casi negro con brasas ámbar y naranja que se desplazan lento.
+ * Fondo de todas las pantallas: degradado negro con dos nubes grises muy tenues que se desplazan lento.
  * Es la fuente que desenfocan los componentes de vidrio del [content].
  * El progreso de la animación se lee solo en la fase de dibujo, así que no recompone la pantalla.
  */
