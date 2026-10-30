@@ -8,53 +8,30 @@ import kotlin.math.pow
 
 /**
  * Contraste WCAG 2.1 de cada pareja texto/fondo de la app. AA pide 4.5:1 para texto normal y
- * 3:1 para elementos gráficos (curva, bordes de selección). Los fondos de vidrio se calculan
- * como blanco translúcido sobre el fondo más claro de la app, que es el peor caso.
+ * 3:1 para elementos gráficos (curva, marcos). Sin vidrio, todo va directo sobre el fondo, así
+ * que se revisan sus tres tonos; el más claro ([Charcoal]) es el peor caso.
  */
 class ContrastTest {
 
-    private val worstBackground = Charcoal
-    private val glass = Color.White.copy(alpha = GLASS_FILL_ALPHA).over(worstBackground)
-    private val glassFallback = Color.White.copy(alpha = GLASS_FALLBACK_FILL_ALPHA).over(worstBackground)
+    private val backgrounds = listOf(Ink, Graphite, Charcoal)
 
     @Test
     fun textOnBackgroundMeetsAa() {
-        listOf(Ink, Graphite, Charcoal).forEach { background ->
+        backgrounds.forEach { background ->
             assertText(TextPrimary, background, "texto principal")
             assertText(TextSecondary, background, "texto secundario")
-            assertText(Amber, background, "etiqueta // ámbar")
-            assertText(Orange, background, "explicación naranja")
+            assertText(Amber, background, "texto ámbar (títulos, chips, botón principal)")
+            assertText(Orange, background, "texto naranja (cadenas en el código)")
             assertText(DangerRed, background, "aviso rojo")
         }
     }
 
     @Test
-    fun textOnGlassMeetsAa() {
-        listOf(glass, glassFallback).forEach { background ->
-            assertText(TextPrimary, background, "texto sobre vidrio")
-            assertText(TextSecondary, background, "ejes de la gráfica")
-            assertText(Amber, background, "valor en ámbar")
+    fun graphicsMeetGraphicContrast() {
+        backgrounds.forEach { background ->
+            assertGraphic(Amber, background, "curva de la gráfica y marco del botón principal")
+            assertGraphic(Orange, background, "banda resaltada")
         }
-    }
-
-    @Test
-    fun primaryButtonTextMeetsAa() {
-        assertText(AmberDeep, Amber, "texto del botón principal")
-    }
-
-    @Test
-    fun bracketChipTextMeetsAa() {
-        listOf(Ink, Charcoal, glass, glassFallback).forEach { background ->
-            assertText(Amber, background, "chip seleccionado")
-            assertText(DangerRed, background, "chip de aviso")
-            assertText(TextSecondary, background, "chip sin seleccionar")
-        }
-    }
-
-    @Test
-    fun chartCurveMeetsGraphicContrast() {
-        assertGraphic(Amber, glassFallback, "curva de la gráfica")
-        assertGraphic(Orange, glassFallback, "banda resaltada")
     }
 
     private fun assertText(foreground: Color, background: Color, name: String) =
@@ -68,13 +45,6 @@ class ContrastTest {
         assertTrue("$name: contraste ${"%.2f".format(ratio)} < $minimum", ratio >= minimum)
     }
 }
-
-/** Compone un color translúcido sobre un fondo opaco (mezcla "source over"). */
-private fun Color.over(background: Color): Color = Color(
-    red = red * alpha + background.red * (1 - alpha),
-    green = green * alpha + background.green * (1 - alpha),
-    blue = blue * alpha + background.blue * (1 - alpha),
-)
 
 private fun contrastRatio(first: Color, second: Color): Double {
     val lighter = maxOf(relativeLuminance(first), relativeLuminance(second))

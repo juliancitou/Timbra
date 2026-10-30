@@ -60,8 +60,6 @@ private const val FADE_DELAY_MS = 50
 
 @Composable
 fun TimbraNavHost(
-    blurEnabled: Boolean,
-    onBlurEnabledChange: (Boolean) -> Unit,
     navController: NavHostController = rememberNavController(),
 ) {
     val animated = !isReducedMotionEnabled()
@@ -127,8 +125,6 @@ fun TimbraNavHost(
                     popExitTransition = { if (animated) transformBackdropOut() else ExitTransition.None },
                 ) {
                     SettingsScreen(
-                        blurEnabled = blurEnabled,
-                        onBlurEnabledChange = onBlurEnabledChange,
                         onOpenAudioTest = { navController.navigate(AudioTestRoute) },
                         onOpenAbout = { navController.navigate(AboutRoute) },
                         onBack = back,

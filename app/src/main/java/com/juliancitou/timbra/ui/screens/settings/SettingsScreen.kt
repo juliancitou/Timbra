@@ -16,7 +16,6 @@ import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassButtonStyle
-import com.juliancitou.timbra.ui.theme.GlassChip
 import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.SETTINGS_TRANSFORM_KEY
@@ -25,8 +24,6 @@ import com.juliancitou.timbra.ui.theme.containerTransform
 
 @Composable
 fun SettingsScreen(
-    blurEnabled: Boolean,
-    onBlurEnabledChange: (Boolean) -> Unit,
     onOpenAudioTest: () -> Unit,
     onOpenAbout: () -> Unit,
     onBack: () -> Unit,
@@ -36,15 +33,6 @@ fun SettingsScreen(
         onBack = onBack,
         modifier = Modifier.containerTransform(SETTINGS_TRANSFORM_KEY),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
-            SectionLabel(stringResource(R.string.settings_section_blur))
-            DetailText(stringResource(R.string.settings_blur_body))
-            GlassChip(
-                label = stringResource(if (blurEnabled) R.string.settings_blur_on else R.string.settings_blur_off),
-                selected = blurEnabled,
-                onClick = { onBlurEnabledChange(!blurEnabled) },
-            )
-        }
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
             SectionLabel(stringResource(R.string.settings_section_audio_test))
             DetailText(stringResource(R.string.settings_audio_test_body))

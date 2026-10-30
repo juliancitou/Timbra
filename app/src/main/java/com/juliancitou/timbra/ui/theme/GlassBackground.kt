@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
@@ -17,8 +16,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.cos
@@ -69,7 +66,6 @@ private val NightGradient = Brush.verticalGradient(listOf(Ink, Graphite, Charcoa
 
 /**
  * Fondo de todas las pantallas: degradado negro con dos nubes grises muy tenues que se desplazan lento.
- * Es la fuente que desenfocan los componentes de vidrio del [content].
  * El progreso de la animación se lee solo en la fase de dibujo, así que no recompone la pantalla.
  */
 @Composable
@@ -78,25 +74,21 @@ fun GlassBackground(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val progress = rememberAuroraProgress(animated = !isReducedMotionEnabled())
-    val hazeState = rememberHazeState()
     Box(modifier = modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .hazeSource(hazeState)
                 .background(NightGradient)
                 .drawBehind { drawAurora(progress.value) },
         )
-        CompositionLocalProvider(LocalGlassHazeState provides hazeState) {
-            content()
-        }
+        content()
     }
 }
 
 /**
  * Progreso de la aurora (0 a 1) actualizado a [AURORA_FRAMES_PER_SECOND]. Se mueve tan lento que
- * a 15 cuadros por segundo no se nota, y así el fondo no obliga a recalcular todos los
- * desenfoques de vidrio en cada cuadro de una pantalla de 120 Hz.
+ * a 15 cuadros por segundo no se nota, y así la pantalla no tiene que redibujar el fondo en
+ * cada cuadro de una pantalla de 120 Hz.
  */
 @Composable
 private fun rememberAuroraProgress(animated: Boolean): State<Float> {

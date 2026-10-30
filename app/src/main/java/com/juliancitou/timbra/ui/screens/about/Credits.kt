@@ -14,7 +14,6 @@ const val FONT_LICENSE_ASSET = "licenses/cascadia-mono-OFL.txt"
 /** Lo mismo que la sección "Agradecimientos" del README; si cambia uno, cambia el otro. */
 object Credits {
     val libraries = listOf(
-        Credit("Haze", "Chris Banes", "Apache 2.0", "https://github.com/chrisbanes/haze"),
         Credit(
             "Jetpack Compose · Material 3",
             "Google / AndroidX",

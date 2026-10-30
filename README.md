@@ -242,7 +242,6 @@ También puedes verlos dentro de la app: **Ajustes → Más información**.
 
 | Proyecto | Para qué se usa | Autor | Licencia |
 |---|---|---|---|
-| [Haze](https://github.com/chrisbanes/haze) | Efecto de vidrio con desenfoque | Chris Banes | Apache 2.0 |
 | [Jetpack Compose](https://developer.android.com/compose) y Material 3 | Toda la interfaz | Google / AndroidX | Apache 2.0 |
 | [Navigation Compose](https://developer.android.com/guide/navigation) | Navegación entre pantallas | Google / AndroidX | Apache 2.0 |
 | [AndroidX Core, Activity y Lifecycle](https://developer.android.com/jetpack/androidx) | Base de la app, ViewModel y ciclo de vida | Google / AndroidX | Apache 2.0 |

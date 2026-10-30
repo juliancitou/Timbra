@@ -98,10 +98,6 @@
 
     <!-- Ajustes -->
     <string name="settings_title">Ajustes</string>
-    <string name="settings_section_blur">efecto de vidrio</string>
-    <string name="settings_blur_body">Si la app se siente lenta, apaga el desenfoque. Se verá un vidrio más opaco.</string>
-    <string name="settings_blur_on">Desenfoque activado</string>
-    <string name="settings_blur_off">Desenfoque desactivado</string>
 
     <!-- Prueba de audio (Fase 2) -->
     <string name="settings_section_audio_test">prueba de audio</string>
