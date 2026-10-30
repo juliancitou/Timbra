@@ -30,12 +30,12 @@ import androidx.compose.ui.unit.dp
 enum class GlassButtonStyle { Primary, Secondary }
 
 private val ButtonShape = RoundedCornerShape(GlassCornerRadius)
-private val ButtonMinHeight = 56.dp
+private val ButtonMinHeight = 52.dp
 private const val PRESSED_SCALE = 0.97f
 private const val DISABLED_ALPHA = 0.38f
 
 /**
- * Botón de la app. [GlassButtonStyle.Primary] es sólido (aqua) y debe haber uno solo por
+ * Botón de la app. [GlassButtonStyle.Primary] es sólido (ámbar) y debe haber uno solo por
  * pantalla; [GlassButtonStyle.Secondary] es de vidrio para las acciones de apoyo.
  */
 @Composable
@@ -80,7 +80,7 @@ fun GlassButton(
                 haptics.performHapticFeedback(HapticFeedbackType.Confirm)
                 onClick()
             }
-            .padding(horizontal = Spacing.large, vertical = Spacing.medium),
+            .padding(horizontal = Spacing.large, vertical = 14.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(

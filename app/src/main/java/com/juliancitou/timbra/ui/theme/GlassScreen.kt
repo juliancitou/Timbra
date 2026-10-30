@@ -12,26 +12,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import com.juliancitou.timbra.R
 
 /**
- * Estructura común de cada pantalla, sin tarjetas de más: barra superior con volver y una acción
- * opcional, título grande, la indicación principal ([lead]) en letra grande, el contenido
- * desplazable y las acciones fijas abajo, al alcance del pulgar.
+ * Estructura común de cada pantalla, sin tarjetas de más: barra superior con volver y una
+ * acción opcional, título estilo terminal (`> Título`), la indicación principal ([lead]) en
+ * letra grande, el contenido desplazable y las acciones fijas abajo, al alcance del pulgar.
  */
 @Composable
 fun GlassScreen(
     title: String,
     modifier: Modifier = Modifier,
     lead: String? = null,
+    showCursor: Boolean = false,
     onBack: (() -> Unit)? = null,
     headerAction: (@Composable () -> Unit)? = null,
     actions: @Composable ColumnScope.() -> Unit = {},
@@ -41,7 +38,7 @@ fun GlassScreen(
         modifier = modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .padding(horizontal = Spacing.large, vertical = Spacing.medium),
+            .padding(horizontal = Spacing.screenHorizontal, vertical = Spacing.medium),
         verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
         if (onBack != null || headerAction != null) {
@@ -65,12 +62,7 @@ fun GlassScreen(
             verticalArrangement = Arrangement.spacedBy(Spacing.large),
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.semantics { heading() },
-                )
+                TerminalTitle(text = title, showCursor = showCursor)
                 if (lead != null) LeadText(lead)
             }
             content()

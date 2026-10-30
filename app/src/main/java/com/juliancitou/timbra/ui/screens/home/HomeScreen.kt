@@ -25,6 +25,7 @@ fun HomeScreen(
     GlassScreen(
         title = stringResource(R.string.app_name),
         lead = stringResource(R.string.home_lead),
+        showCursor = true,
         headerAction = {
             GlassIconButton(
                 iconRes = R.drawable.ic_settings,

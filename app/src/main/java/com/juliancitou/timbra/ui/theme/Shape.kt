@@ -21,4 +21,5 @@ object Spacing {
     val large = 24.dp
     val extraLarge = 32.dp
     val minTouchTarget = 48.dp
+    val screenHorizontal = 32.dp
 }
