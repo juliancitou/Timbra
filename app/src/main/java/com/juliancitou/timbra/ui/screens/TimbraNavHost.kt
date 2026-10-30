@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.juliancitou.timbra.ui.screens.about.AboutScreen
 import com.juliancitou.timbra.ui.screens.audiotest.AudioTestScreen
 import com.juliancitou.timbra.ui.screens.comfort.ComfortLevelScreen
 import com.juliancitou.timbra.ui.screens.export.ExportScreen
@@ -38,6 +39,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object HistoryRoute
 @Serializable data object SettingsRoute
 @Serializable data object AudioTestRoute
+@Serializable data object AboutRoute
 
 /**
  * Escalas del zoom entre pantallas: la que entra crece desde [SCALE_SMALL] y la que se va
@@ -100,11 +102,15 @@ fun TimbraNavHost(
                 blurEnabled = blurEnabled,
                 onBlurEnabledChange = onBlurEnabledChange,
                 onOpenAudioTest = { navController.navigate(AudioTestRoute) },
+                onOpenAbout = { navController.navigate(AboutRoute) },
                 onBack = back,
             )
         }
         composable<AudioTestRoute> {
             AudioTestScreen(onBack = back)
+        }
+        composable<AboutRoute> {
+            AboutScreen(onBack = back)
         }
     }
 }

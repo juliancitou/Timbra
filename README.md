@@ -236,6 +236,8 @@ Timbra/
 Timbra existe gracias a herramientas, bibliotecas y conocimiento que otras personas compartieron.
 Gracias a todas ellas.
 
+También puedes verlos dentro de la app: **Ajustes → Más información**.
+
 ### Bibliotecas incluidas en la app
 
 | Proyecto | Para qué se usa | Autor | Licencia |

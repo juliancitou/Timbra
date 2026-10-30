@@ -1,14 +1,17 @@
 package com.juliancitou.timbra.ui.screens.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.juliancitou.timbra.BuildConfig
+import androidx.compose.ui.semantics.Role
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.GlassButton
@@ -23,6 +26,7 @@ fun SettingsScreen(
     blurEnabled: Boolean,
     onBlurEnabledChange: (Boolean) -> Unit,
     onOpenAudioTest: () -> Unit,
+    onOpenAbout: () -> Unit,
     onBack: () -> Unit,
 ) {
     GlassScreen(title = stringResource(R.string.settings_title), onBack = onBack) {
@@ -45,14 +49,21 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-            SectionLabel(stringResource(R.string.settings_section_about))
-            Text(
-                text = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-            DetailText(stringResource(R.string.settings_font_credit))
-        }
+        MoreInfoRow(onClick = onOpenAbout)
     }
+}
+
+/** Entrada discreta a créditos y contacto: una sola línea al final de Ajustes. */
+@Composable
+private fun MoreInfoRow(onClick: () -> Unit) {
+    Text(
+        text = stringResource(R.string.settings_more_info) + "  ›",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = Spacing.minTouchTarget)
+            .clickable(role = Role.Button, onClick = onClick)
+            .wrapContentHeight(),
+    )
 }

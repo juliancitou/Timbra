@@ -102,9 +102,6 @@
     <string name="settings_blur_body">Si la app se siente lenta, apaga el desenfoque. Se verá un vidrio más opaco.</string>
     <string name="settings_blur_on">Desenfoque activado</string>
     <string name="settings_blur_off">Desenfoque desactivado</string>
-    <string name="settings_section_about">acerca de</string>
-    <string name="settings_version">Timbra %1$s</string>
-    <string name="settings_font_credit">Tipografía Cascadia Mono · licencia SIL OFL 1.1</string>
 
     <!-- Prueba de audio (Fase 2) -->
     <string name="settings_section_audio_test">prueba de audio</string>
@@ -157,4 +154,22 @@
     <string name="audio_status_other_app">En pausa: otra app usa el audio</string>
     <string name="audio_status_headphones">En pausa: se desconectaron los audífonos</string>
     <string name="audio_status_time_limit">Se detuvo tras 20 minutos para cuidar tus oídos</string>
+
+    <!-- Acerca de -->
+    <string name="settings_more_info">Más información</string>
+    <string name="about_title">Acerca de</string>
+    <string name="about_lead">Timbra es un proyecto personal creado por %1$s.</string>
+    <string name="about_section_contact">contacto</string>
+    <string name="about_profile">Perfil del creador en GitHub</string>
+    <string name="about_repository">Código fuente de Timbra</string>
+    <string name="about_issues">Reportar un problema o sugerir una idea</string>
+    <string name="about_section_collaborate">colabora</string>
+    <string name="about_collaborate">¿Quieres ayudar a que Timbra mejore? Eres bienvenido: propón ideas, reporta errores o envía tus cambios al repositorio. Escríbeme sin problema y lo platicamos.</string>
+    <string name="about_section_libraries">agradecimientos</string>
+    <string name="about_section_references">en qué se basa el audio</string>
+    <string name="about_section_licenses">licencias</string>
+    <string name="about_font_license_body">La licencia de la tipografía Cascadia Mono viaja dentro de la app, como pide la licencia SIL OFL 1.1.</string>
+    <string name="about_show_license">Ver licencia</string>
+    <string name="about_hide_license">Ocultar licencia</string>
+    <string name="about_version">Timbra %1$s</string>
 </resources>

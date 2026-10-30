@@ -5,6 +5,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -193,4 +196,28 @@ fun Hairline(modifier: Modifier = Modifier) {
             .height(1.dp)
             .background(Color.White.copy(alpha = 0.08f)),
     )
+}
+
+/**
+ * Enlace que se abre en el navegador del teléfono: [label] arriba y la dirección en ámbar con una
+ * flecha `→`. La app no necesita permiso de internet: quien abre la página es el navegador.
+ */
+@Composable
+fun LinkRow(label: String, url: String, modifier: Modifier = Modifier) {
+    val uriHandler = LocalUriHandler.current
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = Spacing.minTouchTarget)
+            .clickable(role = Role.Button, onClickLabel = label) { runCatching { uriHandler.openUri(url) } }
+            .padding(vertical = Spacing.small),
+        verticalArrangement = Arrangement.spacedBy(Spacing.extraSmall),
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
+        Text(
+            text = "→ " + url.removePrefix("https://"),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
+    }
 }

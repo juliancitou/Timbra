@@ -164,7 +164,7 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 - [ ] Renombrar y borrar
 - [ ] Animaciones y microinteracciones finales
 - [ ] Revisión completa de textos
-- [ ] Agradecimientos y licencias dentro de la app (Ajustes → Acerca de)
+- [x] Agradecimientos, licencias y contacto dentro de la app (Ajustes → Más información)
 - [x] Ícono de la app (adelantado: logo del usuario en `art/timbra_logo.svg`)
 - [ ] Tag y release `v1.0.0`
 
