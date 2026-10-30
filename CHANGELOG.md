@@ -19,6 +19,24 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `c29f5bd` · fix: hacer fluida la pantalla de prueba de audio
+- Síntoma: la prueba de audio se sentía con tirones. Medido con `dumpsys gfxinfo`: mediana de
+  9 ms por cuadro con pantalla de 120 Hz (presupuesto de 8.3 ms) y 1 % de cuadros de 61 ms.
+- Causa: ~30 chips, cada uno con su propio desenfoque de Haze, recalculados en cada cuadro porque
+  la aurora se movía a 120 cuadros por segundo; además, la generación de música competía con la
+  interfaz por el procesador.
+- Arreglo: los chips sin seleccionar usan relleno translúcido al 8 % con borde (sin desenfoque);
+  la aurora se actualiza a 15 cuadros por segundo (se mueve tan lento que no se nota); la música
+  se genera en un hilo propio de baja prioridad, lo que además quita la necesidad de un `Mutex`.
+
+### 2026-10-30 · `9166176` · ui: usar el logo de Timbra como ícono
+- Ícono adaptable a partir de `art/timbra_logo.svg` (logo del usuario): fondo con el degradado
+  oscuro y, al frente, los cinco canales del ecualizador escalados dentro de la zona segura de
+  66 dp con margen. Versión monocroma para los íconos con tema de Android.
+- Los íconos vectoriales de Android no tienen desenfoque: el brillo del canal amarillo se imita
+  con dos trazos anchos y translúcidos. Se borran los `.webp` de la plantilla (minSdk 33 siempre
+  usa el ícono adaptable).
+
 ### 2026-10-30 · `85d4dd1` · ui: agregar géneros y 14 ecualizaciones a la prueba
 - En "Probar el sonido": fila de géneros y 14 ecualizaciones (sin ecualizar, preset de ejemplo,
   más/menos graves, menos lodo, más voz, menos "S", más brillo, menos agudos, en V, cálido,

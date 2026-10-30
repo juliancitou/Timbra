@@ -164,7 +164,7 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 - [ ] Renombrar y borrar
 - [ ] Animaciones y microinteracciones finales
 - [ ] Revisión completa de textos
-- [ ] Ícono de la app
+- [x] Ícono de la app (adelantado: logo del usuario en `art/timbra_logo.svg`)
 - [ ] Tag y release `v1.0.0`
 
 ## Fase 7 (opcional) — Analizador de espectro
