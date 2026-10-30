@@ -19,6 +19,14 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `d3ed656` · docs: agregar agradecimientos
+- Sección "Agradecimientos" en el README, pedida por el usuario: bibliotecas incluidas (Haze,
+  Jetpack Compose y Material 3, Navigation, AndroidX, Kotlin, Cascadia Mono), herramientas de
+  desarrollo y pruebas (Android Studio, Gradle, Foojay, JUnit, AndroidX Test, GitHub Actions,
+  Temurin) y el conocimiento en que se basa el audio (Audio EQ Cookbook, ITU-R BS.1770, Paul
+  Kellet, Schroeder/Freeverb), cada uno con enlace y licencia verificada.
+- A partir de ahora, cada dependencia o recurso nuevo se agrega ahí en el mismo commit.
+
 ### 2026-10-30 · `c29f5bd` · fix: hacer fluida la pantalla de prueba de audio
 - Síntoma: la prueba de audio se sentía con tirones. Medido con `dumpsys gfxinfo`: mediana de
   9 ms por cuadro con pantalla de 120 Hz (presupuesto de 8.3 ms) y 1 % de cuadros de 61 ms.
