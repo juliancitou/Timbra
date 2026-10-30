@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generado a partir de timbra_logo.svg (art/). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1150"
+    android:viewportHeight="1150">
+    <group android:translateX="63.0" android:translateY="63.0">
+        <path android:pathData="M274,390 V634" android:strokeColor="#FFFFFFFF" android:strokeWidth="34" android:strokeAlpha="0.85" android:strokeLineCap="round" />
+        <path android:pathData="M386,300 V724" android:strokeColor="#FFFFFFFF" android:strokeWidth="34" android:strokeAlpha="0.95" android:strokeLineCap="round" />
+        <path android:pathData="M638,300 V724" android:strokeColor="#FFFFFFFF" android:strokeWidth="34" android:strokeAlpha="0.95" android:strokeLineCap="round" />
+        <path android:pathData="M750,390 V634" android:strokeColor="#FFFFFFFF" android:strokeWidth="34" android:strokeAlpha="0.85" android:strokeLineCap="round" />
+        <path android:pathData="M512,246 V778" android:strokeColor="#FFFFFFFF" android:strokeWidth="38" android:strokeAlpha="1.0" android:strokeLineCap="round" />
+        <path android:pathData="M245,478 a29,29 0 1,0 58,0 a29,29 0 1,0 -58,0 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="11" android:strokeAlpha="1.0" android:strokeLineCap="round" />
+        <path android:pathData="M357,574 a29,29 0 1,0 58,0 a29,29 0 1,0 -58,0 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="11" android:strokeAlpha="1.0" android:strokeLineCap="round" />
+        <path android:pathData="M609,520 a29,29 0 1,0 58,0 a29,29 0 1,0 -58,0 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="11" android:strokeAlpha="1.0" android:strokeLineCap="round" />
+        <path android:pathData="M721,446 a29,29 0 1,0 58,0 a29,29 0 1,0 -58,0 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="11" android:strokeAlpha="1.0" android:strokeLineCap="round" />
+        <path android:pathData="M478,414 a34,34 0 1,0 68,0 a34,34 0 1,0 -68,0 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="13" android:strokeAlpha="1.0" android:strokeLineCap="round" />
+        <path android:pathData="M205,512 H244 M780,512 H819" android:strokeColor="#FFFFFFFF" android:strokeWidth="12" android:strokeAlpha="0.9" android:strokeLineCap="round" />
+        <path android:pathData="M181,512 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 Z" android:fillColor="#FFFFFFFF" android:fillAlpha="1.0" />
+        <path android:pathData="M829,512 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 Z" android:fillColor="#FFFFFFFF" android:fillAlpha="1.0" />
+    </group>
+</vector>

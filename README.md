@@ -219,6 +219,7 @@ Timbra/
 ├── TODO.md              Pendientes por etapa
 ├── CHANGELOG.md         Historial detallado de cambios
 ├── .github/workflows/   Compilación automática: pruebas, revisión y APK
+├── art/                 Logo original en SVG (fuente del ícono de la app)
 └── app/                 Código de la app (Kotlin + Jetpack Compose)
 ```
 

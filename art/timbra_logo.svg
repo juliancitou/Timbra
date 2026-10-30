@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1B1B1E"/>
+      <stop offset="1" stop-color="#0B0B0D"/>
+    </linearGradient>
+    <linearGradient id="yellow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD15A"/>
+      <stop offset="1" stop-color="#FFB92E"/>
+    </linearGradient>
+    <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="13" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="1 0 0 0 1
+                0 1 0 0 0.62
+                0 0 1 0 0.12
+                0 0 0 0.28 0" result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- App-icon canvas -->
+  <rect x="40" y="40" width="944" height="944" rx="228" fill="url(#bg)"/>
+  <rect x="41.5" y="41.5" width="941" height="941" rx="226.5"
+        fill="none" stroke="#FFFFFF" stroke-opacity=".09" stroke-width="3"/>
+
+  <!-- Subtle acoustic field -->
+  <circle cx="512" cy="512" r="300" fill="none" stroke="#FFFFFF" stroke-opacity=".035" stroke-width="3"/>
+  <circle cx="512" cy="512" r="246" fill="none" stroke="#FFFFFF" stroke-opacity=".035" stroke-width="3"/>
+
+  <!-- Equalizer: five tuned channels with independent slider positions -->
+  <g stroke-linecap="round" fill="none">
+    <!-- outer channels -->
+    <path d="M274 390 V634" stroke="#77777D" stroke-width="34" opacity=".85"/>
+    <path d="M386 300 V724" stroke="#B8B8BD" stroke-width="34" opacity=".95"/>
+    <path d="M638 300 V724" stroke="#B8B8BD" stroke-width="34" opacity=".95"/>
+    <path d="M750 390 V634" stroke="#77777D" stroke-width="34" opacity=".85"/>
+    <!-- center channel -->
+    <path d="M512 246 V778" stroke="url(#yellow)" stroke-width="38" filter="url(#softGlow)"/>
+  </g>
+
+  <!-- Slider caps -->
+  <g>
+    <circle cx="274" cy="478" r="29" fill="#171719" stroke="#A4A4AA" stroke-width="11"/>
+    <circle cx="386" cy="574" r="29" fill="#171719" stroke="#E5E5E8" stroke-width="11"/>
+    <circle cx="512" cy="414" r="34" fill="#171719" stroke="url(#yellow)" stroke-width="13" filter="url(#softGlow)"/>
+    <circle cx="638" cy="520" r="29" fill="#171719" stroke="#E5E5E8" stroke-width="11"/>
+    <circle cx="750" cy="446" r="29" fill="#171719" stroke="#A4A4AA" stroke-width="11"/>
+  </g>
+
+  <!-- Small waveform accents give the mark a recognizable audio signature -->
+  <path d="M205 512 H244 M780 512 H819" stroke="#FFC342" stroke-width="12" stroke-linecap="round" opacity=".9"/>
+  <circle cx="188" cy="512" r="7" fill="#FFC342"/>
+  <circle cx="836" cy="512" r="7" fill="#FFC342"/>
+</svg>
