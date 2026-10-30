@@ -19,6 +19,27 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-29 · `7e46e84` · chore: crear proyecto Android base
+- Proyecto creado con la plantilla *Empty Activity* (Compose) de Android Studio Rabbit 2
+  (2026.2.2): paquete `com.juliancitou.timbra`, `minSdk 33`, `compileSdk`/`targetSdk 37`
+  (Android 17), `versionName 0.1.0`, `versionCode 1`.
+- Versiones actualizadas a la última estable: Gradle 9.8.2 (con SHA-256 verificado),
+  AGP 9.5.0, Kotlin 2.4.21, core-ktx 1.19.1, lifecycle 2.11.0, activity-compose 1.13.0,
+  Compose BOM 2026.09.00, androidx.test junit 1.3.0, espresso 3.7.0.
+- AGP 9 trae Kotlin 2.2.10 integrado; se declara `org.jetbrains.kotlin.android` con
+  `apply false` en la raíz para subirlo a 2.4.21 (debe coincidir con el plugin de Compose).
+- Código compilado para Java 17; Gradle corre con JDK 25 (`gradle-daemon-jvm.properties`).
+- Verificado: `testDebugUnitTest`, `lintDebug` y `assembleDebug` pasan. Lint solo reporta
+  avisos de la plantilla, que se limpian en la Fase 1.
+- Instalada y abierta en el POCO X8 Pro Max (HyperOS 3.0, Android 16). En HyperOS hay que
+  activar **Instalar vía USB** y **Depuración USB (ajustes de seguridad)**, y aceptar el aviso
+  en pantalla; si no, la instalación falla con `INSTALL_FAILED_USER_RESTRICTED`.
+- Pendiente de decidir: `android:allowBackup="true"` de la plantilla.
+
+### 2026-10-29 · `63deedb` · ci: usar JDK 25 como Android Studio
+- `android.yml` pasa de Temurin 21 a 25 para compilar con el mismo JDK que Android Studio
+  Rabbit 2 y la terminal.
+
 ### 2026-10-29 · `fa7949c` · docs: reescribir README
 - Guía completa para cualquier persona: qué hace la app y qué no, términos básicos (Hz, dB,
   preset), requisitos del teléfono (Android 13 o superior) y dispositivos probados

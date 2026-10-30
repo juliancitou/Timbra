@@ -21,16 +21,16 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 - [x] Instalar Android Studio, SDK más reciente y Platform-Tools
 - [x] Instalar GitHub CLI e iniciar sesión
 - [x] Verificar identidad de Git (`user.name`, `user.email`) de tu cuenta
-- [ ] Crear proyecto Empty Activity (Compose) dentro de la carpeta `timbra`
-  - [ ] Paquete `com.juliancitou.timbra`, `minSdk 33`
-  - [ ] `versionName = "0.1.0"`, `versionCode = 1`
-  - [ ] Conservar el `.gitignore` del repositorio (si Android Studio crea otro en la raíz, fusionarlos)
-- [ ] Ordenar dependencias en `gradle/libs.versions.toml` con versiones estables actuales
+- [x] Crear proyecto Empty Activity (Compose) dentro de la carpeta `timbra`
+  - [x] Paquete `com.juliancitou.timbra`, `minSdk 33`
+  - [x] `versionName = "0.1.0"`, `versionCode = 1`
+  - [x] Conservar el `.gitignore` del repositorio (si Android Studio crea otro en la raíz, fusionarlos)
+- [x] Ordenar dependencias en `gradle/libs.versions.toml` con versiones estables actuales
 - [x] Acciones de `android.yml` en su versión mayor más reciente
-- [ ] Confirmar que el JDK de `android.yml` (21) coincide con el del proyecto
+- [x] JDK 25 igual en Android Studio, terminal y `android.yml`
 - [x] Verificar la autoría de los commits
 - [x] Activar Depuración USB e Instalar vía USB en el teléfono
-- [ ] Instalar y abrir la app vacía en el POCO
+- [x] Instalar y abrir la app vacía en el POCO
 - [ ] Confirmar que el workflow pasa en verde en GitHub
 - [ ] Tag y release `v0.1.0` (el workflow adjunta el APK)
 
@@ -43,6 +43,7 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 - [ ] Tipografía (Inter o sistema) con números tabulares para dB y Hz
 - [ ] Formas: esquinas de 28 dp, espaciados consistentes
 - [ ] Tema oscuro como principal
+- [ ] Quitar restos de la plantilla (colores sin usar, etiqueta repetida, chequeo de SDK innecesario)
 
 ### Componentes de vidrio (`ui/theme/`)
 - [ ] `GlassBackground`: degradado + 2–3 manchas aurora con movimiento lento
@@ -164,6 +165,7 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 
 ## Ideas y deuda técnica
 
+- [ ] Decidir `android:allowBackup` (la plantilla lo deja en `true`: respaldo en la nube de Android)
 - [ ] Evaluar bibliotecas de "liquid glass" adicionales a Haze
 - [ ] Widget o acceso rápido para exportar el último preset
 - [ ] Modo claro opcional
