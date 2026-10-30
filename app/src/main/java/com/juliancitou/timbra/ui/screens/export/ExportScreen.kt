@@ -1,5 +1,11 @@
 package com.juliancitou.timbra.ui.screens.export
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,18 +13,52 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.FileProvider
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
+import com.juliancitou.timbra.ui.theme.TerminalChip
+import com.juliancitou.timbra.ui.theme.TerminalChipTone
 import com.juliancitou.timbra.ui.theme.TerminalScreen
+import java.io.File
 
+private enum class SaveResult { Saved, Failed }
+
+/** Carpeta dentro de la caché desde la que se comparten los presets (ver `res/xml/file_paths.xml`). */
+private const val SHARED_PRESETS_DIRECTORY = "presets"
+private const val PRESET_MIME_TYPE = "application/json"
+
+/**
+ * Guardar o compartir el preset. Guardar usa el selector de archivos del sistema, así que la app
+ * no necesita permisos de almacenamiento; compartir pasa una copia temporal por `FileProvider`.
+ */
 @Composable
-fun ExportScreen(onGoHome: () -> Unit, onBack: () -> Unit) {
+fun ExportScreen(
+    presetName: String,
+    fileName: String,
+    presetJson: () -> String,
+    onGoHome: () -> Unit,
+    onBack: () -> Unit,
+) {
+    val context = LocalContext.current
+    var saveResult by rememberSaveable { mutableStateOf<SaveResult?>(null) }
+    val createDocument = ActivityResultContracts.CreateDocument(PRESET_MIME_TYPE)
+    val saveLauncher = rememberLauncherForActivityResult(createDocument) { uri ->
+        if (uri != null) saveResult = if (writeTo(context, uri, presetJson())) SaveResult.Saved else SaveResult.Failed
+    }
+    val shareTitle = stringResource(R.string.export_share_chooser)
+
     TerminalScreen(
         title = stringResource(R.string.export_title),
         lead = stringResource(R.string.export_lead),
@@ -26,13 +66,13 @@ fun ExportScreen(onGoHome: () -> Unit, onBack: () -> Unit) {
         actions = {
             TerminalButton(
                 text = stringResource(R.string.action_save_file),
-                onClick = {},
+                onClick = { saveLauncher.launch(fileName) },
                 modifier = Modifier.fillMaxWidth(),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
                 TerminalButton(
                     text = stringResource(R.string.action_share),
-                    onClick = {},
+                    onClick = { share(context, fileName, presetJson(), shareTitle) },
                     style = TerminalButtonStyle.Secondary,
                     modifier = Modifier.weight(1f),
                 )
@@ -48,9 +88,23 @@ fun ExportScreen(onGoHome: () -> Unit, onBack: () -> Unit) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             SectionLabel(stringResource(R.string.export_section_name))
             Text(
-                text = stringResource(R.string.export_preset_name),
+                text = PowerampExporter.NAME_PREFIX + presetName,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+                text = fileName,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        saveResult?.let { result ->
+            TerminalChip(
+                label = stringResource(
+                    if (result == SaveResult.Saved) R.string.export_saved else R.string.export_save_failed,
+                ),
+                selected = result == SaveResult.Saved,
+                tone = if (result == SaveResult.Failed) TerminalChipTone.Warning else TerminalChipTone.Normal,
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
@@ -63,5 +117,27 @@ fun ExportScreen(onGoHome: () -> Unit, onBack: () -> Unit) {
                 ),
             )
         }
+    }
+}
+
+private fun writeTo(context: Context, uri: Uri, json: String): Boolean = runCatching {
+    val stream = context.contentResolver.openOutputStream(uri, "wt") ?: error("No se pudo abrir el archivo")
+    stream.use { it.write(json.toByteArray()) }
+}.isSuccess
+
+/** Escribe una copia en la caché y abre el menú de compartir del sistema con ella. */
+private fun share(context: Context, fileName: String, json: String, chooserTitle: String) {
+    val directory = File(context.cacheDir, SHARED_PRESETS_DIRECTORY).apply { mkdirs() }
+    val file = File(directory, fileName).apply { writeText(json) }
+    val uri = FileProvider.getUriForFile(context, "${context.packageName}.presets", file)
+    val send = Intent(Intent.ACTION_SEND).apply {
+        type = PRESET_MIME_TYPE
+        putExtra(Intent.EXTRA_STREAM, uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    try {
+        context.startActivity(Intent.createChooser(send, chooserTitle))
+    } catch (_: ActivityNotFoundException) {
+        // No hay ninguna app para compartir; "Guardar archivo" sigue disponible.
     }
 }

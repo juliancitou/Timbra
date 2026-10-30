@@ -25,6 +25,7 @@ import com.juliancitou.timbra.ui.theme.containerTransform
 @Composable
 fun SettingsScreen(
     onOpenAudioTest: () -> Unit,
+    onOpenAdvancedPreview: () -> Unit,
     onOpenAbout: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -39,6 +40,16 @@ fun SettingsScreen(
             TerminalButton(
                 text = stringResource(R.string.action_audio_test),
                 onClick = onOpenAudioTest,
+                style = TerminalButtonStyle.Secondary,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
+            SectionLabel(stringResource(R.string.settings_section_advanced))
+            DetailText(stringResource(R.string.settings_advanced_body))
+            TerminalButton(
+                text = stringResource(R.string.action_advanced_preview),
+                onClick = onOpenAdvancedPreview,
                 style = TerminalButtonStyle.Secondary,
                 modifier = Modifier.fillMaxWidth(),
             )

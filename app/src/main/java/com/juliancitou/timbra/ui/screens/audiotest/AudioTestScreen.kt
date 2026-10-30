@@ -21,6 +21,7 @@ import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.PlaybackStatus
 import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
+import com.juliancitou.timbra.ui.screens.label
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.PlayingIndicator
 import com.juliancitou.timbra.ui.theme.SectionLabel
@@ -76,7 +77,7 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
             ChoiceSection(R.string.audio_test_section_genre) {
                 Genre.entries.forEach { genre ->
                     TerminalChip(
-                        label = stringResource(genreLabel(genre)),
+                        label = stringResource(genre.label()),
                         selected = state.genre == genre,
                         onClick = { viewModel.selectGenre(genre) },
                     )
@@ -153,16 +154,6 @@ private fun statusLabel(status: PlaybackStatus): Int = when (status) {
     PlaybackStatus.PausedByOtherApp -> R.string.audio_status_other_app
     PlaybackStatus.PausedHeadphonesDisconnected -> R.string.audio_status_headphones
     PlaybackStatus.StoppedByTimeLimit -> R.string.audio_status_time_limit
-}
-
-@StringRes
-private fun genreLabel(genre: Genre): Int = when (genre) {
-    Genre.Pop -> R.string.genre_pop
-    Genre.Rock -> R.string.genre_rock
-    Genre.Classical -> R.string.genre_classical
-    Genre.Electronic -> R.string.genre_electronic
-    Genre.HipHop -> R.string.genre_hip_hop
-    Genre.Jazz -> R.string.genre_jazz
 }
 
 @StringRes

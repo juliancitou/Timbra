@@ -17,6 +17,7 @@ import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalScreen
+import com.juliancitou.timbra.ui.theme.TerminalTextField
 import com.juliancitou.timbra.ui.theme.staggeredEntrance
 
 private val ChecklistItems = listOf(
@@ -28,8 +29,14 @@ private val ChecklistItems = listOf(
 
 private val AllChecked = (1 shl ChecklistItems.size) - 1
 
+/** Lista de preparación y el nombre de los audífonos, que será el nombre sugerido del preset. */
 @Composable
-fun PreparationScreen(onContinue: () -> Unit, onBack: () -> Unit) {
+fun PreparationScreen(
+    headphonesName: String,
+    onHeadphonesNameChange: (String) -> Unit,
+    onContinue: () -> Unit,
+    onBack: () -> Unit,
+) {
     // Un bit por punto de la lista: sobrevive a rotaciones y a la recreación de la pantalla.
     var checkedMask by rememberSaveable { mutableIntStateOf(0) }
 
@@ -57,6 +64,12 @@ fun PreparationScreen(onContinue: () -> Unit, onBack: () -> Unit) {
                 )
             }
         }
+        TerminalTextField(
+            value = headphonesName,
+            onValueChange = onHeadphonesNameChange,
+            label = stringResource(R.string.preparation_headphones_label),
+            placeholder = stringResource(R.string.preparation_headphones_placeholder),
+        )
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             SectionLabel(stringResource(R.string.preparation_section_why))
             DetailText(stringResource(R.string.preparation_why))

@@ -4,7 +4,6 @@
     <!-- Comunes -->
     <string name="action_back">Volver</string>
     <string name="action_continue">Continuar</string>
-    <string name="sample_notice">Contenido de ejemplo: todavía no suena nada.</string>
 
     <!-- Inicio -->
     <string name="home_lead">Crea una ecualización hecha para tus oídos y tus audífonos.</string>
@@ -22,18 +21,17 @@
 
     <!-- Preparación -->
     <string name="preparation_title">Preparación</string>
-    <string name="preparation_lead">Mide igual que como escuchas música. Marca cada punto cuando esté listo.</string>
+    <string name="preparation_lead">Haz el test igual que como escuchas música. Marca cada punto cuando esté listo.</string>
     <string name="preparation_headphones">Audífonos conectados</string>
     <string name="preparation_noise_cancelling">Cancelación de ruido en tu modo habitual</string>
     <string name="preparation_poweramp_off">Ecualizador de Poweramp apagado</string>
     <string name="preparation_quiet_place">Estoy en un lugar silencioso</string>
     <string name="preparation_section_why">por qué</string>
-    <string name="preparation_why">Con el ecualizador de Poweramp apagado se miden tus audífonos tal como son.</string>
+    <string name="preparation_why">Con el ecualizador de Poweramp apagado escuchas tus audífonos tal como son, sin ajustes encima.</string>
 
     <!-- Nivel cómodo -->
     <string name="comfort_title">Nivel cómodo</string>
-    <string name="comfort_lead">Sube el volumen del teléfono poco a poco hasta que la referencia se oiga clara, pero nunca fuerte.</string>
-    <string name="comfort_volume">Volumen del teléfono: %1$d %%</string>
+    <string name="comfort_lead">Elige un género y pulsa Reproducir. Sube el volumen del teléfono poco a poco hasta que se oiga claro, pero nunca fuerte.</string>
     <string name="comfort_section_safety">seguridad</string>
     <string name="comfort_safety">Si en algún momento te molesta, pausa. El sonido nunca supera un nivel seguro.</string>
     <string name="action_play">Reproducir</string>
@@ -78,9 +76,8 @@
 
     <!-- Exportar -->
     <string name="export_title">Exportar</string>
-    <string name="export_lead">Guarda el archivo y ábrelo en Poweramp Equalizer.</string>
+    <string name="export_lead">Guarda el archivo en tu teléfono y luego impórtalo en Poweramp Equalizer.</string>
     <string name="export_section_name">nombre del preset</string>
-    <string name="export_preset_name">Timbra - Mi ecualización</string>
     <string name="export_section_steps">cómo importarlo</string>
     <string name="export_step_open">Abre Poweramp Equalizer.</string>
     <string name="export_step_presets">Entra a la lista de presets y elige importar.</string>
@@ -168,4 +165,71 @@
     <string name="about_show_license">Ver licencia</string>
     <string name="about_hide_license">Ocultar licencia</string>
     <string name="about_version">Timbra %1$s</string>
+
+    <!-- Preparación: audífonos -->
+    <string name="preparation_headphones_label">tus audífonos</string>
+    <string name="preparation_headphones_placeholder">por ejemplo, FreeBuds Pro 4</string>
+    <string name="comfort_section_genre">música del test</string>
+
+    <!-- Test: rondas -->
+    <string name="finder_progress_coarse">ronda %1$d de %2$d · primera pasada</string>
+    <string name="finder_progress_fine">ronda %1$d de %2$d · afinar</string>
+    <string name="finder_step_listen">Toca cada círculo para escuchar cómo cambia.</string>
+    <string name="finder_step_choose">Elige el que te suene mejor y pulsa "Elegir".</string>
+    <string name="finder_fine_hint">Ahora afina: las opciones están más cerca de lo que elegiste.</string>
+    <string name="finder_preparing">Preparando opciones…</string>
+    <string name="finder_node_description">Opción %1$d de %2$d, %3$s</string>
+    <string name="action_choose">Elegir</string>
+
+    <string name="finder_balance_title">Balance</string>
+    <string name="finder_balance_question">¿Lo prefieres más cálido o más brillante?</string>
+    <string name="finder_balance_hint">Inclina todo el sonido: a un lado más cuerpo, al otro más brillo.</string>
+    <string name="finder_balance_lower">cálido</string>
+    <string name="finder_balance_upper">brillante</string>
+    <string name="finder_bass_title">Graves</string>
+    <string name="finder_bass_question">¿Cuánto bajo te gusta?</string>
+    <string name="finder_bass_hint">El golpe del bombo y el cuerpo del bajo.</string>
+    <string name="finder_bass_lower">menos</string>
+    <string name="finder_bass_upper">más</string>
+    <string name="finder_clarity_title">Claridad</string>
+    <string name="finder_clarity_question">¿Qué tan limpio quieres el fondo?</string>
+    <string name="finder_clarity_hint">Quitar "lodo" despeja las voces y el piano.</string>
+    <string name="finder_clarity_lower">más limpio</string>
+    <string name="finder_clarity_upper">más cuerpo</string>
+    <string name="finder_voice_title">Voz</string>
+    <string name="finder_voice_question">¿Qué tanto quieres que resalten las voces?</string>
+    <string name="finder_voice_hint">La presencia de las voces y los instrumentos solistas.</string>
+    <string name="finder_voice_lower">más suave</string>
+    <string name="finder_voice_upper">más presente</string>
+    <string name="finder_sibilance_title">La "S"</string>
+    <string name="finder_sibilance_question">¿Te molestan la "S" o los platillos?</string>
+    <string name="finder_sibilance_hint">Bájala si la "S" de las voces o el "tss" de los platillos pican.</string>
+    <string name="finder_sibilance_lower">más suave</string>
+    <string name="finder_sibilance_upper">más filo</string>
+    <string name="finder_air_title">Aire</string>
+    <string name="finder_air_question">¿Cuánto brillo quieres en lo más agudo?</string>
+    <string name="finder_air_hint">El "aire" de los violines y los platillos.</string>
+    <string name="finder_air_lower">más oscuro</string>
+    <string name="finder_air_upper">más aire</string>
+
+    <!-- Test: resultado -->
+    <string name="finder_result_title">Tu ecualización</string>
+    <string name="finder_result_lead">Escúchala y compárala con el sonido original.</string>
+    <string name="finder_result_chart">Gráfica de tu ecualización.</string>
+    <string name="finder_compare_with">Con ecualización</string>
+    <string name="finder_compare_without">Sin ecualizar</string>
+    <string name="finder_preset_label">nombre del preset</string>
+    <string name="finder_default_preset_name">Mi ecualización</string>
+    <string name="action_restart_test">Repetir el test</string>
+
+    <!-- Exportar -->
+    <string name="export_saved">Archivo guardado</string>
+    <string name="export_save_failed">No se pudo guardar el archivo</string>
+    <string name="export_share_chooser">Compartir preset</string>
+
+    <!-- Modo avanzado (vista previa) -->
+    <string name="settings_section_advanced">modo avanzado</string>
+    <string name="settings_advanced_body">Medición banda por banda para encontrar picos exactos, como la "S". Llega en una versión futura; por ahora es una vista previa sin sonido.</string>
+    <string name="action_advanced_preview">Ver vista previa</string>
+    <string name="action_finish">Terminar</string>
 </resources>

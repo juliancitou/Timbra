@@ -11,17 +11,31 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.screens.about.AboutScreen
 import com.juliancitou.timbra.ui.screens.audiotest.AudioTestScreen
 import com.juliancitou.timbra.ui.screens.comfort.ComfortLevelScreen
 import com.juliancitou.timbra.ui.screens.export.ExportScreen
+import com.juliancitou.timbra.ui.screens.finder.EqualizerFinderViewModel
+import com.juliancitou.timbra.ui.screens.finder.FinderResultScreen
+import com.juliancitou.timbra.ui.screens.finder.FinderRoundScreen
 import com.juliancitou.timbra.ui.screens.history.HistoryScreen
 import com.juliancitou.timbra.ui.screens.home.HomeScreen
 import com.juliancitou.timbra.ui.screens.measurement.MeasurementScreen
@@ -43,6 +57,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object MeasurementRoute
 @Serializable data object ResultsRoute
 @Serializable data object TasteRoute
+@Serializable data object FinderRoundRoute
+@Serializable data object FinderResultRoute
 @Serializable data object ExportRoute
 @Serializable data object HistoryRoute
 @Serializable data object SettingsRoute
@@ -63,6 +79,10 @@ fun TimbraNavHost(
     navController: NavHostController = rememberNavController(),
 ) {
     val animated = !isReducedMotionEnabled()
+    // El test se comparte entre varias pantallas: su ViewModel vive con la actividad.
+    val finder: EqualizerFinderViewModel = viewModel()
+    val finderState by finder.uiState.collectAsStateWithLifecycle()
+    StopFinderSoundOutsideItsScreens(navController, onStop = finder::stopSound)
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             NavHost(
@@ -97,10 +117,57 @@ fun TimbraNavHost(
                     )
                 }
                 screen<PreparationRoute> {
-                    PreparationScreen(onContinue = { navController.navigate(ComfortLevelRoute) }, onBack = back)
+                    PreparationScreen(
+                        headphonesName = finderState.headphonesName,
+                        onHeadphonesNameChange = finder::setHeadphonesName,
+                        onContinue = { navController.navigate(ComfortLevelRoute) },
+                        onBack = back,
+                    )
                 }
                 screen<ComfortLevelRoute> {
-                    ComfortLevelScreen(onReady = { navController.navigate(MeasurementRoute) }, onBack = back)
+                    ComfortLevelScreen(
+                        state = finderState,
+                        onPrepareMusic = finder::prepareMusic,
+                        onSelectGenre = finder::selectGenre,
+                        onTogglePlayback = finder::togglePlayback,
+                        onReady = {
+                            finder.startTest()
+                            navController.navigate(FinderRoundRoute)
+                        },
+                        onBack = back,
+                    )
+                }
+                screen<FinderRoundRoute> {
+                    LaunchedEffect(finderState.finder.isFinished) {
+                        if (finderState.finder.isFinished) navController.navigate(FinderResultRoute)
+                    }
+                    if (!finderState.finder.isFinished) {
+                        FinderRoundScreen(
+                            state = finderState,
+                            onAudition = finder::audition,
+                            onChoose = finder::chooseAudition,
+                            onTogglePlayback = finder::togglePlayback,
+                            onPreviousRound = finder::previousRound,
+                            onExit = back,
+                        )
+                    }
+                }
+                screen<FinderResultRoute> {
+                    FinderResultScreen(
+                        state = finderState,
+                        onBypassChange = finder::setBypass,
+                        onTogglePlayback = finder::togglePlayback,
+                        onPresetNameChange = finder::setPresetName,
+                        onExport = { navController.navigate(ExportRoute) },
+                        onRestart = {
+                            finder.startTest()
+                            navController.popBackStack(FinderRoundRoute, inclusive = false)
+                        },
+                        onPreviousRound = {
+                            finder.previousRound()
+                            navController.popBackStack()
+                        },
+                    )
                 }
                 screen<MeasurementRoute> {
                     MeasurementScreen(onFinished = { navController.navigate(ResultsRoute) }, onBack = back)
@@ -109,10 +176,14 @@ fun TimbraNavHost(
                     ResultsScreen(onAdjustTaste = { navController.navigate(TasteRoute) }, onBack = back)
                 }
                 screen<TasteRoute> {
-                    TasteScreen(onExport = { navController.navigate(ExportRoute) }, onBack = back)
+                    TasteScreen(onFinish = { navController.popBackStack(HomeRoute, inclusive = false) }, onBack = back)
                 }
                 screen<ExportRoute> {
+                    val defaultName = stringResource(R.string.finder_default_preset_name)
                     ExportScreen(
+                        presetName = finderState.effectivePresetName(defaultName),
+                        fileName = finder.presetFileName(defaultName),
+                        presetJson = { finder.presetJson(defaultName) },
                         onGoHome = { navController.popBackStack(HomeRoute, inclusive = false) },
                         onBack = back,
                     )
@@ -126,6 +197,7 @@ fun TimbraNavHost(
                 ) {
                     SettingsScreen(
                         onOpenAudioTest = { navController.navigate(AudioTestRoute) },
+                        onOpenAdvancedPreview = { navController.navigate(MeasurementRoute) },
                         onOpenAbout = { navController.navigate(AboutRoute) },
                         onBack = back,
                     )
@@ -145,6 +217,28 @@ fun TimbraNavHost(
  * Destino con su escena de animación disponible para `containerTransform`. Las transiciones nulas
  * usan las generales del `NavHost`.
  */
+/** Pantallas del test en las que puede sonar la música; en cualquier otra, el sonido se detiene. */
+private val FinderSoundRoutes = listOf(ComfortLevelRoute::class, FinderRoundRoute::class, FinderResultRoute::class)
+
+/**
+ * Detiene el sonido del test al salir de sus pantallas y cuando la app pasa a segundo plano o se
+ * apaga la pantalla. Es la regla "nunca suena fuera de las pantallas del test".
+ */
+@Composable
+private fun StopFinderSoundOutsideItsScreens(navController: NavHostController, onStop: () -> Unit) {
+    val entry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(entry?.destination) {
+        val destination = entry?.destination ?: return@LaunchedEffect
+        if (FinderSoundRoutes.none { destination.hasRoute(it) }) onStop()
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) onStop() }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+}
+
 private inline fun <reified T : Any> NavGraphBuilder.screen(
     noinline enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? = null,
     noinline exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? = null,

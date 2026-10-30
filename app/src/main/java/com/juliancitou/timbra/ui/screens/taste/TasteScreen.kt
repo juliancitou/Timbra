@@ -21,7 +21,7 @@ import com.juliancitou.timbra.ui.theme.TerminalSliderSize
 private val TasteRangeDb = -6f..6f
 
 @Composable
-fun TasteScreen(onExport: () -> Unit, onBack: () -> Unit) {
+fun TasteScreen(onFinish: () -> Unit, onBack: () -> Unit) {
     var bassDb by rememberSaveable { mutableFloatStateOf(0f) }
     var voiceDb by rememberSaveable { mutableFloatStateOf(0f) }
     var brightnessDb by rememberSaveable { mutableFloatStateOf(0f) }
@@ -35,8 +35,8 @@ fun TasteScreen(onExport: () -> Unit, onBack: () -> Unit) {
         onBack = onBack,
         actions = {
             TerminalButton(
-                text = stringResource(R.string.action_export),
-                onClick = onExport,
+                text = stringResource(R.string.action_finish),
+                onClick = onFinish,
                 modifier = Modifier.fillMaxWidth(),
             )
         },
