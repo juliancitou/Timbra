@@ -19,6 +19,14 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `cb03326` · ui: chips con corchetes estilo terminal
+- Pedido del usuario: los chips quedan solo como la palabra entre corchetes, `[ Confiable ]`,
+  sin fondo ni contorno. Gris sin seleccionar, ámbar seleccionado y rojo para avisos, con el
+  color deslizándose al cambiar. TalkBack lee solo la palabra.
+- Sin fondo propio, el texto del chip depende de lo que tenga detrás: el rojo de aviso sube de
+  `#FF8A8A` a `#FF9A9A` para cumplir 4.5:1 también sobre el vidrio sin desenfoque (estaba en
+  4.14:1). `ContrastTest` ahora verifica los chips sobre fondo y sobre vidrio.
+
 ### 2026-10-30 · `61b8a9b` · ui: botones con marco ASCII e íconos sin fondo
 - Pedido del usuario: botones con aspecto de recuadro ASCII y sin fondo. `asciiFrame` dibuja
   esquinas ┌ ┐ └ ┘, laterales continuos y guiones repartidos de forma pareja arriba y abajo, que
