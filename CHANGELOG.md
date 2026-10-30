@@ -19,6 +19,18 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+_Nada todavía._
+
+## [0.4.0] · 2026-10-30 · Fase 3: música generada y estilo terminal
+
+Música del test generada por la app en seis géneros (pop, rock, clásica, electrónica, hip-hop y
+jazz) con bajo pulsado más definido, 14 ecualizaciones de prueba hechas con curvas suaves y el
+preamp de Poweramp. La interfaz pasa del liquid glass a un estilo de terminal/ASCII: botones con
+marco ASCII, chips con corchetes, pasos como líneas de código, títulos que se escriben y engrane
+que se expande en Ajustes. Además: ícono con el logo del usuario, pantalla "Acerca de" con
+créditos y contacto, y la prueba de audio fluida a 120 Hz. El usuario escuchó los seis géneros
+sin quejas.
+
 ### 2026-10-30 · `df4afc3` · ui: pasos como líneas de código y subtítulos más grandes
 - Pedido del usuario: que pasos e indicaciones se vean como código. `CodeLines` muestra cada
   paso con número de línea tenue, una barra `│` que acompaña al texto aunque ocupe varios

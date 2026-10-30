@@ -97,7 +97,7 @@ terminó en estilo terminal/ASCII).
 - [x] Pruebas: igualación de volumen entre ecualizaciones
 - [x] Pantalla temporal "Prueba de audio" en Ajustes
 - [x] Escuchar en los audífonos: sin clics, sin distorsión, volumen cómodo
-- [ ] Tag y release `v0.3.0`
+- [x] Tag y release `v0.3.0`
 
 ## Fase 3 — Música generada · `v0.4.0`
 
@@ -114,7 +114,7 @@ terminó en estilo terminal/ASCII).
 - [x] Seis géneros: pop, rock, clásica, electrónica, hip-hop y jazz
 - [x] 14 ecualizaciones de prueba hechas con curvas suaves (`EqualizerShapes`)
 - [x] Escuchar en los audífonos: pop suena musical
-- [ ] Escuchar los seis géneros y ajustar lo que no convenza
+- [x] Escuchar los seis géneros y ajustar lo que no convenza
 - [ ] Más géneros a futuro (mariachi, blues, balada acústica…)
 - [ ] Tag y release `v0.4.0`
 
