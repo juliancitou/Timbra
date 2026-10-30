@@ -19,6 +19,18 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+_Nada todavía._
+
+## [0.3.0] · 2026-10-30 · Fase 2: motor de audio seguro y ecualizador en vivo
+
+La app suena por primera vez. Cadena fija fuente → ecualizador de 25 bandas (con cambio sin
+clics) → entrada/salida de 50 ms → limitador de seguridad (−18 dBFS RMS, picos a −6 dBFS),
+igualación de volumen con ponderación K, foco de audio, pausa al desconectar audífonos y paro
+automático a los 20 minutos. Pantalla temporal "Prueba de audio" en Ajustes. Probado en el
+POCO X8 Pro Max con los FreeBuds Pro 4: sin clics, cambios suaves, pausas correctas y volumen
+cómodo. También incluye la reorganización del plan (test de esferas como modo principal) y la
+desactivación del respaldo de datos.
+
 ### 2026-10-30 · `4b8a5e1` · ui: agregar pantalla de prueba de audio
 - Pantalla temporal en Ajustes → "Probar el sonido": ruido rosa o tono de 1 kHz, cuatro
   ecualizaciones para cambiar mientras suena (sin ecualizar, preset de ejemplo, más graves,

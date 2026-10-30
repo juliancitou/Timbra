@@ -32,7 +32,7 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 - [x] Activar Depuración USB e Instalar vía USB en el teléfono
 - [x] Instalar y abrir la app vacía en el POCO
 - [x] Confirmar que el workflow pasa en verde en GitHub
-- [ ] Tag y release `v0.1.0` (el workflow adjunta el APK)
+- [x] Tag y release `v0.1.0` (el workflow adjunta el APK)
 
 ## Fase 1 — Diseño y navegación · `v0.2.0`
 
@@ -74,7 +74,7 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 - [x] Objetivos táctiles ≥ 48 dp y `contentDescription` en iconos
 - [x] Probar con texto grande del sistema
 - [x] Probar fluidez en el POCO (sin tirones al desenfocar)
-- [ ] Tag y release `v0.2.0`
+- [x] Tag y release `v0.2.0`
 
 ## Fase 2 — Motor de audio seguro y ecualizador en vivo · `v0.3.0`
 
@@ -95,7 +95,7 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 - [x] Pruebas: fades y fundidos sin discontinuidades
 - [x] Pruebas: igualación de volumen entre ecualizaciones
 - [x] Pantalla temporal "Prueba de audio" en Ajustes
-- [ ] Escuchar en los audífonos: sin clics, sin distorsión, volumen cómodo
+- [x] Escuchar en los audífonos: sin clics, sin distorsión, volumen cómodo
 - [ ] Tag y release `v0.3.0`
 
 ## Fase 3 — Música generada · `v0.4.0`
