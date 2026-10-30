@@ -1,0 +1,40 @@
+# Gradle
+.gradle/
+build/
+.kotlin/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.navigation/
+
+# VS Code
+.vscode/
+
+# Salidas de compilación
+*.apk
+*.aab
+*.ap_
+*.dex
+*.hprof
+
+# Firmas y secretos
+*.jks
+*.keystore
+keystore.properties
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Registros
+*.log
+
+# Notas de trabajo locales (no se publican)
+/docs/
+/CLAUDE.md
+/.claude/
