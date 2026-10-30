@@ -19,6 +19,16 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `61b8a9b` · ui: botones con marco ASCII e íconos sin fondo
+- Pedido del usuario: botones con aspecto de recuadro ASCII y sin fondo. `asciiFrame` dibuja
+  esquinas ┌ ┐ └ ┘, laterales continuos y guiones repartidos de forma pareja arriba y abajo, que
+  siempre cierran en las esquinas sin importar el ancho ni el tamaño de letra. Se dibuja en vez de
+  escribirse con caracteres porque el texto se descuadraría con la letra grande del sistema.
+- Principal: contorno y texto ámbar. Secundario: contorno gris y texto blanco. Al presionar, los
+  guiones se alargan hasta formar una línea continua en 200 ms.
+- Engrane y flecha de volver: solo el ícono, sin vidrio, borde ni escuadras (onda circular al
+  tocar, área táctil de 48 dp). Se elimina `bracketCorners`, que ya no se usa.
+
 ### 2026-10-30 · `de27119` · ui: animar títulos, listas, casillas y controles
 - Títulos `> Título` que se escriben letra por letra en ~0.3 s; las letras pendientes ya ocupan
   su lugar (transparentes), así que nada se mueve. TalkBack lee el título completo.
