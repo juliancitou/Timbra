@@ -1,9 +1,12 @@
 package com.juliancitou.timbra.ui.theme
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +21,10 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,11 +39,19 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 private const val CURSOR_BLINK_MS = 1_100
+
+/** El título se escribe en ~0.3 s en total, sin pasar de 35 ms por letra en títulos cortos. */
+private const val TYPEWRITER_TOTAL_MS = 300L
+private const val TYPEWRITER_MAX_CHAR_MS = 35L
 
 /**
  * Título con forma de línea de terminal: `> Título`, y opcionalmente un cursor `_` que
@@ -48,14 +62,18 @@ private const val CURSOR_BLINK_MS = 1_100
 fun TerminalTitle(text: String, modifier: Modifier = Modifier, showCursor: Boolean = false) {
     val style = MaterialTheme.typography.headlineMedium
     val accent = MaterialTheme.colorScheme.primary
-    val cursorAlpha = rememberCursorAlpha(blinking = showCursor && !isReducedMotionEnabled())
+    val animated = !isReducedMotionEnabled()
+    val cursorAlpha = rememberCursorAlpha(blinking = showCursor && animated)
+    val typed = rememberTypedCharacters(text, animated)
+    val textColor = MaterialTheme.colorScheme.onBackground
     Row(modifier = modifier.semantics(mergeDescendants = true) { heading() }) {
         Text(text = "> ", style = style, color = accent, modifier = Modifier.clearAndSetSemantics {})
         Text(
-            text = text,
+            text = typewriterText(text, typed.value, textColor),
             style = style,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.weight(1f, fill = false),
+            modifier = Modifier
+                .weight(1f, fill = false)
+                .semantics { contentDescription = text },
         )
         if (showCursor) {
             Text(
@@ -68,6 +86,30 @@ fun TerminalTitle(text: String, modifier: Modifier = Modifier, showCursor: Boole
             )
         }
     }
+}
+
+/** Cuántas letras del título ya se "escribieron": todas, de golpe, si se reduce el movimiento. */
+@Composable
+private fun rememberTypedCharacters(text: String, animated: Boolean): State<Int> {
+    val typed = remember(text) { mutableIntStateOf(if (animated) 0 else text.length) }
+    LaunchedEffect(text) {
+        if (!animated) return@LaunchedEffect
+        val perCharacter = (TYPEWRITER_TOTAL_MS / text.length.coerceAtLeast(1)).coerceAtMost(TYPEWRITER_MAX_CHAR_MS)
+        while (typed.intValue < text.length) {
+            delay(perCharacter)
+            typed.intValue++
+        }
+    }
+    return typed
+}
+
+/**
+ * El título completo, con las letras aún no escritas transparentes: así ocupa su lugar desde el
+ * inicio y nada se mueve mientras aparece.
+ */
+private fun typewriterText(text: String, typed: Int, color: Color) = buildAnnotatedString {
+    withStyle(SpanStyle(color = color)) { append(text.take(typed)) }
+    withStyle(SpanStyle(color = Color.Transparent)) { append(text.drop(typed)) }
 }
 
 @Composable
@@ -140,7 +182,10 @@ fun BulletList(items: List<String>, modifier: Modifier = Modifier) {
 private fun MarkedList(items: List<String>, marker: (Int) -> String, modifier: Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
         items.forEachIndexed { index, item ->
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.medium)) {
+            Row(
+                modifier = Modifier.staggeredEntrance(index),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
+            ) {
                 Text(
                     text = marker(index),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
@@ -173,17 +218,38 @@ fun CheckRow(label: String, checked: Boolean, onToggle: () -> Unit, modifier: Mo
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
-        Text(
-            text = if (checked) "[x]" else "[ ]",
-            style = MaterialTheme.typography.titleMedium,
-            color = if (checked) colors.primary else colors.onSurfaceVariant,
-            modifier = Modifier.clearAndSetSemantics {},
+        val markColor by animateColorAsState(
+            if (checked) colors.primary else colors.onSurfaceVariant,
+            label = "mark",
         )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = if (checked) colors.onBackground else colors.onSurfaceVariant,
+        val labelColor by animateColorAsState(
+            if (checked) colors.onBackground else colors.onSurfaceVariant,
+            label = "label",
         )
+        val markScale by animateFloatAsState(
+            targetValue = if (checked) 1f else 0f,
+            animationSpec = spring(dampingRatio = 0.45f, stiffness = 600f),
+            label = "markScale",
+        )
+        val style = MaterialTheme.typography.titleMedium
+        Row(modifier = Modifier.clearAndSetSemantics {}) {
+            Text(text = "[", style = style, color = markColor)
+            Box(contentAlignment = Alignment.Center) {
+                Text(text = " ", style = style)
+                Text(
+                    text = "x",
+                    style = style,
+                    color = markColor,
+                    modifier = Modifier.graphicsLayer {
+                        scaleX = markScale
+                        scaleY = markScale
+                        alpha = markScale.coerceIn(0f, 1f)
+                    },
+                )
+            }
+            Text(text = "]", style = style, color = markColor)
+        }
+        Text(text = label, style = MaterialTheme.typography.bodyLarge, color = labelColor)
     }
 }
 

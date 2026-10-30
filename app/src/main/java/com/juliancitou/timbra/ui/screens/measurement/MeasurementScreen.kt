@@ -1,6 +1,8 @@
 package com.juliancitou.timbra.ui.screens.measurement
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,12 +20,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
+import com.juliancitou.timbra.ui.theme.EmphasizedDecelerate
 import com.juliancitou.timbra.ui.theme.FitText
 import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassButtonStyle
 import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.GlassSlider
 import com.juliancitou.timbra.ui.theme.LeadText
+import com.juliancitou.timbra.ui.theme.MotionDuration
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.formatHertz
@@ -38,6 +42,11 @@ fun MeasurementScreen(onFinished: () -> Unit, onBack: () -> Unit) {
     var gainDb by rememberSaveable { mutableFloatStateOf(0f) }
     val bandCount = POWERAMP_BAND_FREQUENCIES_HZ.size
     val frequencyHz = POWERAMP_BAND_FREQUENCIES_HZ[bandIndex]
+    val progress by animateFloatAsState(
+        targetValue = (bandIndex + 1f) / bandCount,
+        animationSpec = tween(MotionDuration.LONG_MS, easing = EmphasizedDecelerate),
+        label = "bandProgress",
+    )
 
     fun nextBand() {
         if (bandIndex == bandCount - 1) {
@@ -77,7 +86,7 @@ fun MeasurementScreen(onFinished: () -> Unit, onBack: () -> Unit) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             SectionLabel(stringResource(R.string.measurement_progress, bandIndex + 1, bandCount))
             LinearProgressIndicator(
-                progress = { (bandIndex + 1f) / bandCount },
+                progress = { progress },
                 modifier = Modifier.fillMaxWidth(),
                 trackColor = Color.White.copy(alpha = 0.10f),
                 drawStopIndicator = {},

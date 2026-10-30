@@ -17,6 +17,7 @@ import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.staggeredEntrance
 
 private val ChecklistItems = listOf(
     R.string.preparation_headphones,
@@ -52,6 +53,7 @@ fun PreparationScreen(onContinue: () -> Unit, onBack: () -> Unit) {
                     label = stringResource(labelRes),
                     checked = checkedMask and bit != 0,
                     onToggle = { checkedMask = checkedMask xor bit },
+                    modifier = Modifier.staggeredEntrance(index),
                 )
             }
         }

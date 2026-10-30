@@ -4,10 +4,12 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
@@ -24,6 +26,7 @@ import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassChip
 import com.juliancitou.timbra.ui.theme.GlassChipTone
 import com.juliancitou.timbra.ui.theme.GlassScreen
+import com.juliancitou.timbra.ui.theme.PlayingIndicator
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 
@@ -47,11 +50,19 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
             )
         },
     ) {
-        GlassChip(
-            label = stringResource(if (state.canPlay) statusLabel(state.status) else R.string.audio_status_preparing),
-            tone = if (state.status.isWarning()) GlassChipTone.Warning else GlassChipTone.Normal,
-            selected = state.status == PlaybackStatus.Playing,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
+        ) {
+            GlassChip(
+                label = stringResource(
+                    if (state.canPlay) statusLabel(state.status) else R.string.audio_status_preparing,
+                ),
+                tone = if (state.status.isWarning()) GlassChipTone.Warning else GlassChipTone.Normal,
+                selected = state.status == PlaybackStatus.Playing,
+            )
+            PlayingIndicator(playing = state.status == PlaybackStatus.Playing)
+        }
         ChoiceSection(R.string.audio_test_section_signal) {
             TestSignal.entries.forEach { signal ->
                 GlassChip(

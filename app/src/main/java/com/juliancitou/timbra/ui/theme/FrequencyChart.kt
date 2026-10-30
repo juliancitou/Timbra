@@ -1,10 +1,17 @@
 package com.juliancitou.timbra.ui.theme
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -48,6 +55,7 @@ fun FrequencyChart(
     highlightedBandIndex: Int? = null,
 ) {
     require(gainsDb.size == frequenciesHz.size) { "Cada frecuencia necesita una ganancia" }
+    val shownGains = rememberMorphingGains(gainsDb)
     val textMeasurer = rememberTextMeasurer()
     val colors = MaterialTheme.colorScheme
     val labelStyle = MaterialTheme.typography.labelSmall.withTabularNumbers().copy(color = colors.onSurfaceVariant)
@@ -76,7 +84,7 @@ fun FrequencyChart(
             bottom = size.height - frequencyLabelHeight - LabelGap.toPx(),
         )
         drawGrid(plot, minDb, maxDb, chartColors, textMeasurer, labelStyle)
-        val points = frequenciesHz.zip(gainsDb) { hz, db ->
+        val points = frequenciesHz.zip(shownGains()) { hz, db ->
             Offset(
                 x = plot.left + plot.width * frequencyToFraction(hz.toFloat()),
                 y = plot.top + plot.height * gainToFraction(db, minDb, maxDb),
@@ -85,6 +93,31 @@ fun FrequencyChart(
         drawCurve(points, plot, chartColors.curve)
         drawPoints(points, estimatedBandIndices, highlightedBandIndex, plot, chartColors)
     }
+}
+
+/**
+ * Ganancias que se deslizan de la curva anterior a la nueva en ~200 ms, para que la gráfica se
+ * transforme en vez de saltar al mover un control. Se leen al dibujar, sin recomponer.
+ */
+@Composable
+private fun rememberMorphingGains(target: List<Float>): () -> List<Float> {
+    val animated = !isReducedMotionEnabled()
+    val progress = remember { Animatable(1f) }
+    var from by remember { mutableStateOf(target) }
+    var to by remember { mutableStateOf(target) }
+    val current = { from.zip(to) { a, b -> a + (b - a) * progress.value } }
+    LaunchedEffect(target) {
+        if (target == to) return@LaunchedEffect
+        from = if (from.size == target.size) current() else target
+        to = target
+        if (animated) {
+            progress.snapTo(0f)
+            progress.animateTo(1f, tween(MotionDuration.SHORT_MS, easing = EmphasizedDecelerate))
+        } else {
+            progress.snapTo(1f)
+        }
+    }
+    return current
 }
 
 private class ChartColors(
