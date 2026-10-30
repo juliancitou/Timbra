@@ -43,7 +43,7 @@ private val NudgeDistance = 6.dp
 
 /** Solo el ícono, sin fondo ni contorno; el área táctil sigue siendo de 48 dp. */
 @Composable
-fun GlassIconButton(
+fun TerminalIconButton(
     @DrawableRes iconRes: Int,
     contentDescription: String,
     onClick: () -> Unit,

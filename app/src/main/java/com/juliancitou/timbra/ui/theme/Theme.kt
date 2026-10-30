@@ -26,7 +26,7 @@ private val TimbraColorScheme = darkColorScheme(
     outline = Outline,
 )
 
-/** Tema siempre oscuro: el vidrio translúcido y la aurora se diseñaron solo para fondo oscuro. */
+/** Tema siempre oscuro: el estilo de terminal y el fondo difuminado se diseñaron solo para oscuro. */
 @Composable
 fun TimbraTheme(content: @Composable () -> Unit) {
     MaterialTheme(

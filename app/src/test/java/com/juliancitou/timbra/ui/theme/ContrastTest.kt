@@ -8,8 +8,8 @@ import kotlin.math.pow
 
 /**
  * Contraste WCAG 2.1 de cada pareja texto/fondo de la app. AA pide 4.5:1 para texto normal y
- * 3:1 para elementos gráficos (curva, marcos). Sin vidrio, todo va directo sobre el fondo, así
- * que se revisan sus tres tonos; el más claro ([Charcoal]) es el peor caso.
+ * 3:1 para elementos gráficos (curva, marcos). Todo va directo sobre el fondo, así que se revisan
+ * sus tres tonos; el más claro ([Charcoal]) es el peor caso.
  */
 class ContrastTest {
 

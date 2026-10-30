@@ -16,15 +16,15 @@ import androidx.compose.ui.semantics.Role
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.screens.SampleData
 import com.juliancitou.timbra.ui.screens.SampleMeasurement
-import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.Hairline
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.TerminalScreen
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
 fun HistoryScreen(onOpenMeasurement: () -> Unit, onBack: () -> Unit) {
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.history_title),
         lead = stringResource(R.string.history_lead),
         onBack = onBack,

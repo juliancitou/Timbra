@@ -14,12 +14,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.DetailText
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassButtonStyle
-import com.juliancitou.timbra.ui.theme.GlassScreen
-import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.SETTINGS_TRANSFORM_KEY
+import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
+import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.containerTransform
 
 @Composable
@@ -28,7 +28,7 @@ fun SettingsScreen(
     onOpenAbout: () -> Unit,
     onBack: () -> Unit,
 ) {
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.settings_title),
         onBack = onBack,
         modifier = Modifier.containerTransform(SETTINGS_TRANSFORM_KEY),
@@ -36,10 +36,10 @@ fun SettingsScreen(
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
             SectionLabel(stringResource(R.string.settings_section_audio_test))
             DetailText(stringResource(R.string.settings_audio_test_body))
-            GlassButton(
+            TerminalButton(
                 text = stringResource(R.string.action_audio_test),
                 onClick = onOpenAudioTest,
-                style = GlassButtonStyle.Secondary,
+                style = TerminalButtonStyle.Secondary,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

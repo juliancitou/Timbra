@@ -42,7 +42,7 @@ fun Modifier.containerTransform(key: String): Modifier {
             exit = fadeOut(tween(MotionDuration.CONTAINER_TRANSFORM_MS / 3)),
             boundsTransform = ContainerBounds,
             resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-            clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(GlassCornerRadius)),
+            clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(PanelCornerRadius)),
         )
     }
 }

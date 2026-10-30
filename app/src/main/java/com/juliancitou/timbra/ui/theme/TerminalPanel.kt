@@ -14,7 +14,7 @@ private const val PANEL_FRAME_ALPHA = 0.35f
 
 /** Recuadro ASCII sin fondo (┌ - - ┐) para agrupar contenido, como la gráfica. */
 @Composable
-fun GlassCard(
+fun TerminalPanel(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(20.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(Spacing.small),

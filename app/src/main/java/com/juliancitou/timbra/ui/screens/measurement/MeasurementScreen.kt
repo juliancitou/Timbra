@@ -22,14 +22,14 @@ import com.juliancitou.timbra.R
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
 import com.juliancitou.timbra.ui.theme.EmphasizedDecelerate
 import com.juliancitou.timbra.ui.theme.FitText
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassButtonStyle
-import com.juliancitou.timbra.ui.theme.GlassScreen
-import com.juliancitou.timbra.ui.theme.GlassSlider
 import com.juliancitou.timbra.ui.theme.LeadText
 import com.juliancitou.timbra.ui.theme.MotionDuration
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
+import com.juliancitou.timbra.ui.theme.TerminalScreen
+import com.juliancitou.timbra.ui.theme.TerminalSlider
 import com.juliancitou.timbra.ui.theme.formatHertz
 import com.juliancitou.timbra.ui.theme.withTabularNumbers
 
@@ -57,26 +57,26 @@ fun MeasurementScreen(onFinished: () -> Unit, onBack: () -> Unit) {
         }
     }
 
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.measurement_title),
         lead = stringResource(R.string.measurement_lead),
         onBack = onBack,
         actions = {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                GlassButton(
+                TerminalButton(
                     text = stringResource(R.string.action_repeat),
                     onClick = { gainDb = 0f },
-                    style = GlassButtonStyle.Secondary,
+                    style = TerminalButtonStyle.Secondary,
                     modifier = Modifier.weight(1f),
                 )
-                GlassButton(
+                TerminalButton(
                     text = stringResource(R.string.action_skip),
                     onClick = ::nextBand,
-                    style = GlassButtonStyle.Secondary,
+                    style = TerminalButtonStyle.Secondary,
                     modifier = Modifier.weight(1f),
                 )
             }
-            GlassButton(
+            TerminalButton(
                 text = stringResource(R.string.action_sounds_equal),
                 onClick = ::nextBand,
                 modifier = Modifier.fillMaxWidth(),
@@ -100,7 +100,7 @@ fun MeasurementScreen(onFinished: () -> Unit, onBack: () -> Unit) {
             )
             LeadText(stringResource(bandHintRes(frequencyHz)))
         }
-        GlassSlider(
+        TerminalSlider(
             valueDb = gainDb,
             onValueChange = { gainDb = it },
             label = stringResource(R.string.measurement_band_gain),

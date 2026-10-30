@@ -24,7 +24,7 @@ import com.juliancitou.timbra.R
  * letra grande, el contenido desplazable y las acciones fijas abajo, al alcance del pulgar.
  */
 @Composable
-fun GlassScreen(
+fun TerminalScreen(
     title: String,
     modifier: Modifier = Modifier,
     lead: String? = null,
@@ -44,7 +44,7 @@ fun GlassScreen(
         if (onBack != null || headerAction != null) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (onBack != null) {
-                    GlassIconButton(
+                    TerminalIconButton(
                         iconRes = R.drawable.ic_arrow_back,
                         contentDescription = stringResource(R.string.action_back),
                         onClick = onBack,

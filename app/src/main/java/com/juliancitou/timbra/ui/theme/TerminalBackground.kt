@@ -69,7 +69,7 @@ private val NightGradient = Brush.verticalGradient(listOf(Ink, Graphite, Charcoa
  * El progreso de la animación se lee solo en la fase de dibujo, así que no recompone la pantalla.
  */
 @Composable
-fun GlassBackground(
+fun TerminalBackground(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {

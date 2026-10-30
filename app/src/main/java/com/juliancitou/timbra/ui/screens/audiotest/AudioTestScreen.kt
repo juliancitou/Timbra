@@ -22,25 +22,25 @@ import com.juliancitou.timbra.audio.PlaybackStatus
 import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.ui.theme.DetailText
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassChip
-import com.juliancitou.timbra.ui.theme.GlassChipTone
-import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.PlayingIndicator
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalChip
+import com.juliancitou.timbra.ui.theme.TerminalChipTone
+import com.juliancitou.timbra.ui.theme.TerminalScreen
 
 @Composable
 fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     StopWhenLeavingForeground(onStop = viewModel::stop)
 
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.audio_test_title),
         lead = stringResource(R.string.audio_test_lead),
         onBack = onBack,
         actions = {
-            GlassButton(
+            TerminalButton(
                 text = stringResource(
                     if (state.status == PlaybackStatus.Playing) R.string.audio_test_stop else R.string.action_play,
                 ),
@@ -54,18 +54,18 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
         ) {
-            GlassChip(
+            TerminalChip(
                 label = stringResource(
                     if (state.canPlay) statusLabel(state.status) else R.string.audio_status_preparing,
                 ),
-                tone = if (state.status.isWarning()) GlassChipTone.Warning else GlassChipTone.Normal,
+                tone = if (state.status.isWarning()) TerminalChipTone.Warning else TerminalChipTone.Normal,
                 selected = state.status == PlaybackStatus.Playing,
             )
             PlayingIndicator(playing = state.status == PlaybackStatus.Playing)
         }
         ChoiceSection(R.string.audio_test_section_signal) {
             TestSignal.entries.forEach { signal ->
-                GlassChip(
+                TerminalChip(
                     label = stringResource(signalLabel(signal)),
                     selected = state.signal == signal,
                     onClick = { viewModel.selectSignal(signal) },
@@ -75,7 +75,7 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
         if (state.signal == TestSignal.Music) {
             ChoiceSection(R.string.audio_test_section_genre) {
                 Genre.entries.forEach { genre ->
-                    GlassChip(
+                    TerminalChip(
                         label = stringResource(genreLabel(genre)),
                         selected = state.genre == genre,
                         onClick = { viewModel.selectGenre(genre) },
@@ -84,7 +84,7 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
             }
             ChoiceSection(R.string.audio_test_section_focus) {
                 MusicFocus.entries.forEach { focus ->
-                    GlassChip(
+                    TerminalChip(
                         label = stringResource(focusLabel(focus)),
                         selected = state.focus == focus,
                         onClick = { viewModel.selectFocus(focus) },
@@ -94,7 +94,7 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
         }
         ChoiceSection(R.string.audio_test_section_equalization) {
             TestEqualization.entries.forEach { equalization ->
-                GlassChip(
+                TerminalChip(
                     label = stringResource(equalizationLabel(equalization)),
                     selected = state.equalization == equalization,
                     onClick = { viewModel.selectEqualization(equalization) },
@@ -102,7 +102,7 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
             }
         }
         ChoiceSection(R.string.audio_test_section_loudness) {
-            GlassChip(
+            TerminalChip(
                 label = stringResource(
                     if (state.matchLoudness) R.string.audio_test_match_on else R.string.audio_test_match_off,
                 ),

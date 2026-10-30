@@ -10,36 +10,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassButtonStyle
-import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.StepList
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
+import com.juliancitou.timbra.ui.theme.TerminalScreen
 
 @Composable
 fun ExportScreen(onGoHome: () -> Unit, onBack: () -> Unit) {
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.export_title),
         lead = stringResource(R.string.export_lead),
         onBack = onBack,
         actions = {
-            GlassButton(
+            TerminalButton(
                 text = stringResource(R.string.action_save_file),
                 onClick = {},
                 modifier = Modifier.fillMaxWidth(),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                GlassButton(
+                TerminalButton(
                     text = stringResource(R.string.action_share),
                     onClick = {},
-                    style = GlassButtonStyle.Secondary,
+                    style = TerminalButtonStyle.Secondary,
                     modifier = Modifier.weight(1f),
                 )
-                GlassButton(
+                TerminalButton(
                     text = stringResource(R.string.action_go_home),
                     onClick = onGoHome,
-                    style = GlassButtonStyle.Secondary,
+                    style = TerminalButtonStyle.Secondary,
                     modifier = Modifier.weight(1f),
                 )
             }

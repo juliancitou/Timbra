@@ -17,19 +17,19 @@ import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.BuildConfig
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.DetailText
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassButtonStyle
-import com.juliancitou.timbra.ui.theme.GlassCard
-import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.Hairline
 import com.juliancitou.timbra.ui.theme.LinkRow
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
+import com.juliancitou.timbra.ui.theme.TerminalPanel
+import com.juliancitou.timbra.ui.theme.TerminalScreen
 
 /** Créditos, contacto y licencias. Se llega desde Ajustes → "Más información". */
 @Composable
 fun AboutScreen(onBack: () -> Unit) {
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.about_title),
         lead = stringResource(R.string.about_lead, CREATOR_ACCOUNT),
         onBack = onBack,
@@ -83,14 +83,14 @@ private fun FontLicense() {
         if (visible) context.assets.open(FONT_LICENSE_ASSET).bufferedReader().use { it.readText() } else ""
     }
     DetailText(stringResource(R.string.about_font_license_body))
-    GlassButton(
+    TerminalButton(
         text = stringResource(if (visible) R.string.about_hide_license else R.string.about_show_license),
         onClick = { visible = !visible },
-        style = GlassButtonStyle.Secondary,
+        style = TerminalButtonStyle.Secondary,
         modifier = Modifier.fillMaxWidth(),
     )
     if (visible) {
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
+        TerminalPanel(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = licenseText,
                 style = MaterialTheme.typography.bodySmall,

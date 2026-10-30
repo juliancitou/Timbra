@@ -14,12 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.DetailText
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassButtonStyle
-import com.juliancitou.timbra.ui.theme.GlassChip
-import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
+import com.juliancitou.timbra.ui.theme.TerminalChip
+import com.juliancitou.timbra.ui.theme.TerminalScreen
 
 private const val SAMPLE_VOLUME_PERCENT = 40
 
@@ -27,19 +27,19 @@ private const val SAMPLE_VOLUME_PERCENT = 40
 fun ComfortLevelScreen(onReady: () -> Unit, onBack: () -> Unit) {
     var playing by rememberSaveable { mutableStateOf(false) }
 
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.comfort_title),
         lead = stringResource(R.string.comfort_lead),
         onBack = onBack,
         actions = {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                GlassButton(
+                TerminalButton(
                     text = stringResource(if (playing) R.string.action_pause else R.string.action_play),
                     onClick = { playing = !playing },
-                    style = GlassButtonStyle.Secondary,
+                    style = TerminalButtonStyle.Secondary,
                     modifier = Modifier.weight(1f),
                 )
-                GlassButton(
+                TerminalButton(
                     text = stringResource(R.string.action_ready),
                     onClick = onReady,
                     modifier = Modifier.weight(1f),
@@ -47,7 +47,7 @@ fun ComfortLevelScreen(onReady: () -> Unit, onBack: () -> Unit) {
             }
         },
     ) {
-        GlassChip(label = stringResource(R.string.comfort_volume, SAMPLE_VOLUME_PERCENT))
+        TerminalChip(label = stringResource(R.string.comfort_volume, SAMPLE_VOLUME_PERCENT))
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(Spacing.small),

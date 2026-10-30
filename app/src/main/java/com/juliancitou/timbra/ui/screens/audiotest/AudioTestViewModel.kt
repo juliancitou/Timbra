@@ -16,10 +16,10 @@ import com.juliancitou.timbra.audio.PinkNoise
 import com.juliancitou.timbra.audio.PlaybackStatus
 import com.juliancitou.timbra.audio.SignalSource
 import com.juliancitou.timbra.audio.SineTone
-import com.juliancitou.timbra.audio.presetFromCurve
 import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.music.MusicLoop
+import com.juliancitou.timbra.audio.presetFromCurve
 import com.juliancitou.timbra.ui.screens.SampleData
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow

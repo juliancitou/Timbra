@@ -25,7 +25,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
 /** [Warning] es solo para estados de seguridad (nivel alto, audífonos desconectados). */
-enum class GlassChipTone { Normal, Warning }
+enum class TerminalChipTone { Normal, Warning }
 
 private val ChipMinHeight = 40.dp
 
@@ -36,20 +36,20 @@ private val ChipMinHeight = 40.dp
  * los lectores de pantalla leen solo la palabra, sin los corchetes.
  */
 @Composable
-fun GlassChip(
+fun TerminalChip(
     label: String,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
-    tone: GlassChipTone = GlassChipTone.Normal,
+    tone: TerminalChipTone = TerminalChipTone.Normal,
     onClick: (() -> Unit)? = null,
 ) {
     val haptics = LocalHapticFeedback.current
     val colors = MaterialTheme.colorScheme
     val accent = when (tone) {
-        GlassChipTone.Normal -> colors.primary
-        GlassChipTone.Warning -> colors.error
+        TerminalChipTone.Normal -> colors.primary
+        TerminalChipTone.Warning -> colors.error
     }
-    val highlighted = selected || tone == GlassChipTone.Warning
+    val highlighted = selected || tone == TerminalChipTone.Warning
     val bracketColor by animateColorAsState(
         if (highlighted) accent else colors.onSurfaceVariant.copy(alpha = UNSELECTED_BRACKET_ALPHA),
         animationSpec = tween(MotionDuration.SHORT_MS),

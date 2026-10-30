@@ -11,28 +11,28 @@ import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.screens.SampleData
 import com.juliancitou.timbra.ui.theme.BulletList
 import com.juliancitou.timbra.ui.theme.FrequencyChart
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassCard
-import com.juliancitou.timbra.ui.theme.GlassChip
-import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalChip
+import com.juliancitou.timbra.ui.theme.TerminalPanel
+import com.juliancitou.timbra.ui.theme.TerminalScreen
 
 @Composable
 fun ResultsScreen(onAdjustTaste: () -> Unit, onBack: () -> Unit) {
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.results_title),
         lead = stringResource(R.string.results_lead),
         onBack = onBack,
         actions = {
-            GlassButton(
+            TerminalButton(
                 text = stringResource(R.string.action_adjust_taste),
                 onClick = onAdjustTaste,
                 modifier = Modifier.fillMaxWidth(),
             )
         },
     ) {
-        GlassCard {
+        TerminalPanel {
             FrequencyChart(
                 gainsDb = SampleData.curveDb,
                 contentDescription = stringResource(R.string.results_chart_description),
@@ -42,8 +42,8 @@ fun ResultsScreen(onAdjustTaste: () -> Unit, onBack: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(Spacing.small),
                 verticalArrangement = Arrangement.spacedBy(Spacing.small),
             ) {
-                GlassChip(label = stringResource(R.string.chip_reliable), selected = true)
-                GlassChip(label = stringResource(R.string.chip_estimated))
+                TerminalChip(label = stringResource(R.string.chip_reliable), selected = true)
+                TerminalChip(label = stringResource(R.string.chip_estimated))
             }
         }
         Column(

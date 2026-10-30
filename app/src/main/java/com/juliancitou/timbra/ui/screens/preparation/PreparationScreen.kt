@@ -13,10 +13,10 @@ import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.CheckRow
 import com.juliancitou.timbra.ui.theme.DetailText
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.staggeredEntrance
 
 private val ChecklistItems = listOf(
@@ -33,12 +33,12 @@ fun PreparationScreen(onContinue: () -> Unit, onBack: () -> Unit) {
     // Un bit por punto de la lista: sobrevive a rotaciones y a la recreación de la pantalla.
     var checkedMask by rememberSaveable { mutableIntStateOf(0) }
 
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.preparation_title),
         lead = stringResource(R.string.preparation_lead),
         onBack = onBack,
         actions = {
-            GlassButton(
+            TerminalButton(
                 text = stringResource(R.string.action_continue),
                 onClick = onContinue,
                 enabled = checkedMask == AllChecked,

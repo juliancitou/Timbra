@@ -8,16 +8,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.BulletList
-import com.juliancitou.timbra.ui.theme.containerTransform
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassButtonStyle
-import com.juliancitou.timbra.ui.theme.GlassIconButton
-import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.IconMotion
 import com.juliancitou.timbra.ui.theme.SETTINGS_TRANSFORM_KEY
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.StepList
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
+import com.juliancitou.timbra.ui.theme.TerminalIconButton
+import com.juliancitou.timbra.ui.theme.TerminalScreen
+import com.juliancitou.timbra.ui.theme.containerTransform
 
 @Composable
 fun HomeScreen(
@@ -25,12 +25,12 @@ fun HomeScreen(
     onOpenHistory: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.app_name),
         lead = stringResource(R.string.home_lead),
         showCursor = true,
         headerAction = {
-            GlassIconButton(
+            TerminalIconButton(
                 iconRes = R.drawable.ic_settings,
                 contentDescription = stringResource(R.string.action_settings),
                 onClick = onOpenSettings,
@@ -39,15 +39,15 @@ fun HomeScreen(
             )
         },
         actions = {
-            GlassButton(
+            TerminalButton(
                 text = stringResource(R.string.action_create_equalization),
                 onClick = onCreateEqualization,
                 modifier = Modifier.fillMaxWidth(),
             )
-            GlassButton(
+            TerminalButton(
                 text = stringResource(R.string.action_my_measurements),
                 onClick = onOpenHistory,
-                style = GlassButtonStyle.Secondary,
+                style = TerminalButtonStyle.Secondary,
                 modifier = Modifier.fillMaxWidth(),
             )
         },

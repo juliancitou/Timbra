@@ -12,11 +12,11 @@ import com.juliancitou.timbra.R
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
 import com.juliancitou.timbra.ui.screens.SampleData
 import com.juliancitou.timbra.ui.theme.FrequencyChart
-import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassCard
-import com.juliancitou.timbra.ui.theme.GlassScreen
-import com.juliancitou.timbra.ui.theme.GlassSlider
-import com.juliancitou.timbra.ui.theme.GlassSliderSize
+import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalPanel
+import com.juliancitou.timbra.ui.theme.TerminalScreen
+import com.juliancitou.timbra.ui.theme.TerminalSlider
+import com.juliancitou.timbra.ui.theme.TerminalSliderSize
 
 private val TasteRangeDb = -6f..6f
 
@@ -29,19 +29,19 @@ fun TasteScreen(onExport: () -> Unit, onBack: () -> Unit) {
         gain + sampleTasteOffset(POWERAMP_BAND_FREQUENCIES_HZ[index], bassDb, voiceDb, brightnessDb)
     }
 
-    GlassScreen(
+    TerminalScreen(
         title = stringResource(R.string.taste_title),
         lead = stringResource(R.string.taste_lead),
         onBack = onBack,
         actions = {
-            GlassButton(
+            TerminalButton(
                 text = stringResource(R.string.action_export),
                 onClick = onExport,
                 modifier = Modifier.fillMaxWidth(),
             )
         },
     ) {
-        GlassCard {
+        TerminalPanel {
             FrequencyChart(
                 gainsDb = previewDb,
                 contentDescription = stringResource(R.string.taste_preview_description),
@@ -56,12 +56,12 @@ fun TasteScreen(onExport: () -> Unit, onBack: () -> Unit) {
 
 @Composable
 private fun TasteSlider(label: String, valueDb: Float, onValueChange: (Float) -> Unit) {
-    GlassSlider(
+    TerminalSlider(
         valueDb = valueDb,
         onValueChange = onValueChange,
         label = label,
         valueRange = TasteRangeDb,
-        size = GlassSliderSize.Compact,
+        size = TerminalSliderSize.Compact,
     )
 }
 

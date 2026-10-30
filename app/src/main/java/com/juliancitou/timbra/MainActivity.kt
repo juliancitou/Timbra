@@ -8,7 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import com.juliancitou.timbra.ui.screens.TimbraNavHost
-import com.juliancitou.timbra.ui.theme.GlassBackground
+import com.juliancitou.timbra.ui.theme.TerminalBackground
 import com.juliancitou.timbra.ui.theme.TimbraTheme
 
 class MainActivity : ComponentActivity() {
@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
 /** Un solo fondo para toda la app: así la aurora no se reinicia ni se duplica al navegar. */
 @Composable
 fun TimbraApp() {
-    GlassBackground {
+    TerminalBackground {
         TimbraNavHost()
     }
 }

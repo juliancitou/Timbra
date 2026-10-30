@@ -1,21 +1,19 @@
 package com.juliancitou.timbra.ui.screens
 
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavGraphBuilder
-import com.juliancitou.timbra.ui.theme.LocalNavAnimatedVisibilityScope
-import com.juliancitou.timbra.ui.theme.LocalSharedTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,6 +31,8 @@ import com.juliancitou.timbra.ui.screens.settings.SettingsScreen
 import com.juliancitou.timbra.ui.screens.taste.TasteScreen
 import com.juliancitou.timbra.ui.theme.EmphasizedAccelerate
 import com.juliancitou.timbra.ui.theme.EmphasizedDecelerate
+import com.juliancitou.timbra.ui.theme.LocalNavAnimatedVisibilityScope
+import com.juliancitou.timbra.ui.theme.LocalSharedTransitionScope
 import com.juliancitou.timbra.ui.theme.MotionDuration
 import com.juliancitou.timbra.ui.theme.isReducedMotionEnabled
 import kotlinx.serialization.Serializable

@@ -25,7 +25,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-enum class GlassButtonStyle { Primary, Secondary }
+enum class TerminalButtonStyle { Primary, Secondary }
 
 private val ButtonMinHeight = 52.dp
 private const val PRESSED_SCALE = 0.98f
@@ -34,16 +34,16 @@ private const val SECONDARY_FRAME_ALPHA = 0.55f
 
 /**
  * Botón con aspecto de recuadro ASCII (┌ - - ┐ │ texto │ └ - - ┘), sin fondo: solo el contorno y
- * el texto. [GlassButtonStyle.Primary] va en ámbar y debe haber uno solo por pantalla;
- * [GlassButtonStyle.Secondary] va en gris y blanco. Al presionar, los guiones se unen en una línea
+ * el texto. [TerminalButtonStyle.Primary] va en ámbar y debe haber uno solo por pantalla;
+ * [TerminalButtonStyle.Secondary] va en gris y blanco. Al presionar, los guiones se unen en una línea
  * continua.
  */
 @Composable
-fun GlassButton(
+fun TerminalButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    style: GlassButtonStyle = GlassButtonStyle.Primary,
+    style: TerminalButtonStyle = TerminalButtonStyle.Primary,
     enabled: Boolean = true,
 ) {
     val haptics = LocalHapticFeedback.current
@@ -62,8 +62,8 @@ fun GlassButton(
     )
     val colors = MaterialTheme.colorScheme
     val (frameColor, textColor) = when (style) {
-        GlassButtonStyle.Primary -> colors.primary to colors.primary
-        GlassButtonStyle.Secondary -> colors.onSurfaceVariant.copy(alpha = SECONDARY_FRAME_ALPHA) to colors.onSurface
+        TerminalButtonStyle.Primary -> colors.primary to colors.primary
+        TerminalButtonStyle.Secondary -> colors.onSurfaceVariant.copy(alpha = SECONDARY_FRAME_ALPHA) to colors.onSurface
     }
 
     Box(
