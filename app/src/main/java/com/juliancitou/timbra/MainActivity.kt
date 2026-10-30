@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.juliancitou.timbra.ui.theme.FrequencyChart
 import com.juliancitou.timbra.ui.theme.GlassBackground
 import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassButtonStyle
@@ -51,6 +52,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private val SampleCurveDb = listOf(
+    -1.5f, -1.5f, -1f, -0.5f, 0f, 0f, -1f, -2f, -2.5f, -2.5f, -2f, -1f, -0.5f,
+    0f, 0.5f, 1f, 1.5f, 1f, 0f, -1.5f, -3.5f, -4.5f, -3.5f, -2.5f, -2.5f,
+)
+
 @Composable
 fun TimbraApp() {
     var gainDb by remember { mutableFloatStateOf(0f) }
@@ -73,6 +79,18 @@ fun TimbraApp() {
                     text = stringResource(R.string.home_subtitle),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            GlassCard {
+                Text(
+                    text = stringResource(R.string.chart_sample_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                FrequencyChart(
+                    gainsDb = SampleCurveDb,
+                    contentDescription = stringResource(R.string.chart_sample_description),
+                    estimatedBandIndices = setOf(0, 1, 2),
+                    highlightedBandIndex = 21,
                 )
             }
             GlassCard {

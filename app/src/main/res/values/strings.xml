@@ -7,4 +7,6 @@
     <string name="chip_volume_high">Volumen alto</string>
     <string name="action_create_equalization">Crear mi ecualización</string>
     <string name="action_my_measurements">Mis mediciones</string>
+    <string name="chart_sample_title">Tu curva (ejemplo)</string>
+    <string name="chart_sample_description">Gráfica de ecualización de ejemplo: graves ligeramente bajos, voces un poco arriba y un recorte en 8.4 kHz.</string>
 </resources>
