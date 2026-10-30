@@ -19,6 +19,17 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `20d3c5e` · ui: agregar Acerca de con créditos y contacto
+- Pantalla "Acerca de", discreta: al final de Ajustes solo hay una línea "Más información ›".
+- Indica que Timbra es un proyecto personal creado por juliancitou, con enlaces a su perfil de
+  GitHub, al repositorio y a los issues para reportar problemas o sugerir ideas, y una
+  invitación abierta a colaborar.
+- Agradecimientos (bibliotecas y referencias de audio) con autor, licencia y enlace, iguales a
+  los del README. El texto completo de la licencia OFL de Cascadia Mono se puede leer ahí.
+- Los enlaces se abren en el navegador: la app sigue sin permiso de internet. No se incluye
+  correo electrónico para no publicarlo; el contacto es por GitHub.
+- `LinkRow`: componente de enlace con estilo de terminal (`→ github.com/...`).
+
 ### 2026-10-30 · `d3ed656` · docs: agregar agradecimientos
 - Sección "Agradecimientos" en el README, pedida por el usuario: bibliotecas incluidas (Haze,
   Jetpack Compose y Material 3, Navigation, AndroidX, Kotlin, Cascadia Mono), herramientas de
