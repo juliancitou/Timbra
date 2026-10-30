@@ -1,12 +1,96 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="es">
     <string name="app_name">Timbra</string>
+
+    <!-- Comunes -->
+    <string name="action_back">Volver</string>
+    <string name="action_continue">Continuar</string>
+    <string name="sample_notice">Contenido de ejemplo: todavía no suena nada.</string>
+
+    <!-- Inicio -->
     <string name="home_subtitle">Mide cómo escuchas cada frecuencia y crea una ecualización a tu medida.</string>
-    <string name="slider_band_gain">Ganancia de la banda</string>
-    <string name="chip_reliable">Confiable</string>
-    <string name="chip_estimated">Estimada</string>
-    <string name="chip_volume_high">Volumen alto</string>
+    <string name="home_how_title">¿Cómo funciona?</string>
+    <string name="home_how_body">Escucharás dos sonidos y moverás un control hasta que se oigan igual de fuertes. Lo harás en 25 bandas, de los graves a los agudos. Toma de 10 a 15 minutos.</string>
     <string name="action_create_equalization">Crear mi ecualización</string>
     <string name="action_my_measurements">Mis mediciones</string>
-    <string name="chart_sample_title">Tu curva (ejemplo)</string>
-    <string name="chart_sample_description">Gráfica de ecualización de ejemplo: graves ligeramente bajos, voces un poco arriba y un recorte en 8.4 kHz.</string>
+    <string name="action_settings">Ajustes</string>
+
+    <!-- Preparación -->
+    <string name="preparation_title">Antes de empezar</string>
+    <string name="preparation_subtitle">Para que el resultado sirva, mide igual que como escuchas música. Toca cada punto cuando esté listo.</string>
+    <string name="preparation_headphones">Audífonos conectados</string>
+    <string name="preparation_noise_cancelling">Cancelación de ruido en tu modo habitual</string>
+    <string name="preparation_poweramp_off">Ecualizador de Poweramp apagado</string>
+    <string name="preparation_quiet_place">Estoy en un lugar silencioso</string>
+    <string name="preparation_why">El ecualizador de Poweramp debe estar apagado para medir tus audífonos tal como son.</string>
+
+    <!-- Nivel cómodo -->
+    <string name="comfort_title">Nivel cómodo</string>
+    <string name="comfort_subtitle">Sonará un sonido de referencia. Sube el volumen del teléfono poco a poco hasta que se oiga claro, pero nunca fuerte.</string>
+    <string name="comfort_volume">Volumen del teléfono: %1$d %%</string>
+    <string name="comfort_safety">Si en algún momento te molesta, pausa. El sonido nunca supera un nivel seguro.</string>
+    <string name="action_play">Reproducir</string>
+    <string name="action_pause">Pausar</string>
+    <string name="action_ready">Listo</string>
+
+    <!-- Medición -->
+    <string name="measurement_title">Igualar bandas</string>
+    <string name="measurement_progress">Banda %1$d de %2$d</string>
+    <string name="measurement_instructions">Oirás alternarse la referencia y esta banda. Mueve el control hasta que las dos suenen igual de fuertes.</string>
+    <string name="measurement_band_gain">Ganancia de la banda</string>
+    <string name="measurement_hint_sub_bass">Aquí vive el retumbe más profundo; a veces casi no se oye.</string>
+    <string name="measurement_hint_bass">Aquí está el golpe del bombo.</string>
+    <string name="measurement_hint_mud">Aquí se acumula el "lodo" que tapa las voces.</string>
+    <string name="measurement_hint_voice">Aquí está el cuerpo de las voces.</string>
+    <string name="measurement_hint_presence">Aquí está la claridad de las voces.</string>
+    <string name="measurement_hint_sibilance">Aquí vive la "S" y el "tss" de los platillos.</string>
+    <string name="measurement_hint_air">Aquí está el "aire" de la música.</string>
+    <string name="action_repeat">Repetir</string>
+    <string name="action_skip">Saltar</string>
+    <string name="action_sounds_equal">Suenan igual</string>
+
+    <!-- Resultados -->
+    <string name="results_title">Tus resultados</string>
+    <string name="results_subtitle">Así te llegan las frecuencias con tus audífonos. Los puntos huecos son bandas estimadas.</string>
+    <string name="results_chart_description">Gráfica de tu curva: graves ligeramente bajos, voces un poco arriba y un pico en 8.4 kHz.</string>
+    <string name="results_findings_title">Lo que encontramos</string>
+    <string name="results_finding_sibilance">Tienes un pico en 8.4 kHz: aquí está la "S".</string>
+    <string name="results_finding_mud">Hay algo de lodo entre 200 y 270 Hz.</string>
+    <string name="chip_reliable">Confiable</string>
+    <string name="chip_estimated">Estimada</string>
+    <string name="action_adjust_taste">Ajustar a mi gusto</string>
+
+    <!-- Ajuste de gusto -->
+    <string name="taste_title">Ajusta a tu gusto</string>
+    <string name="taste_subtitle">La medición corrige tus picos. Aquí decides cuánto grave, voz y brillo quieres.</string>
+    <string name="taste_preview_description">Vista previa de tu ecualización con los ajustes de gusto.</string>
+    <string name="taste_bass">Graves</string>
+    <string name="taste_voice">Presencia de voz</string>
+    <string name="taste_brightness">Brillo</string>
+    <string name="action_export">Exportar</string>
+
+    <!-- Exportar -->
+    <string name="export_title">Exportar a Poweramp</string>
+    <string name="export_subtitle">Guarda el archivo y luego impórtalo en Poweramp Equalizer.</string>
+    <string name="export_preset_name">Timbra - Mi ecualización</string>
+    <string name="export_steps_title">Cómo importarlo</string>
+    <string name="export_steps_body">1. Abre Poweramp Equalizer.\n2. Entra a la lista de presets y elige importar.\n3. Selecciona el archivo que guardaste.</string>
+    <string name="action_save_file">Guardar archivo</string>
+    <string name="action_share">Compartir</string>
+    <string name="action_go_home">Volver al inicio</string>
+
+    <!-- Historial -->
+    <string name="history_title">Mis mediciones</string>
+    <string name="history_subtitle">Tus mediciones anteriores. Toca una para ver su curva.</string>
+    <string name="history_entry_date">%1$s · %2$s</string>
+    <string name="history_codec_aac">AAC</string>
+    <string name="history_codec_ldac">LDAC</string>
+
+    <!-- Ajustes -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_blur_title">Efecto de vidrio</string>
+    <string name="settings_blur_body">Si la app se siente lenta, apaga el desenfoque. Se verá un vidrio más opaco.</string>
+    <string name="settings_blur_on">Desenfoque activado</string>
+    <string name="settings_blur_off">Desenfoque desactivado</string>
+    <string name="settings_about_title">Acerca de</string>
+    <string name="settings_version">Versión %1$s</string>
 </resources>
