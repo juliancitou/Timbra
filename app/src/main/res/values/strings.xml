@@ -108,14 +108,22 @@
 
     <!-- Prueba de audio (Fase 2) -->
     <string name="settings_section_audio_test">prueba de audio</string>
-    <string name="settings_audio_test_body">Escucha el motor de sonido antes de la medición. Baja el volumen del teléfono primero.</string>
+    <string name="settings_audio_test_body">Escucha el motor de sonido y la música del test. Baja el volumen del teléfono primero.</string>
     <string name="action_audio_test">Probar el sonido</string>
     <string name="audio_test_title">Prueba de audio</string>
     <string name="audio_test_lead">Baja el volumen del teléfono antes de empezar y súbelo poco a poco.</string>
     <string name="audio_test_stop">Detener</string>
     <string name="audio_test_section_signal">señal</string>
+    <string name="audio_test_signal_music">Música del test</string>
     <string name="audio_test_signal_pink">Ruido rosa</string>
     <string name="audio_test_signal_tone">Tono de 1 kHz</string>
+    <string name="audio_test_section_focus">zona resaltada</string>
+    <string name="audio_test_focus_balanced">Equilibrada</string>
+    <string name="audio_test_focus_bass">Graves</string>
+    <string name="audio_test_focus_clarity">Claridad</string>
+    <string name="audio_test_focus_voice">Voz</string>
+    <string name="audio_test_focus_sibilance">"S" y platillos</string>
+    <string name="audio_test_focus_air">Aire</string>
     <string name="audio_test_section_equalization">ecualización</string>
     <string name="audio_test_eq_flat">Sin ecualizar</string>
     <string name="audio_test_eq_sample">Preset de ejemplo</string>
@@ -126,6 +134,7 @@
     <string name="audio_test_match_off">Igualar volumen: no</string>
     <string name="audio_test_section_check">qué revisar</string>
     <string name="audio_test_check">Cambia de ecualización mientras suena: no debe haber clics ni saltos. Con "Igualar volumen" activado, todas deben sonar igual de fuertes.</string>
+    <string name="audio_status_preparing">Preparando la música…</string>
     <string name="audio_status_stopped">Detenido</string>
     <string name="audio_status_playing">Sonando</string>
     <string name="audio_status_other_app">En pausa: otra app usa el audio</string>

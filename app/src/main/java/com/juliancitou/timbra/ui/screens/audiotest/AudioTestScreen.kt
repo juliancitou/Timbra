@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.PlaybackStatus
+import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassChip
@@ -40,12 +41,13 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
                     if (state.status == PlaybackStatus.Playing) R.string.audio_test_stop else R.string.action_play,
                 ),
                 onClick = viewModel::togglePlayback,
+                enabled = state.canPlay,
                 modifier = Modifier.fillMaxWidth(),
             )
         },
     ) {
         GlassChip(
-            label = stringResource(statusLabel(state.status)),
+            label = stringResource(if (state.canPlay) statusLabel(state.status) else R.string.audio_status_preparing),
             tone = if (state.status.isWarning()) GlassChipTone.Warning else GlassChipTone.Normal,
             selected = state.status == PlaybackStatus.Playing,
         )
@@ -56,6 +58,17 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
                     selected = state.signal == signal,
                     onClick = { viewModel.selectSignal(signal) },
                 )
+            }
+        }
+        if (state.signal == TestSignal.Music) {
+            ChoiceSection(R.string.audio_test_section_focus) {
+                MusicFocus.entries.forEach { focus ->
+                    GlassChip(
+                        label = stringResource(focusLabel(focus)),
+                        selected = state.focus == focus,
+                        onClick = { viewModel.selectFocus(focus) },
+                    )
+                }
             }
         }
         ChoiceSection(R.string.audio_test_section_equalization) {
@@ -122,7 +135,18 @@ private fun statusLabel(status: PlaybackStatus): Int = when (status) {
 }
 
 @StringRes
+private fun focusLabel(focus: MusicFocus): Int = when (focus) {
+    MusicFocus.Balanced -> R.string.audio_test_focus_balanced
+    MusicFocus.Bass -> R.string.audio_test_focus_bass
+    MusicFocus.Clarity -> R.string.audio_test_focus_clarity
+    MusicFocus.Voice -> R.string.audio_test_focus_voice
+    MusicFocus.Sibilance -> R.string.audio_test_focus_sibilance
+    MusicFocus.Air -> R.string.audio_test_focus_air
+}
+
+@StringRes
 private fun signalLabel(signal: TestSignal): Int = when (signal) {
+    TestSignal.Music -> R.string.audio_test_signal_music
     TestSignal.PinkNoise -> R.string.audio_test_signal_pink
     TestSignal.Tone -> R.string.audio_test_signal_tone
 }
