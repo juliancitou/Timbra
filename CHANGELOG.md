@@ -19,6 +19,14 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `69982c3` · ui: más aire en pantalla y títulos estilo terminal
+- Pedido del usuario: que el contenido no llene la pantalla. Márgenes laterales de 24 a 32 dp,
+  tipografía un 10–15 % más chica (título 23 sp, indicación principal 18 sp, cuerpo 14 sp,
+  valor del deslizador 36 sp) y botones de 52 dp de alto (siguen sobre el mínimo de 48 dp).
+- `TerminalTitle`: los títulos se ven como una línea de terminal, `> Título`, con el `>` en
+  ámbar. En Inicio, un cursor `_` parpadea cada 1.1 s (fijo si se reduce el movimiento). El
+  `>` y el cursor no se leen en voz alta con lectores de pantalla.
+
 ### 2026-10-30 · `53481e9` · ui: rediseñar pantallas con estilo minimalista
 - Pedido del usuario: menos tarjetas de vidrio y más jerarquía tipográfica. El texto va
   directo sobre el fondo; el vidrio queda solo en la gráfica, botones y chips.
