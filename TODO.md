@@ -53,21 +53,21 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 - [x] `GlassButton` (principal y secundario) con respuesta háptica
 - [x] `GlassSlider`: grande, cómodo con el pulgar, valor en dB visible
 - [x] `GlassChip` para opciones y estados
-- [ ] `FrequencyChart`: curva sobre las 25 bandas, ejes en Hz y dB
+- [x] `FrequencyChart`: curva sobre las 25 bandas, ejes en Hz y dB
 - [ ] Respaldo sin desenfoque (relleno al 20 %)
 
 ### Navegación y pantallas de ejemplo
-- [ ] Navigation Compose con transiciones de 200–350 ms
-- [ ] Inicio
-- [ ] Preparación
-- [ ] Nivel cómodo
-- [ ] Medición
-- [ ] Resultados
-- [ ] Ajuste de gusto
-- [ ] Exportar
-- [ ] Historial
-- [ ] Ajustes
-- [ ] Todos los textos en `strings.xml` (español de México)
+- [x] Navigation Compose con transiciones de 200–350 ms
+- [x] Inicio
+- [x] Preparación
+- [x] Nivel cómodo
+- [x] Medición
+- [x] Resultados
+- [x] Ajuste de gusto
+- [x] Exportar
+- [x] Historial
+- [x] Ajustes
+- [x] Todos los textos en `strings.xml` (español de México)
 
 ### Revisión
 - [ ] Contraste AA en todos los textos

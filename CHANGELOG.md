@@ -19,6 +19,33 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `8714975` · ui: agregar navegación y pantallas de ejemplo
+- Las 9 pantallas del plan con contenido de ejemplo: Inicio, Preparación, Nivel cómodo,
+  Medición, Resultados, Ajuste de gusto, Exportar, Historial y Ajustes. Todavía no suena
+  nada ni se guarda nada; cada pantalla ya responde qué hacer, por qué y qué sigue.
+- `GlassScreen`: estructura común con título, botón de volver, contenido desplazable y
+  acciones fijas abajo. `GlassIconButton` para el botón redondo de volver (48 dp).
+- Navegación con rutas tipadas: deslizamiento corto más desvanecido de 300 ms, sin animación
+  si el sistema pide reducir movimiento. Un solo `GlassBackground` para toda la app, así la
+  aurora no se reinicia al cambiar de pantalla.
+- Ajustes incluye un interruptor del desenfoque para probar el respaldo al 20 % y muestra la
+  versión de la app (se activó `BuildConfig`). El estado aún no se guarda al cerrar la app.
+- Medición muestra una explicación por zona ("aquí vive la S"); Ajuste de gusto mueve una
+  vista previa aproximada de la curva (la fórmula real llega en la Fase 4).
+- Textos en `strings.xml` marcados como español (`tools:locale="es"`) para que lint no los
+  revise con el diccionario de inglés.
+
+### 2026-10-30 · `2fbe84f` · chore: agregar Navigation Compose
+- Navigation Compose 2.10.2 y el plugin de serialización de Kotlin (2.4.21), que las rutas
+  tipadas necesitan y que la Fase 3 usará para guardar sesiones en JSON.
+
+### 2026-10-30 · `e13bd4c` · ui: crear FrequencyChart
+- Gráfica de las 25 bandas de Poweramp: eje de frecuencia logarítmico (20 Hz–20 kHz), eje de
+  −12 a +12 dB con la línea de 0 dB resaltada, curva suave (Catmull-Rom → Bézier) con relleno
+  degradado, puntos huecos para bandas estimadas y una banda resaltada.
+- `POWERAMP_BAND_FREQUENCIES_HZ` en `export/`, y la escala en funciones puras con 6 pruebas
+  (incluida la que confirma que las 25 bandas quedan espaciadas de forma pareja).
+
 ### 2026-10-30 · `af09bcd` · ui: mostrar componentes en pantalla de prueba
 - Pantalla temporal con tarjeta, deslizador, chips y botones para revisarlos en el teléfono;
   se reemplaza por la navegación real más adelante en la Fase 1.
