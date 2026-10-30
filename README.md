@@ -1,12 +1,15 @@
 # Timbra
 
-App para Android que mide **cómo escuchas tú** cada frecuencia con tus audífonos y genera un
-preset de ecualizador para **Poweramp Equalizer** hecho a tu medida.
+App para Android que te ayuda a encontrar **la ecualización que mejor te suena** con
+**cualquier audífono**, y la guarda como preset para **Poweramp Equalizer**.
 
-La idea es sencilla: la app te pone dos sonidos, uno de referencia y otro de prueba, y tú mueves
-un control hasta que los dos suenen igual de fuertes. Repite esto en 25 bandas, desde los graves
-más profundos hasta los agudos más altos, y con tus respuestas calcula una ecualización que
-corrige lo que a ti te sobra o te falta (por ejemplo, una "S" que pica o un bajo que tapa las voces).
+La idea es sencilla y se siente como un juego: suena música y en pantalla ves varias esferas.
+Cada esfera es una ecualización distinta y, al tocarla, el sonido cambia al instante. Ronda por
+ronda (graves, voces, la "S", el brillo…) eliges la que más te gusta, y al final tienes tu
+ecualización lista para exportar.
+
+Para quien quiera más precisión hay un **modo avanzado** que mide cómo escuchas cada una de las
+25 bandas y encuentra picos que molestan, como una "S" que pica.
 
 - Repositorio: <https://github.com/juliancitou/Timbra>
 - Pendientes y avance: [`TODO.md`](TODO.md)
@@ -26,10 +29,10 @@ corrige lo que a ti te sobra o te falta (por ejemplo, una "S" que pica o un bajo
 
 | Sí hace | No hace |
 |---|---|
-| Encuentra picos y huecos angostos en cómo te llegan las frecuencias (sibilancia, resonancias) | Medir el volumen real dentro de tu oído (para eso hace falta un micrófono de medición) |
-| Compara las bandas entre sí según tu percepción | Cambiar ajustes de tu teléfono, de tus audífonos o de Poweramp |
+| Te deja elegir de oído, con esferas, cuánto grave, voz y brillo quieres | Medir el volumen real dentro de tu oído (para eso hace falta un micrófono de medición) |
+| Funciona con cualquier audífono, Bluetooth o de cable | Ecualizar Spotify u otras apps por sí misma: eso lo hace Poweramp con el preset |
+| En modo avanzado, encuentra picos angostos (sibilancia, resonancias) | Cambiar ajustes de tu teléfono, de tus audífonos o de Poweramp |
 | Genera un archivo `.json` que importas en Poweramp | Conectarse a internet ni pedir cuentas |
-| Te deja ajustar a tu gusto cuánto grave, voz y brillo quieres | Reproducir sonido fuera de la pantalla de medición |
 
 **Términos que verás en la app:**
 
@@ -46,9 +49,9 @@ corrige lo que a ti te sobra o te falta (por ejemplo, una "S" que pica o un bajo
 | Necesitas | Detalle |
 |---|---|
 | Teléfono Android | **Android 13 o más reciente** |
-| Audífonos | Bluetooth o de cable. Mide siempre con los mismos con los que escuchas música |
+| Audífonos | Cualquiera, Bluetooth o de cable. Haz el test con los mismos con los que escuchas música |
 | Poweramp Equalizer | Disponible en Google Play. Es donde se importa el preset que genera Timbra |
-| Tiempo y silencio | Unos 10–15 minutos en un lugar callado, de preferencia descansado |
+| Tiempo y silencio | Unos 5–8 minutos para el test (10–15 para el modo avanzado) en un lugar callado |
 
 La app **no pide permisos especiales** y **no usa internet**.
 
@@ -59,9 +62,10 @@ La app **no pide permisos especiales** y **no usa internet**.
 | Teléfono | POCO X8 Pro Max | HyperOS 3.0, Android 16 |
 | Audífonos | HUAWEI FreeBuds Pro 4 | Bluetooth, códec AAC |
 
-Debería funcionar en cualquier teléfono con Android 13 o superior, pero solo se ha probado en el
-equipo de la tabla. La medición es personal: el resultado vale para **tu** oído con **esos**
-audífonos. Si cambias de audífonos, mide de nuevo.
+Debería funcionar en cualquier teléfono con Android 13 o superior y con cualquier audífono, pero
+solo se ha probado con el equipo de la tabla. El resultado es personal: vale para **tu** oído con
+**esos** audífonos. Si cambias de audífonos, haz el test otra vez; la app guarda una ecualización
+por cada par de audífonos.
 
 ---
 
@@ -164,19 +168,25 @@ adb devices                    # muestra los teléfonos conectados
 
 > Flujo previsto; puede cambiar durante el desarrollo.
 
-1. **Prepara:** conecta tus audífonos, usa el mismo modo de cancelación de ruido con el que
-   escuchas música y **apaga el ecualizador de Poweramp** mientras mides.
-2. **Nivel cómodo:** suena un sonido de referencia. Ajusta el volumen del teléfono hasta que se
-   oiga claro pero cómodo, nunca fuerte.
-3. **Igualar bandas:** para cada una de las 25 bandas oirás alternarse la referencia y el sonido
-   de prueba. Mueve el control hasta que los dos suenen igual de fuertes y toca **Suenan igual**.
-   Puedes repetir o saltar cualquier banda, y pausar cuando quieras.
-4. **Resultados:** verás tu curva y, en palabras simples, dónde están tus picos
-   ("aquí está la S").
-5. **Ajusta a tu gusto:** tres controles: Graves, Presencia de voz y Brillo.
-6. **Exporta:** guarda o comparte el archivo `.json`.
-7. **Importa en Poweramp Equalizer:** abre la lista de presets de Poweramp Equalizer, usa la
-   opción de importar y elige el archivo. La app muestra los pasos exactos al exportar.
+### Encuentra tu ecualización (modo principal)
+
+1. **Prepara:** conecta tus audífonos, elige cuáles son y **apaga el ecualizador de Poweramp**
+   mientras haces el test.
+2. **Nivel cómodo:** suena la música del test. Ajusta el volumen del teléfono hasta que se oiga
+   claro pero cómodo, nunca fuerte.
+3. **Rondas de esferas:** cada ronda se enfoca en algo: balance general, graves, claridad, voces,
+   la "S" y los platillos, y el aire de los agudos. Toca las esferas para escuchar cada opción;
+   todas suenan igual de fuertes, así que eliges solo por cómo suenan. Cuando una te guste, elígela.
+4. **Tu resultado:** escúchalo completo y compáralo con "sin ecualizar".
+5. **Exporta:** guarda o comparte el archivo `.json`.
+6. **Importa en Poweramp Equalizer:** abre la lista de presets, usa la opción de importar y elige
+   el archivo. La app muestra los pasos exactos al exportar.
+
+### Modo avanzado (opcional)
+
+Desde Ajustes. Para cada una de las 25 bandas oirás alternarse un sonido de referencia y uno de
+prueba, y moverás un control hasta que suenen igual de fuertes. Con eso la app encuentra picos
+angostos (por ejemplo, dónde está exactamente tu "S") y los corrige sobre el resultado del test.
 
 ---
 

@@ -3,9 +3,9 @@
 Pendientes y metas, organizados por etapas.
 Marca `[x]` al terminar. Lo relevante se documenta en `CHANGELOG.md` con fecha y commit.
 
-**Meta final:** un preset de Poweramp basado en tu propia escucha, con la "S" y los platillos
-controlados, bajos presentes sin tapar voces y medios claros, obtenido en una medición de menos de
-15 minutos desde una app elegante y fácil de usar.
+**Meta final:** que cualquier persona, con cualquier audífono, encuentre jugando la ecualización
+que más le gusta y la exporte a Poweramp; y que quien quiera más precisión tenga un modo avanzado
+que mida banda por banda. Todo desde una app elegante y fácil de usar.
 
 ---
 
@@ -76,90 +76,101 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 - [x] Probar fluidez en el POCO (sin tirones al desenfocar)
 - [ ] Tag y release `v0.2.0`
 
-## Fase 2 — Motor de audio seguro · `v0.3.0`
+## Fase 2 — Motor de audio seguro y ecualizador en vivo · `v0.3.0`
 
-**Meta:** sonidos limpios, sin clics, siempre dentro de un nivel seguro.
+**Meta:** sonido limpio, siempre dentro de un nivel seguro, con ecualización en vivo sin clics.
 
-- [ ] `PinkNoise`: generador de ruido rosa
-- [ ] `Biquad`: filtro pasa-banda; dos en cascada para tercio de octava
-- [ ] `BandNoise`: ruido por banda normalizado al mismo RMS
-- [ ] `WarbleTone`: seno modulado ±1/6 de octava a 5 Hz (alternativa)
-- [ ] `Fade`: entradas y salidas de 50 ms
 - [ ] `SafetyLimiter`: −18 dBFS RMS, picos a −6 dBFS
-- [ ] `ToneAlternator`: alterna referencia 1 kHz y banda de prueba (~0.8 s cada una)
+- [ ] `Fade`: entradas y salidas de 50 ms
+- [ ] Fundido cruzado ≤ 50 ms al cambiar de ecualización
+- [ ] `Biquad`: pico, pasa-banda y estantes
+- [ ] `GraphicEqualizer`: 25 bandas que imitan a Poweramp + preamp
+- [ ] `LoudnessMatcher`: igualar volumen entre ecualizaciones (ponderación K)
 - [ ] `AudioEngine` con `AudioTrack` (stream, PCM float, frecuencia nativa)
 - [ ] Foco de audio y pausa al perderlo
 - [ ] Pausa al desconectar audífonos (`ACTION_AUDIO_BECOMING_NOISY`)
 - [ ] Paro automático a los 20 minutos y al salir de la pantalla
-- [ ] Pruebas: frecuencia central y ancho de banda de filtros
-- [ ] Pruebas: RMS normalizado entre bandas
+- [ ] Pruebas: respuesta en frecuencia de los filtros y del ecualizador
 - [ ] Pruebas: el limitador nunca supera el pico máximo
-- [ ] Pruebas: fades sin discontinuidades
-- [ ] Escuchar en los FreeBuds: sin clics, sin distorsión, volumen cómodo
+- [ ] Pruebas: fades y fundidos sin discontinuidades
+- [ ] Pruebas: igualación de volumen entre ecualizaciones
+- [ ] Escuchar en los audífonos: sin clics, sin distorsión, volumen cómodo
 - [ ] Tag y release `v0.3.0`
 
-## Fase 3 — Flujo de medición · `v0.4.0`
+## Fase 3 — Música generada · `v0.4.0`
 
-**Meta:** completar una medición de principio a fin y poder retomarla.
+**Meta:** un bucle musical sintetizado por la app, agradable y que cubra graves, medios y agudos.
 
-- [ ] Lista de verificación de preparación (audífonos, ANC, Poweramp EQ apagado, silencio)
-- [ ] Pantalla de nivel cómodo con aviso si cambia el volumen del teléfono
-- [ ] Recorrido por las 25 bandas con progreso visible
-- [ ] Explicación corta por banda ("aquí vive la S", "aquí está el golpe del bombo")
-- [ ] Botones Repetir, Saltar y Suenan igual
-- [ ] Opción de saltar bandas de 20–36 Hz
-- [ ] Doble pasada opcional en orden distinto
-- [ ] Pedir repetir bandas con diferencia > 3 dB entre pasadas
-- [ ] Guardar progreso y retomar al volver
-- [ ] Persistir sesiones con `kotlinx.serialization`
-- [ ] Probar una medición completa en el teléfono (8–12 min)
+- [ ] Bombo y bajo
+- [ ] Acordes / pad
+- [ ] "Voz" sintética con formantes
+- [ ] Hi-hats, platillos y sonido de "s"
+- [ ] Bucle de 8–16 s sin cortes
+- [ ] Variantes por ronda que resaltan cada zona
+- [ ] Pruebas: cubre las 25 bandas y no satura
+- [ ] Escuchar en los audífonos: suena musical
 - [ ] Tag y release `v0.4.0`
 
-## Fase 4 — Análisis y exportación · `v0.5.0`
+## Fase 4 — Test de esferas y exportación · `v0.5.0`
 
-**Meta:** el preset se importa en Poweramp y suena mejor que los presets hechos a mano.
+**Meta:** encontrar tu ecualización jugando con esferas y exportarla a Poweramp.
 
-- [ ] Tabla ISO 226:2023 a ~60 fonios interpolada en las 25 frecuencias
-- [ ] Curva de desviación `D = C − g`
-- [ ] Separar tendencia (suavizado ~1 octava) y detalle (picos/valles)
-- [ ] Detección de picos y su descripción en lenguaje claro
-- [ ] Marcar bandas confiables y estimadas
-- [ ] Controles de gusto: Graves, Presencia de voz, Brillo
-- [ ] Construir preset: corrección ±6 dB + gusto + tendencia atenuada
+- [ ] Rondas: balance, graves, claridad, voz, "S" y platillos, aire
+- [ ] Pasada de afinado con pasos más chicos alrededor de lo elegido
+- [ ] Pantalla de ronda con esferas y cambio de sonido instantáneo
+- [ ] Repetir ronda y volver a la anterior
+- [ ] Resultado: gráfica y comparar con/sin ecualización
 - [ ] Redondeo a 0.5 dB, rango −8 a +3 dB, cálculo de preamp
 - [ ] `PowerampExporter`: 2 bandas de tono en 0 dB + 25 bandas gráficas
 - [ ] Prueba golden del JSON en `app/src/test/resources/`
 - [ ] Guardar con el selector de archivos y compartir
 - [ ] Instrucciones de importación en la app
-- [ ] Importar en Poweramp y comparar contra el preset v5
+- [ ] Perfil de audífono básico (nombre)
+- [ ] Importar en Poweramp y comparar con la vista previa
 - [ ] Tag y release `v0.5.0`
 
-## Fase 5 — Historial y pulido · `v1.0.0`
+## Fase 5 — Modo avanzado: medición por bandas · `v0.6.0`
 
-**Meta:** app completa, estable y agradable de usar a diario.
+**Meta:** encontrar picos angostos (como la "S") y combinarlos con el resultado del test.
 
-- [ ] Historial de mediciones
+- [ ] `PinkNoise`, `BandNoise` (tercio de octava, mismo RMS) y `WarbleTone`
+- [ ] `ToneAlternator`: referencia 1 kHz y banda de prueba (~0.8 s cada una)
+- [ ] Preparación y nivel cómodo con aviso si cambia el volumen del teléfono
+- [ ] Recorrido por las 25 bandas con progreso y explicación por zona
+- [ ] Repetir, saltar y doble pasada; repetir bandas con diferencia > 3 dB
+- [ ] Guardar progreso y retomar (`kotlinx.serialization`)
+- [ ] Tabla ISO 226:2023 a ~60 fonios en las 25 frecuencias
+- [ ] Curva de desviación, tendencia y detalle, detección de picos
+- [ ] Marcar bandas confiables y estimadas
+- [ ] Combinar la corrección con el resultado del test de esferas
+- [ ] Probar una medición completa en el teléfono
+- [ ] Tag y release `v0.6.0`
+
+## Fase 6 — Mis ecualizaciones, perfiles y pulido · `v1.0.0`
+
+**Meta:** app completa, estable y agradable de usar a diario con cualquier audífono.
+
+- [ ] Perfiles por audífono (nombre detectado o escrito, códec opcional)
+- [ ] Historial por perfil
 - [ ] Comparar dos curvas en la misma gráfica
 - [ ] Volver a exportar presets anteriores
-- [ ] Renombrar y borrar mediciones
+- [ ] Renombrar y borrar
 - [ ] Animaciones y microinteracciones finales
 - [ ] Revisión completa de textos
 - [ ] Ícono de la app
-- [ ] Pantalla Acerca de con versión
 - [ ] Tag y release `v1.0.0`
 
-## Fase 6 (opcional) — Analizador de espectro
+## Fase 7 (opcional) — Analizador de espectro
 
 - [ ] Investigar si Spotify permite `AudioPlaybackCapture`
 - [ ] Servicio en primer plano solo mientras el analizador corre
-- [ ] FFT y visualización en tiempo real con estilo de vidrio
+- [ ] FFT y visualización en tiempo real
 - [ ] Permisos explicados antes de pedirlos
 
-## Fase 7 (opcional) — Datos objetivos
+## Fase 8 (opcional) — Datos objetivos
 
-- [ ] Importar curva medida (CSV de squig.link)
-- [ ] Combinar curva objetiva con la medición personal
-- [ ] Perfiles por modo de ANC y por códec (AAC / LDAC)
+- [ ] Importar curva medida (CSV de squig.link) por modelo de audífono
+- [ ] Combinar curva objetiva con la preferencia personal
 
 ---
 
