@@ -1,6 +1,7 @@
 package com.juliancitou.timbra.export
 
 import com.juliancitou.timbra.audio.EqualizerSettings
+import java.text.Normalizer
 import java.util.Locale
 
 /**
@@ -14,7 +15,10 @@ object PowerampExporter {
 
     private data class ToneBand(val type: Int, val frequencyHz: Int, val q: Float)
 
-    private val toneBands = listOf(ToneBand(type = 0, frequencyHz = 90, q = 0.8f), ToneBand(type = 1, frequencyHz = 10_000, q = 0.6f))
+    private val toneBands = listOf(
+        ToneBand(type = 0, frequencyHz = 90, q = 0.8f),
+        ToneBand(type = 1, frequencyHz = 10_000, q = 0.6f),
+    )
     private const val GRAPHIC_BAND_TYPE = 2
 
     fun toJson(presetName: String, settings: EqualizerSettings): String {
@@ -33,7 +37,7 @@ object PowerampExporter {
 
     /** Nombre de archivo sugerido: `timbra-mi-ecualizacion.json`, sin acentos ni espacios. */
     fun fileName(presetName: String): String {
-        val slug = java.text.Normalizer.normalize(presetName.trim().lowercase(Locale.ROOT), java.text.Normalizer.Form.NFD)
+        val slug = Normalizer.normalize(presetName.trim().lowercase(Locale.ROOT), Normalizer.Form.NFD)
             .replace(Regex("\\p{M}"), "")
             .replace(Regex("[^a-z0-9]+"), "-")
             .trim('-')

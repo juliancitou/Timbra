@@ -36,7 +36,10 @@ enum class FinderDimension(
 
     /** Curva de esta zona sobre las 25 bandas cuando vale [valueDb]. */
     fun curve(valueDb: Double): List<Double> = when (this) {
-        Balance -> sum(lowShelf(400.0, -valueDb / 2, transitionOctaves = 2.0), highShelf(2500.0, valueDb / 2, 2.0))
+        Balance -> sum(
+            lowShelf(400.0, -valueDb / 2, transitionOctaves = 2.0),
+            highShelf(2500.0, valueDb / 2, transitionOctaves = 2.0),
+        )
         Bass -> lowShelf(120.0, valueDb)
         Clarity -> bell(250.0, valueDb, widthOctaves = 1.5)
         Voice -> bell(2000.0, valueDb, widthOctaves = 1.5)
@@ -51,7 +54,9 @@ data class FinderRound(val dimension: FinderDimension, val fine: Boolean) {
 }
 
 /** Cada zona tiene una pasada gruesa seguida de una de afinado: 12 rondas en total. */
-val FINDER_ROUNDS: List<FinderRound> = FinderDimension.entries.flatMap { listOf(FinderRound(it, false), FinderRound(it, true)) }
+val FINDER_ROUNDS: List<FinderRound> = FinderDimension.entries.flatMap { dimension ->
+    listOf(FinderRound(dimension, fine = false), FinderRound(dimension, fine = true))
+}
 
 /**
  * Estado del test "Encuentra tu ecualización". Es inmutable: cada elección devuelve un estado
