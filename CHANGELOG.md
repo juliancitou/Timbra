@@ -19,7 +19,51 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
-_Nada todavía._
+### 2026-10-30 · `85d4dd1` · ui: agregar géneros y 14 ecualizaciones a la prueba
+- En "Probar el sonido": fila de géneros y 14 ecualizaciones (sin ecualizar, preset de ejemplo,
+  más/menos graves, menos lodo, más voz, menos "S", más brillo, menos agudos, en V, cálido,
+  brillante, rock, concierto). Cada género se genera la primera vez que se elige.
+- Al cambiar de zona se conserva el punto de la pieza; al cambiar de género empieza de nuevo.
+
+### 2026-10-30 · `59461c4` · audio: agregar curvas de ecualización y preamp
+- `EqualizerShapes`: campana (gaussiana en octavas) y estantes bajo y alto que se suman; serán
+  las "dimensiones" de las esferas en la Fase 4.
+- `toPowerampGains()` redondea a 0.5 dB y limita a −8…+3 dB; `powerampPreampDb()` aplica la regla
+  −(máximo positivo + 3), nunca mayor que −4.5. Una prueba atrapó que −0.24 redondeaba a `-0.0`,
+  que habría salido así en el JSON; se corrigió.
+
+### 2026-10-30 · `b3394bc` · audio: agregar seis géneros a la música del test
+- `Song` por género con tempo, progresión, patrones y mezcla propios, sobre pistas comunes
+  (`MusicStem`), así las rondas del test funcionan con cualquier género. Melodías originales.
+- Pop 96 BPM; rock 120 BPM con el bombo como pista más fuerte y guitarras distorsionadas;
+  clásica 72 BPM con cuerdas, timbales y sala amplia; electrónica 124 BPM con bombo en cada
+  pulso; hip-hop 88 BPM con 808 y voz rítmica con muchas "s"; jazz 120 BPM con swing.
+- 75 pruebas: duración, costura, nivel seguro y cobertura de bandas en los seis géneros.
+
+### 2026-10-30 · `953de62` · audio: agregar instrumentos para más géneros
+- Bajo pulsado (armónicos agudos que caen antes + sub-grave): más definición, pedido por el
+  usuario. Bombo con tres estilos (suave, con pegada, largo), caja con más o menos chasquido,
+  aplauso, escobillas, platillo suspendido, timbales, contrabajo, 808, piano con
+  inarmonicidad, guitarra distorsionada con mano apagada, sección de cuerdas con vibrato,
+  sintetizador y la vocal "u".
+
+### 2026-10-30 · `01b7c15` · audio: agregar paso bajo y parciales con caída
+- `BiquadCoefficients.lowPass` y `addPartials`: osciladores por rotación con caída propia por
+  parcial (piano, contrabajo, timbales, bajo). Incluye por error el borrado de
+  `Arrangement.kt`, que en realidad pertenece al commit `b3394bc`.
+
+### 2026-10-30 · `78945de` · ui: agregar la música a la prueba de audio
+- "Música del test" como señal predeterminada y fila "zona resaltada"; "Igualar volumen" mide
+  con la propia música.
+
+### 2026-10-30 · `63e75e4` · audio: generar el bucle musical del test
+- `MusicLoop`: pistas por separado enrolladas en un bucle sin costura (las colas del final se
+  suman al inicio), reverberación en régimen continuo y mezcla normalizada a −24 LUFS con picos
+  bajo −8 dBFS. `MusicFocus` resalta graves, claridad, voz, "S" o aire por ronda.
+
+### 2026-10-30 · `e3194f4` · audio: agregar instrumentos sintetizados y reverberación
+- Tablas de onda sin aliasing, bombo, caja, hi-hat, ride, crash, bajo, pad, voz con formantes
+  (vocales a, o, e) y consonante "s"; reverberación tipo Schroeder/Freeverb.
 
 ## [0.3.0] · 2026-10-30 · Fase 2: motor de audio seguro y ecualizador en vivo
 

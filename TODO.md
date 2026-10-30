@@ -102,14 +102,19 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 
 **Meta:** un bucle musical sintetizado por la app, agradable y que cubra graves, medios y agudos.
 
-- [ ] Bombo y bajo
-- [ ] Acordes / pad
-- [ ] "Voz" sintética con formantes
-- [ ] Hi-hats, platillos y sonido de "s"
-- [ ] Bucle de 8–16 s sin cortes
-- [ ] Variantes por ronda que resaltan cada zona
-- [ ] Pruebas: cubre las 25 bandas y no satura
-- [ ] Escuchar en los audífonos: suena musical
+- [x] Bombo y bajo
+- [x] Acordes / pad
+- [x] "Voz" sintética con formantes
+- [x] Hi-hats, platillos y sonido de "s"
+- [x] Bucle de 8–16 s sin cortes
+- [x] Variantes por ronda que resaltan cada zona
+- [x] Pruebas: cubre las 25 bandas y no satura
+- [x] Bajo pulsado con sub-grave (más definición)
+- [x] Seis géneros: pop, rock, clásica, electrónica, hip-hop y jazz
+- [x] 14 ecualizaciones de prueba hechas con curvas suaves (`EqualizerShapes`)
+- [x] Escuchar en los audífonos: pop suena musical
+- [ ] Escuchar los seis géneros y ajustar lo que no convenza
+- [ ] Más géneros a futuro (mariachi, blues, balada acústica…)
 - [ ] Tag y release `v0.4.0`
 
 ## Fase 4 — Test de esferas y exportación · `v0.5.0`
