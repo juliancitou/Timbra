@@ -10,9 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
-import com.juliancitou.timbra.ui.theme.StepList
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalScreen
@@ -55,7 +55,7 @@ fun ExportScreen(onGoHome: () -> Unit, onBack: () -> Unit) {
         }
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
             SectionLabel(stringResource(R.string.export_section_steps))
-            StepList(
+            CodeLines(
                 listOf(
                     stringResource(R.string.export_step_open),
                     stringResource(R.string.export_step_presets),

@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.screens.SampleData
-import com.juliancitou.timbra.ui.theme.BulletList
+import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.FrequencyChart
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
@@ -51,7 +51,7 @@ fun ResultsScreen(onAdjustTaste: () -> Unit, onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(Spacing.medium),
         ) {
             SectionLabel(stringResource(R.string.results_section_findings))
-            BulletList(
+            CodeLines(
                 listOf(
                     stringResource(R.string.results_finding_sibilance),
                     stringResource(R.string.results_finding_mud),

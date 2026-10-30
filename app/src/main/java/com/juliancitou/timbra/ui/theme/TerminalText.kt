@@ -12,11 +12,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -146,7 +149,7 @@ fun LeadText(text: String, modifier: Modifier = Modifier) {
 fun SectionLabel(text: String, modifier: Modifier = Modifier) {
     Text(
         text = "// $text",
-        style = MaterialTheme.typography.labelLarge,
+        style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp, lineHeight = 22.sp),
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier.clearAndSetSemantics {
             heading()
@@ -166,39 +169,58 @@ fun DetailText(text: String, modifier: Modifier = Modifier, color: Color = Color
     )
 }
 
-/** Pasos numerados `01`, `02`… con el número en ámbar. */
-@Composable
-fun StepList(steps: List<String>, modifier: Modifier = Modifier) {
-    MarkedList(items = steps, marker = { index -> (index + 1).toString().padStart(2, '0') }, modifier = modifier)
-}
+private const val LINE_NUMBER_ALPHA = 0.55f
 
-/** Lista con viñeta `›`, para hallazgos o recomendaciones sin orden. */
+/**
+ * Pasos o indicaciones con aspecto de código: número de línea tenue, una barra `│` que acompaña
+ * al texto aunque ocupe varios renglones, y resaltado de sintaxis sencillo (números en ámbar como
+ * literales y lo que va entre comillas en naranja como cadenas). [firstLine] permite continuar la
+ * numeración de un bloque anterior. Cada línea aparece un poco después de la anterior.
+ */
 @Composable
-fun BulletList(items: List<String>, modifier: Modifier = Modifier) {
-    MarkedList(items = items, marker = { "›" }, modifier = modifier)
-}
-
-@Composable
-private fun MarkedList(items: List<String>, marker: (Int) -> String, modifier: Modifier) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
-        items.forEachIndexed { index, item ->
+fun CodeLines(lines: List<String>, modifier: Modifier = Modifier, firstLine: Int = 1) {
+    val colors = MaterialTheme.colorScheme
+    val dim = colors.onSurfaceVariant.copy(alpha = LINE_NUMBER_ALPHA)
+    val style = MaterialTheme.typography.bodyLarge
+    val gutterDigits = (firstLine + lines.size - 1).toString().length.coerceAtLeast(2)
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        lines.forEachIndexed { index, line ->
             Row(
-                modifier = Modifier.staggeredEntrance(index),
-                horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
+                modifier = Modifier
+                    .height(IntrinsicSize.Min)
+                    .staggeredEntrance(index),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
             ) {
                 Text(
-                    text = marker(index),
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                    color = MaterialTheme.colorScheme.primary,
+                    text = (firstLine + index).toString().padStart(gutterDigits, ' '),
+                    style = style,
+                    color = dim,
                     modifier = Modifier.clearAndSetSemantics {},
                 )
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(1.dp)
+                        .background(dim),
+                )
                 Text(
-                    text = item,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    text = highlightedCode(line, colors.onBackground, colors.primary, colors.secondary),
+                    style = style,
+                    modifier = Modifier.weight(1f),
                 )
             }
         }
+    }
+}
+
+private fun highlightedCode(line: String, plain: Color, number: Color, quoted: Color) = buildAnnotatedString {
+    codeTokens(line).forEach { token ->
+        val color = when (token.kind) {
+            CodeTokenKind.Plain -> plain
+            CodeTokenKind.NumberLiteral -> number
+            CodeTokenKind.StringLiteral -> quoted
+        }
+        withStyle(SpanStyle(color = color)) { append(token.text) }
     }
 }
 
