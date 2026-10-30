@@ -64,7 +64,7 @@ fun GlassSlider(
         verticalArrangement = Arrangement.spacedBy(Spacing.small),
     ) {
         when (size) {
-            GlassSliderSize.Large -> Text(
+            GlassSliderSize.Large -> FitText(
                 text = formattedValue,
                 style = MaterialTheme.typography.displayMedium.withTabularNumbers(),
                 color = colors.onSurface,

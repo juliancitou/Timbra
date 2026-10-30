@@ -27,6 +27,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +48,12 @@ fun TerminalTitle(text: String, modifier: Modifier = Modifier, showCursor: Boole
     val cursorAlpha = rememberCursorAlpha(blinking = showCursor && !isReducedMotionEnabled())
     Row(modifier = modifier.semantics(mergeDescendants = true) { heading() }) {
         Text(text = "> ", style = style, color = accent, modifier = Modifier.clearAndSetSemantics {})
-        Text(text = text, style = style, color = MaterialTheme.colorScheme.onBackground)
+        Text(
+            text = text,
+            style = style,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.weight(1f, fill = false),
+        )
         if (showCursor) {
             Text(
                 text = "_",
@@ -90,14 +96,17 @@ fun LeadText(text: String, modifier: Modifier = Modifier) {
     )
 }
 
-/** Encabezado de sección con forma de comentario de código: `// cómo funciona`. */
+/** Encabezado de sección con forma de comentario de código: `// cómo funciona` (se lee sin `//`). */
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier) {
     Text(
         text = "// $text",
         style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.primary,
-        modifier = modifier.semantics { heading() },
+        modifier = modifier.clearAndSetSemantics {
+            heading()
+            contentDescription = text
+        },
     )
 }
 
@@ -133,6 +142,7 @@ private fun MarkedList(items: List<String>, marker: (Int) -> String, modifier: M
                     text = marker(index),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clearAndSetSemantics {},
                 )
                 Text(
                     text = item,
@@ -164,6 +174,7 @@ fun CheckRow(label: String, checked: Boolean, onToggle: () -> Unit, modifier: Mo
             text = if (checked) "[x]" else "[ ]",
             style = MaterialTheme.typography.titleMedium,
             color = if (checked) colors.primary else colors.onSurfaceVariant,
+            modifier = Modifier.clearAndSetSemantics {},
         )
         Text(
             text = label,

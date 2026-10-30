@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /** [Warning] es solo para estados de seguridad (nivel alto, audífonos desconectados). */
@@ -28,7 +29,7 @@ private const val SELECTED_FILL_ALPHA = 0.14f
 
 /**
  * Opción seleccionable o, con [onClick] nulo, etiqueta de estado. El área táctil crece a 48 dp
- * aunque el chip se vea de 40 dp.
+ * aunque el chip se vea de 40 dp. Con letra muy grande el texto puede usar dos líneas.
  */
 @Composable
 fun GlassChip(
@@ -75,8 +76,8 @@ fun GlassChip(
             text = label,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            softWrap = false,
+            maxLines = 2,
+            textAlign = TextAlign.Center,
         )
     }
 }

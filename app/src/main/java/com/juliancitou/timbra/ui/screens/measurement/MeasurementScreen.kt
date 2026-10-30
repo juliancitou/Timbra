@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -19,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
+import com.juliancitou.timbra.ui.theme.FitText
 import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassButtonStyle
 import com.juliancitou.timbra.ui.theme.GlassScreen
@@ -84,7 +84,7 @@ fun MeasurementScreen(onFinished: () -> Unit, onBack: () -> Unit) {
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-            Text(
+            FitText(
                 text = formatHertz(frequencyHz),
                 style = MaterialTheme.typography.displaySmall.withTabularNumbers(),
                 color = MaterialTheme.colorScheme.primary,

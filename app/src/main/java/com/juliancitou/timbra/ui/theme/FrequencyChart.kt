@@ -23,8 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
 
 private val ChartHeight = 220.dp
-private val LabelGutterStart = 36.dp
-private val LabelGutterBottom = 24.dp
+private val LabelGap = 6.dp
 private val CurveStrokeWidth = 3.dp
 private val PointRadius = 4.dp
 private val HighlightRadius = 9.dp
@@ -67,11 +66,14 @@ fun FrequencyChart(
             .height(ChartHeight)
             .semantics { this.contentDescription = contentDescription },
     ) {
+        // Los márgenes salen de medir las etiquetas, así crecen con el tamaño de letra del sistema.
+        val widestGainLabel = textMeasurer.measure(formatGainAxisLabel(minDb), labelStyle).size
+        val frequencyLabelHeight = textMeasurer.measure(formatFrequencyAxisLabel(1000), labelStyle).size.height
         val plot = PlotArea(
-            left = LabelGutterStart.toPx(),
-            top = labelStyle.fontSize.toPx() / 2,
+            left = widestGainLabel.width + LabelGap.toPx(),
+            top = widestGainLabel.height / 2f,
             right = size.width,
-            bottom = size.height - LabelGutterBottom.toPx(),
+            bottom = size.height - frequencyLabelHeight - LabelGap.toPx(),
         )
         drawGrid(plot, minDb, maxDb, chartColors, textMeasurer, labelStyle)
         val points = frequenciesHz.zip(gainsDb) { hz, db ->
@@ -118,7 +120,7 @@ private fun DrawScope.drawGrid(
         val label = textMeasurer.measure(formatGainAxisLabel(db), labelStyle)
         drawText(
             textLayoutResult = label,
-            topLeft = Offset(plot.left - label.size.width - 6.dp.toPx(), y - label.size.height / 2),
+            topLeft = Offset(plot.left - label.size.width - LabelGap.toPx(), y - label.size.height / 2),
         )
     }
     FrequencyGridHz.forEach { hz ->
@@ -131,7 +133,7 @@ private fun DrawScope.drawGrid(
         )
         val label = textMeasurer.measure(formatFrequencyAxisLabel(hz), labelStyle)
         val labelX = (x - label.size.width / 2).coerceIn(plot.left, plot.right - label.size.width)
-        drawText(textLayoutResult = label, topLeft = Offset(labelX, plot.bottom + 4.dp.toPx()))
+        drawText(textLayoutResult = label, topLeft = Offset(labelX, plot.bottom + LabelGap.toPx()))
     }
 }
 

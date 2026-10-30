@@ -2,7 +2,7 @@ package com.juliancitou.timbra.ui.screens.results
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -38,7 +38,10 @@ fun ResultsScreen(onAdjustTaste: () -> Unit, onBack: () -> Unit) {
                 contentDescription = stringResource(R.string.results_chart_description),
                 estimatedBandIndices = SampleData.estimatedBandIndices,
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+                verticalArrangement = Arrangement.spacedBy(Spacing.small),
+            ) {
                 GlassChip(label = stringResource(R.string.chip_reliable), selected = true)
                 GlassChip(label = stringResource(R.string.chip_estimated))
             }
