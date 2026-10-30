@@ -80,20 +80,21 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 
 **Meta:** sonido limpio, siempre dentro de un nivel seguro, con ecualización en vivo sin clics.
 
-- [ ] `SafetyLimiter`: −18 dBFS RMS, picos a −6 dBFS
-- [ ] `Fade`: entradas y salidas de 50 ms
-- [ ] Fundido cruzado ≤ 50 ms al cambiar de ecualización
-- [ ] `Biquad`: pico, pasa-banda y estantes
-- [ ] `GraphicEqualizer`: 25 bandas que imitan a Poweramp + preamp
-- [ ] `LoudnessMatcher`: igualar volumen entre ecualizaciones (ponderación K)
-- [ ] `AudioEngine` con `AudioTrack` (stream, PCM float, frecuencia nativa)
-- [ ] Foco de audio y pausa al perderlo
-- [ ] Pausa al desconectar audífonos (`ACTION_AUDIO_BECOMING_NOISY`)
-- [ ] Paro automático a los 20 minutos y al salir de la pantalla
-- [ ] Pruebas: respuesta en frecuencia de los filtros y del ecualizador
-- [ ] Pruebas: el limitador nunca supera el pico máximo
-- [ ] Pruebas: fades y fundidos sin discontinuidades
-- [ ] Pruebas: igualación de volumen entre ecualizaciones
+- [x] `SafetyLimiter`: −18 dBFS RMS, picos a −6 dBFS
+- [x] `Fade`: entradas y salidas de 50 ms
+- [x] Fundido cruzado ≤ 50 ms al cambiar de ecualización
+- [x] `Biquad`: pico, pasa-banda y estantes
+- [x] `GraphicEqualizer`: 25 bandas que imitan a Poweramp + preamp
+- [x] `LoudnessMatcher`: igualar volumen entre ecualizaciones (ponderación K)
+- [x] `AudioOutput` con `AudioTrack` (stream, PCM float, frecuencia nativa)
+- [x] Foco de audio y pausa al perderlo
+- [x] Pausa al desconectar audífonos (`ACTION_AUDIO_BECOMING_NOISY`)
+- [x] Paro automático a los 20 minutos y al salir de la pantalla
+- [x] Pruebas: respuesta en frecuencia de los filtros y del ecualizador
+- [x] Pruebas: el limitador nunca supera el pico máximo
+- [x] Pruebas: fades y fundidos sin discontinuidades
+- [x] Pruebas: igualación de volumen entre ecualizaciones
+- [x] Pantalla temporal "Prueba de audio" en Ajustes
 - [ ] Escuchar en los audífonos: sin clics, sin distorsión, volumen cómodo
 - [ ] Tag y release `v0.3.0`
 
@@ -133,7 +134,8 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 
 **Meta:** encontrar picos angostos (como la "S") y combinarlos con el resultado del test.
 
-- [ ] `PinkNoise`, `BandNoise` (tercio de octava, mismo RMS) y `WarbleTone`
+- [x] `PinkNoise` (adelantado en la Fase 2)
+- [ ] `BandNoise` (tercio de octava, mismo RMS) y `WarbleTone`
 - [ ] `ToneAlternator`: referencia 1 kHz y banda de prueba (~0.8 s cada una)
 - [ ] Preparación y nivel cómodo con aviso si cambia el volumen del teléfono
 - [ ] Recorrido por las 25 bandas con progreso y explicación por zona

@@ -19,6 +19,56 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `4b8a5e1` · ui: agregar pantalla de prueba de audio
+- Pantalla temporal en Ajustes → "Probar el sonido": ruido rosa o tono de 1 kHz, cuatro
+  ecualizaciones para cambiar mientras suena (sin ecualizar, preset de ejemplo, más graves,
+  menos agudos), igualar volumen sí/no y el estado de reproducción.
+- `AudioTestViewModel` (MVVM con `StateFlow`); el sonido se detiene al salir de la pantalla, al
+  mandar la app al fondo o al apagar la pantalla. Nunca suena al abrir la app.
+
+### 2026-10-30 · `3acf2ff` · audio: agregar salida con foco y pausa al desconectar
+- `AudioOutput`: `AudioTrack` en stream, PCM float estéreo a la frecuencia nativa del teléfono
+  (48 kHz si no la informa), bloques de ~10 ms y un hilo con prioridad de audio que solo vive
+  mientras hay sonido.
+- Pide el foco de audio (`USAGE_MEDIA`); si otra app o una llamada lo toma, pausa y no reanuda
+  sola. Pausa al recibir `ACTION_AUDIO_BECOMING_NOISY` (audífonos desconectados).
+- Estados: detenido, sonando, en pausa por otra app, en pausa por audífonos y paro por tiempo.
+
+### 2026-10-30 · `2558c18` · audio: unir la cadena de audio con paro automático
+- `AudioRenderer`: fuente → ecualizador con fundido → entrada/salida de 50 ms →
+  `SafetyLimiter`, en ese orden fijo. Mono duplicado en los dos canales.
+- Paro automático a los 20 minutos de sonido continuo. Cambiar de fuente baja, cambia y sube.
+- Los controles solo dejan indicaciones; el hilo de audio es el único que modifica el estado.
+
+### 2026-10-30 · `cd46c6e` · audio: agregar ruido rosa e igualación de volumen
+- `PinkNoise` (filtro de Paul Kellet, misma energía por octava) y `SineTone`.
+- `loudnessLufs` con ponderación K de ITU-R BS.1770 derivada para cualquier frecuencia de
+  muestreo; coincide con los coeficientes oficiales a 48 kHz con error menor a 0.001 dB.
+- `LoudnessMatcher`: ajusta el preamp de vista previa para que cada ecualización suene igual de
+  fuerte que sin ecualizar (el preset exportado no cambia).
+
+### 2026-10-30 · `e677805` · audio: cambiar de ecualización sin clics
+- Durante 50 ms se procesan la ecualización vieja y la nueva y se mezclan con curva de coseno;
+  los pesos suman 1 porque ambas salen de la misma señal (potencia constante daría +3 dB).
+
+### 2026-10-30 · `74dad4a` · audio: agregar fades de 50 ms
+- `GainRamp` con forma de coseno: sin esquinas, sin clic al empezar o parar.
+
+### 2026-10-30 · `c54d47f` · audio: agregar limitador de seguridad
+- `SafetyLimiter`: RMS en ventana de 400 ms limitado a −18 dBFS (ataque 20 ms, liberación
+  500 ms) y techo de pico de −6 dBFS con ataque instantáneo más recorte duro final. NaN e
+  infinitos salen como silencio. Probado con ruido 50 veces sobre escala completa.
+
+### 2026-10-30 · `ff08f93` · audio: agregar ecualizador gráfico de 25 bandas
+- `GraphicEqualizer`: una campana por banda de Poweramp en serie más el preamp. Q = 2, el valor
+  con la curva más pareja (1.4 dB de ondulación con todas las bandas iguales); las bandas
+  vecinas se suman, así que las gráficas deben usar la respuesta real. Por calibrar contra
+  Poweramp en la Fase 4.
+
+### 2026-10-30 · `d730af0` · audio: agregar filtros biquad
+- Pico, estantes, paso alto y pasa-banda (Audio EQ Cookbook), estado en `Double` y respuesta en
+  frecuencia exacta para las pruebas.
+
 ### 2026-10-30 · `894f922` · docs: reorganizar plan con test de esferas
 - Decisión del usuario: el modo principal pasa a ser **"Encuentra tu ecualización"**, un test
   tipo juego. Suena música y el usuario toca esferas, cada una con una ecualización distinta que
