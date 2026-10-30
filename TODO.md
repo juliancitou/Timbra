@@ -39,8 +39,8 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 **Meta:** se ve elegante y fluido en el teléfono, con estilo liquid glass y buen contraste.
 
 ### Tema
-- [x] Paleta: fondo azul noche → violeta, acento aqua, secundario violeta, ámbar/rojo para avisos
-- [x] Tipografía (Inter o sistema) con números tabulares para dB y Hz
+- [x] Paleta: negro y grises, acento ámbar, secundario naranja, rojo solo para avisos
+- [x] Tipografía monoespaciada Cascadia Mono con números tabulares para dB y Hz
 - [x] Formas: esquinas de 28 dp, espaciados consistentes
 - [x] Tema oscuro como principal
 - [x] Quitar restos de la plantilla (colores sin usar, etiqueta repetida, chequeo de SDK innecesario)
@@ -57,7 +57,7 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 - [ ] Respaldo sin desenfoque (relleno al 20 %)
 
 ### Navegación y pantallas de ejemplo
-- [x] Navigation Compose con transiciones de 200–350 ms
+- [x] Navigation Compose con transiciones de zoom de 200–350 ms y atrás predictivo
 - [x] Inicio
 - [x] Preparación
 - [x] Nivel cómodo

@@ -19,6 +19,28 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `14e0958` · ui: animar navegación con zoom y atrás predictivo
+- Al entrar, la pantalla nueva crece desde 92 % mientras aparece y la anterior se agranda a
+  106 % al desvanecerse; al regresar, la actual se encoge y se esconde y la anterior vuelve
+  desde 106 %. Entradas de 350 ms con curva enfatizada de frenado y salidas de 200 ms.
+- `enableOnBackInvokedCallback`: el gesto de atrás predictivo de Android mueve la animación
+  con el dedo y se puede cancelar a la mitad.
+- Sin animación si el sistema pide reducir movimiento.
+
+### 2026-10-30 · `a00a09a` · ui: usar tipografía Cascadia Mono
+- Estilo "app de programador" pedido por el usuario. Consolas no se puede incluir por
+  licencia; se usa Cascadia Mono (Microsoft, OFL), su sucesora libre, como fuente variable
+  (un archivo de 704 KB con grosores de 200 a 700) desde Google Fonts.
+- Licencia OFL incluida en `assets/licenses/`, como exige la OFL al redistribuir la fuente.
+- Tamaños ajustados para monoespaciada (más ancha) y espaciado entre letras en 0.
+
+### 2026-10-30 · `8e4d2f0` · ui: cambiar paleta a negro, gris y ámbar
+- Paleta pedida por el usuario: base casi negra (`#050506` → `#18181B`), texto blanco y gris,
+  acento ámbar `#FFC23D` y secundario naranja `#FF8A3D`. Sustituye a la aqua/violeta.
+- Aurora más oscura: brasas ámbar (20 %), naranja (15 %) y gris humo (9 %). Velo del vidrio
+  al 8 %.
+- Como el ámbar pasó a ser el acento, los avisos de seguridad cambian a **rojo** `#FF6B6B`.
+
 ### 2026-10-30 · `8714975` · ui: agregar navegación y pantallas de ejemplo
 - Las 9 pantallas del plan con contenido de ejemplo: Inicio, Preparación, Nivel cómodo,
   Medición, Resultados, Ajuste de gusto, Exportar, Historial y Ajustes. Todavía no suena
