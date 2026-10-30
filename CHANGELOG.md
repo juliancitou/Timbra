@@ -19,7 +19,11 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
-_Nada todavía._
+### 2026-10-30 · `4273571` · chore: desactivar respaldo y transferencia de datos
+- `android:allowBackup="false"` y reglas de extracción que excluyen todo, tanto del respaldo
+  en la nube como de la copia a un teléfono nuevo (Android 12+ ignora `allowBackup` para esta
+  última). Las mediciones nunca salen del teléfono, como dice el README.
+- Se elimina `backup_rules.xml`: solo aplica a Android 11 o anterior y la app pide Android 13.
 
 ## [0.2.0] · 2026-10-30 · Fase 1: diseño y navegación
 

@@ -165,7 +165,6 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 
 ## Ideas y deuda técnica
 
-- [ ] Decidir `android:allowBackup` (la plantilla lo deja en `true`: respaldo en la nube de Android)
 - [ ] Evaluar bibliotecas de "liquid glass" adicionales a Haze
 - [ ] Probar el efecto Glass de Haze 2 como alternativa al desenfoque clásico
 - [ ] Widget o acceso rápido para exportar el último preset
