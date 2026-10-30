@@ -22,5 +22,5 @@ val TextSecondary = Color(0xFFC2C2CA)
 val Outline = Color(0xFF52525B)
 
 /** Solo para avisos de seguridad auditiva: nunca se usa como acento decorativo. */
-val DangerRed = Color(0xFFFF8A8A)
+val DangerRed = Color(0xFFFF9A9A)
 val DangerRedDeep = Color(0xFF3F0808)

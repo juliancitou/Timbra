@@ -43,11 +43,11 @@ class ContrastTest {
     }
 
     @Test
-    fun selectedChipTextMeetsAa() {
-        listOf(Amber, DangerRed).forEach { accent ->
-            val chipFill = accent.copy(alpha = 0.14f).over(glassFallback)
-            assertText(TextPrimary, chipFill, "texto de chip seleccionado")
-            assertGraphic(accent, glassFallback, "borde de chip seleccionado")
+    fun bracketChipTextMeetsAa() {
+        listOf(Ink, Charcoal, glass, glassFallback).forEach { background ->
+            assertText(Amber, background, "chip seleccionado")
+            assertText(DangerRed, background, "chip de aviso")
+            assertText(TextSecondary, background, "chip sin seleccionar")
         }
     }
 
