@@ -45,6 +45,14 @@ class BiquadTest {
     }
 
     @Test
+    fun lowPassKeepsLowsAndCutsHighs() {
+        val filter = BiquadCoefficients.lowPass(1000.0, q = 0.707, SAMPLE_RATE)
+        assertEquals(0.0, filter.magnitudeDb(50.0, SAMPLE_RATE), 0.05)
+        assertEquals(-3.0, filter.magnitudeDb(1000.0, SAMPLE_RATE), 0.1)
+        assertTrue(filter.magnitudeDb(10_000.0, SAMPLE_RATE) < -35)
+    }
+
+    @Test
     fun bandPassPeaksAtZeroDecibels() {
         val filter = BiquadCoefficients.bandPass(2000.0, q = 4.3, SAMPLE_RATE)
         assertEquals(0.0, filter.magnitudeDb(2000.0, SAMPLE_RATE), 0.01)

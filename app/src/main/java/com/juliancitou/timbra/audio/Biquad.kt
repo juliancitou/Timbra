@@ -93,6 +93,18 @@ data class BiquadCoefficients(
             )
         }
 
+        fun lowPass(frequencyHz: Double, q: Double, sampleRate: Int): BiquadCoefficients {
+            val (cosW, alpha) = angularTerms(frequencyHz, q, sampleRate)
+            return normalized(
+                b0 = (1 - cosW) / 2,
+                b1 = 1 - cosW,
+                b2 = (1 - cosW) / 2,
+                a0 = 1 + alpha,
+                a1 = -2 * cosW,
+                a2 = 1 - alpha,
+            )
+        }
+
         /** Pasa-banda con ganancia de 0 dB en [frequencyHz]. */
         fun bandPass(frequencyHz: Double, q: Double, sampleRate: Int): BiquadCoefficients {
             val (cosW, alpha) = angularTerms(frequencyHz, q, sampleRate)
