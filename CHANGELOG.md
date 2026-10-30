@@ -19,6 +19,18 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `5a9315d` · docs: planear salidas de audio y bandas de Poweramp
+- Pedido del usuario, agregado a la Fase 4 antes de la `v0.5.0`:
+  - **Salida de audio:** Bluetooth (pensada en los HUAWEI FreeBuds Pro 4), cable (cualquier
+    audífono) y bocina del teléfono, que se ecualiza distinto: recortar graves que no puede dar y
+    suavizar 2–4 kHz. La app preselecciona la salida conectada y explica cómo asignar el preset a
+    esa salida en Poweramp (⋮ → Guardar/Asignar).
+  - **Bandas de Poweramp:** Poweramp deja elegir 5, 8, 10, 12, 15, 16, 24, 31 o 32 bandas, o una
+    configuración personalizada de 5 a 32 con inicio y fin. Las 25 bandas actuales del usuario son
+    la personalizada de 20 Hz a 20 kHz con reparto logarítmico, así que las personalizadas se pueden
+    calcular. Las fijas se ofrecerán cuando se confirmen sus frecuencias en el Poweramp del usuario.
+- El contrato del JSON deja de ser "siempre 25 bandas"; habrá una prueba golden por configuración.
+
 ### 2026-10-30 · `20c8d1d` · feat: agregar el test de esferas y la exportación
 - Flujo real: Inicio → Preparación (lista y nombre de los audífonos) → Nivel cómodo (elegir
   género y volumen, con música real) → 12 rondas → Tu ecualización → Exportar.
