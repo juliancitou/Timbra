@@ -18,8 +18,10 @@ private const val SAMPLE_RATE = 48_000
 class MusicLoopTest {
 
     companion object {
-        private val loop by lazy { MusicLoop(SAMPLE_RATE) }
-        private val balanced by lazy { loop.mix(MusicFocus.Balanced) }
+        private val loops by lazy { Genre.entries.associateWith { MusicLoop(SAMPLE_RATE, it.song) } }
+        private val balanced by lazy { loops.mapValues { (_, loop) -> loop.mix(MusicFocus.Balanced) } }
+        private val pop get() = loops.getValue(Genre.Pop)
+        private val popBalanced get() = balanced.getValue(Genre.Pop)
     }
 
     /**
@@ -38,44 +40,77 @@ class MusicLoopTest {
         return 10 * log10(bands.sumOf { 10.0.pow(bandEnergyDb(samples, it.toDouble()) / 10) })
     }
 
-    @Test
-    fun loopLastsExactlyFourBarsAt96Bpm() {
-        assertEquals(10.0, Arrangement.LOOP_SECONDS, 1e-9)
-        assertEquals(SAMPLE_RATE * 10, balanced.size)
-    }
-
-    @Test
-    fun mixIsFiniteAndSafelyBelowTheLimiter() {
-        assertTrue(balanced.all { it.isFinite() })
-        assertTrue(balanced.maxOf { abs(it) } <= decibelsToGain(MUSIC_MAX_PEAK_DBFS) + 1e-9)
-        assertTrue(loudnessLufs(balanced, SAMPLE_RATE) <= MUSIC_TARGET_LUFS + 0.1)
-    }
-
-    @Test
-    fun loopRepeatsWithoutAJump() {
-        val steps = balanced.toList().zipWithNext { a, b -> abs(b - a) }.sorted()
-        val typicalLargeStep = steps[(steps.size * 0.999).toInt()]
-        val seam = abs(balanced.first() - balanced.last())
-        assertTrue("Costura de $seam contra $typicalLargeStep", seam <= typicalLargeStep)
-    }
-
-    @Test
-    fun everyAudibleBandHasMusicalEnergy() {
-        val levels = POWERAMP_BAND_FREQUENCIES_HZ.associateWith { bandEnergyDb(balanced, it.toDouble()) }
-        val loudest = levels.values.max()
-        val weak = levels.filter { (hz, db) -> hz in 27..14998 && db < loudest - 45 }
-        assertTrue("Bandas casi vacías: $weak", weak.isEmpty())
-    }
-
     /**
      * Cuánto gana [zone] frente a [reference] al pasar de la mezcla equilibrada a [focus], en dB.
      * Cada mezcla se normaliza al mismo volumen, así que el énfasis se mide como balance relativo.
      */
     private fun emphasisDb(focus: MusicFocus, zone: IntRange, reference: IntRange): Double {
-        val mix = loop.mix(focus)
+        val mix = pop.mix(focus)
         val focused = zoneEnergyDb(mix, zone) - zoneEnergyDb(mix, reference)
-        val normal = zoneEnergyDb(balanced, zone) - zoneEnergyDb(balanced, reference)
+        val normal = zoneEnergyDb(popBalanced, zone) - zoneEnergyDb(popBalanced, reference)
         return focused - normal
+    }
+
+    @Test
+    fun eachLoopLastsItsFourBars() {
+        Genre.entries.forEach { genre ->
+            val expectedSeconds = 16 * 60.0 / genre.song.tempoBpm
+            assertEquals(genre.name, (expectedSeconds * SAMPLE_RATE).toInt(), balanced.getValue(genre).size)
+        }
+    }
+
+    @Test
+    fun everyMixIsFiniteAndSafelyBelowTheLimiter() {
+        balanced.forEach { (genre, mix) ->
+            assertTrue(genre.name, mix.all { it.isFinite() })
+            assertTrue(genre.name, mix.maxOf { abs(it) } <= decibelsToGain(MUSIC_MAX_PEAK_DBFS) + 1e-9)
+            assertTrue(genre.name, loudnessLufs(mix, SAMPLE_RATE) <= MUSIC_TARGET_LUFS + 0.1)
+        }
+    }
+
+    @Test
+    fun everyLoopRepeatsWithoutAJump() {
+        balanced.forEach { (genre, mix) ->
+            val steps = mix.toList().zipWithNext { a, b -> abs(b - a) }.sorted()
+            val typicalLargeStep = steps[(steps.size * 0.999).toInt()]
+            val seam = abs(mix.first() - mix.last())
+            assertTrue("${genre.name}: costura de $seam contra $typicalLargeStep", seam <= typicalLargeStep)
+        }
+    }
+
+    @Test
+    fun everyGenreFillsTheMainBands() {
+        balanced.forEach { (genre, mix) ->
+            val levels = POWERAMP_BAND_FREQUENCIES_HZ.associateWith { bandEnergyDb(mix, it.toDouble()) }
+            val loudest = levels.values.max()
+            val weak = levels.filter { (hz, db) -> hz in 47..8434 && db < loudest - 45 }
+            assertTrue("${genre.name}: bandas casi vacías $weak", weak.isEmpty())
+        }
+    }
+
+    @Test
+    fun popCoversEveryAudibleBand() {
+        val levels = POWERAMP_BAND_FREQUENCIES_HZ.associateWith { bandEnergyDb(popBalanced, it.toDouble()) }
+        val loudest = levels.values.max()
+        val weak = levels.filter { (hz, db) -> hz in 27..14998 && db < loudest - 45 }
+        assertTrue("Bandas casi vacías: $weak", weak.isEmpty())
+    }
+
+    @Test
+    fun kickIsTheLoudestPartOfTheRockMix() {
+        val kickLevel = RockSong.levelsDb.getValue(MusicStem.Kick)
+        assertTrue(RockSong.levelsDb.values.all { it <= kickLevel })
+    }
+
+    @Test
+    fun punchyKickHitsHarderThanSoftKick() {
+        fun attackEnergy(style: KickStyle): Double {
+            val hit = DoubleArray(SAMPLE_RATE)
+            Instruments(SAMPLE_RATE).kick(hit, 0, style)
+            val beaterBand = Biquad(BiquadCoefficients.bandPass(3500.0, q = 1.0, sampleRate = SAMPLE_RATE))
+            return hit.take(SAMPLE_RATE / 50).sumOf { val y = beaterBand.process(it); y * y }
+        }
+        assertTrue(attackEnergy(KickStyle.Punchy) > 4 * attackEnergy(KickStyle.Soft))
     }
 
     @Test
@@ -98,6 +133,6 @@ class MusicLoopTest {
 
     @Test
     fun renderingIsDeterministic() {
-        assertArrayEquals(balanced, MusicLoop(SAMPLE_RATE).mix(MusicFocus.Balanced), 0.0)
+        assertArrayEquals(popBalanced, MusicLoop(SAMPLE_RATE, PopSong).mix(MusicFocus.Balanced), 0.0)
     }
 }
