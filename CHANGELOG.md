@@ -19,6 +19,15 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+_Nada todavía._
+
+## [0.2.0] · 2026-10-30 · Fase 1: diseño y navegación
+
+Tema oscuro con estética de programador (negro, gris, blanco y ámbar; tipografía Cascadia Mono),
+componentes de vidrio con Haze, las 9 pantallas con contenido de ejemplo, navegación con zoom y
+atrás predictivo, y revisión de accesibilidad (contraste AA verificado con pruebas, TalkBack y
+letra grande). Probado en el POCO X8 Pro Max. Todavía no reproduce sonido.
+
 ### 2026-10-30 · `5f75358` · ui: mejorar lectura con TalkBack y letra grande
 - TalkBack ya no lee los adornos de terminal: `//` de las secciones, números `01` y viñetas
   `›` de las listas y los corchetes de `[x]` (la casilla anuncia "marcada / sin marcar").
@@ -150,6 +159,10 @@ versión publicada va en **Sin publicar**.
   espaciados de 4/8/16/24/32 dp.
 - Ventana con fondo azul noche (sin destello blanco al abrir) y barras del sistema con iconos
   claros. Se quitaron los restos de la plantilla que marcaba lint.
+
+## [0.1.0] · 2026-10-29 · Fase 0: base del proyecto
+
+Repositorio, documentación, CI y proyecto Android vacío que compila y se instala en el POCO.
 
 ### 2026-10-29 · `7e46e84` · chore: crear proyecto Android base
 - Proyecto creado con la plantilla *Empty Activity* (Compose) de Android Studio Rabbit 2

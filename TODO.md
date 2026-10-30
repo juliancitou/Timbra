@@ -31,7 +31,7 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 - [x] Verificar la autoría de los commits
 - [x] Activar Depuración USB e Instalar vía USB en el teléfono
 - [x] Instalar y abrir la app vacía en el POCO
-- [ ] Confirmar que el workflow pasa en verde en GitHub
+- [x] Confirmar que el workflow pasa en verde en GitHub
 - [ ] Tag y release `v0.1.0` (el workflow adjunta el APK)
 
 ## Fase 1 — Diseño y navegación · `v0.2.0`
@@ -54,7 +54,7 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 - [x] `GlassSlider`: grande, cómodo con el pulgar, valor en dB visible
 - [x] `GlassChip` para opciones y estados
 - [x] `FrequencyChart`: curva sobre las 25 bandas, ejes en Hz y dB
-- [ ] Respaldo sin desenfoque (relleno al 20 %)
+- [x] Respaldo sin desenfoque (relleno al 20 %)
 
 ### Navegación y pantallas de ejemplo
 - [x] Navigation Compose con transiciones de zoom de 200–350 ms y atrás predictivo
@@ -72,8 +72,8 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 ### Revisión
 - [x] Contraste AA en todos los textos (verificado con `ContrastTest`)
 - [x] Objetivos táctiles ≥ 48 dp y `contentDescription` en iconos
-- [ ] Probar con texto grande del sistema
-- [ ] Probar fluidez en el POCO (sin tirones al desenfocar)
+- [x] Probar con texto grande del sistema
+- [x] Probar fluidez en el POCO (sin tirones al desenfocar)
 - [ ] Tag y release `v0.2.0`
 
 ## Fase 2 — Motor de audio seguro · `v0.3.0`
