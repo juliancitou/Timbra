@@ -231,6 +231,43 @@ Timbra/
   [Releases](https://github.com/juliancitou/Timbra/releases).
 - El detalle de cada cambio está en [`CHANGELOG.md`](CHANGELOG.md).
 
+## Agradecimientos
+
+Timbra existe gracias a herramientas, bibliotecas y conocimiento que otras personas compartieron.
+Gracias a todas ellas.
+
+### Bibliotecas incluidas en la app
+
+| Proyecto | Para qué se usa | Autor | Licencia |
+|---|---|---|---|
+| [Haze](https://github.com/chrisbanes/haze) | Efecto de vidrio con desenfoque | Chris Banes | Apache 2.0 |
+| [Jetpack Compose](https://developer.android.com/compose) y Material 3 | Toda la interfaz | Google / AndroidX | Apache 2.0 |
+| [Navigation Compose](https://developer.android.com/guide/navigation) | Navegación entre pantallas | Google / AndroidX | Apache 2.0 |
+| [AndroidX Core, Activity y Lifecycle](https://developer.android.com/jetpack/androidx) | Base de la app, ViewModel y ciclo de vida | Google / AndroidX | Apache 2.0 |
+| [Kotlin](https://kotlinlang.org), Coroutines y kotlinx.serialization | Lenguaje, tareas en segundo plano y rutas | JetBrains | Apache 2.0 |
+| [Cascadia Mono](https://github.com/microsoft/cascadia-code) | Tipografía de toda la app (obtenida de [Google Fonts](https://github.com/google/fonts)) | Microsoft | SIL OFL 1.1 |
+
+La licencia de Cascadia Mono va incluida dentro de la app, en `assets/licenses/`.
+
+### Herramientas de desarrollo y pruebas
+
+| Proyecto | Para qué se usa | Licencia |
+|---|---|---|
+| [Android Studio](https://developer.android.com/studio), Android SDK y Android Gradle Plugin | Crear, compilar y probar la app | Apache 2.0 y términos del SDK de Android |
+| [Gradle](https://gradle.org) y [Foojay Toolchains](https://github.com/gradle/foojay-toolchains) | Compilación y descarga del JDK correcto | Apache 2.0 |
+| [JUnit 4](https://junit.org/junit4/) | Pruebas unitarias | EPL 1.0 |
+| [AndroidX Test y Espresso](https://developer.android.com/training/testing) | Pruebas en el dispositivo | Apache 2.0 |
+| [GitHub Actions](https://github.com/features/actions): `checkout`, `setup-java`, `upload-artifact` y [`gradle/actions`](https://github.com/gradle/actions) | Compilación automática y APK de cada versión | MIT |
+| [Eclipse Temurin](https://adoptium.net) | JDK de la compilación automática | GPLv2 con excepción de classpath |
+
+### Conocimiento en el que se basa el audio
+
+- **Audio EQ Cookbook** de Robert Bristow-Johnson: fórmulas de los filtros del ecualizador.
+- **ITU-R BS.1770**: la ponderación K con la que se iguala el volumen entre ecualizaciones.
+- **Paul Kellet**: el filtro que genera el ruido rosa (publicado en musicdsp.org).
+- **Manfred Schroeder** y **Freeverb** de Jezar at Dreampoint (dominio público): la estructura de
+  la reverberación de la música del test.
+
 ## Desinstalar
 
 Como cualquier app: mantén presionado el ícono de **Timbra** → **Desinstalar**.
