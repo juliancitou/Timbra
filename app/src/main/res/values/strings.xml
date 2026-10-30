@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Timbra</string>
     <string name="home_subtitle">Mide cómo escuchas cada frecuencia y crea una ecualización a tu medida.</string>
+    <string name="slider_band_gain">Ganancia de la banda</string>
+    <string name="chip_reliable">Confiable</string>
+    <string name="chip_estimated">Estimada</string>
+    <string name="chip_volume_high">Volumen alto</string>
+    <string name="action_create_equalization">Crear mi ecualización</string>
+    <string name="action_my_measurements">Mis mediciones</string>
 </resources>

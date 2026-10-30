@@ -6,16 +6,33 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.juliancitou.timbra.ui.theme.GlassBackground
+import com.juliancitou.timbra.ui.theme.GlassButton
+import com.juliancitou.timbra.ui.theme.GlassButtonStyle
 import com.juliancitou.timbra.ui.theme.GlassCard
+import com.juliancitou.timbra.ui.theme.GlassChip
+import com.juliancitou.timbra.ui.theme.GlassChipTone
+import com.juliancitou.timbra.ui.theme.GlassSlider
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TimbraTheme
 
@@ -36,20 +53,64 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TimbraApp() {
+    var gainDb by remember { mutableFloatStateOf(0f) }
+    var reliableSelected by remember { mutableStateOf(true) }
     GlassBackground {
-        GlassCard(
+        Column(
             modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = Spacing.large),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .safeDrawingPadding()
+                .padding(Spacing.large),
+            verticalArrangement = Arrangement.spacedBy(Spacing.medium),
         ) {
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineMedium,
+            GlassCard {
+                Text(
+                    text = stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+                Text(
+                    text = stringResource(R.string.home_subtitle),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            GlassCard {
+                GlassSlider(
+                    valueDb = gainDb,
+                    onValueChange = { gainDb = it },
+                    label = stringResource(R.string.slider_band_gain),
+                )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.small),
+                ) {
+                    GlassChip(
+                        label = stringResource(R.string.chip_reliable),
+                        selected = reliableSelected,
+                        onClick = { reliableSelected = true },
+                    )
+                    GlassChip(
+                        label = stringResource(R.string.chip_estimated),
+                        selected = !reliableSelected,
+                        onClick = { reliableSelected = false },
+                    )
+                    GlassChip(
+                        label = stringResource(R.string.chip_volume_high),
+                        tone = GlassChipTone.Warning,
+                    )
+                }
+            }
+            GlassButton(
+                text = stringResource(R.string.action_create_equalization),
+                onClick = {},
+                modifier = Modifier.fillMaxWidth(),
             )
-            Text(
-                text = stringResource(R.string.home_subtitle),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            GlassButton(
+                text = stringResource(R.string.action_my_measurements),
+                onClick = {},
+                style = GlassButtonStyle.Secondary,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
