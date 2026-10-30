@@ -51,7 +51,7 @@ fun ComfortLevelScreen(onReady: () -> Unit, onBack: () -> Unit) {
             Text(
                 text = stringResource(R.string.sample_notice),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.tertiary,
+                color = MaterialTheme.colorScheme.secondary,
             )
         }
     }

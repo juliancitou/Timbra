@@ -2,28 +2,26 @@ package com.juliancitou.timbra.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val NightBlue = Color(0xFF0B1026)
-val DeepIndigo = Color(0xFF161A45)
-val NightViolet = Color(0xFF2A1650)
+val Ink = Color(0xFF050506)
+val Graphite = Color(0xFF0E0E10)
+val Charcoal = Color(0xFF18181B)
 
-val Aqua = Color(0xFF6FE7DD)
-val AquaDeep = Color(0xFF00332F)
-val AquaContainer = Color(0xFF0F4F4A)
+val Amber = Color(0xFFFFC23D)
+val AmberDeep = Color(0xFF241800)
+val AmberContainer = Color(0xFF3A2A00)
 
-val Violet = Color(0xFFB79CFF)
-val VioletDeep = Color(0xFF2A1263)
-val VioletContainer = Color(0xFF41297E)
+val Orange = Color(0xFFFF8A3D)
+val OrangeDeep = Color(0xFF2E1200)
+val OrangeContainer = Color(0xFF4A2410)
 
-val AuroraAqua = Color(0xFF2DD4BF)
-val AuroraViolet = Color(0xFF8B5CF6)
-val AuroraBlue = Color(0xFF3B5BFF)
+val AuroraAmber = Color(0xFFFFB020)
+val AuroraOrange = Color(0xFFFF6A1A)
+val AuroraSmoke = Color(0xFF9A9AA0)
 
-val TextPrimary = Color(0xFFEEF1FF)
-val TextSecondary = Color(0xFFB8BEDB)
-val Outline = Color(0xFF5C6386)
+val TextPrimary = Color(0xFFF4F4F5)
+val TextSecondary = Color(0xFFA1A1AA)
+val Outline = Color(0xFF52525B)
 
-/** Solo para avisos de seguridad auditiva (nivel alto, audífonos desconectados). */
-val WarningAmber = Color(0xFFFFC266)
-val WarningAmberDeep = Color(0xFF3D2600)
-val DangerRed = Color(0xFFFF7A7A)
-val DangerRedDeep = Color(0xFF4A0A0A)
+/** Solo para avisos de seguridad auditiva: nunca se usa como acento decorativo. */
+val DangerRed = Color(0xFFFF6B6B)
+val DangerRedDeep = Color(0xFF3F0808)

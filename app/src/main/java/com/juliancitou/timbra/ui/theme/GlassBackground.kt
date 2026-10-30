@@ -33,6 +33,7 @@ import kotlin.math.sin
  */
 private data class AuroraBlob(
     val color: Color,
+    val alpha: Float,
     val centerX: Float,
     val centerY: Float,
     val driftX: Float,
@@ -43,7 +44,8 @@ private data class AuroraBlob(
 
 private val AuroraBlobs = listOf(
     AuroraBlob(
-        AuroraAqua,
+        AuroraAmber,
+        alpha = 0.20f,
         centerX = 0.15f,
         centerY = 0.18f,
         driftX = 0.12f,
@@ -52,7 +54,8 @@ private val AuroraBlobs = listOf(
         phase = 0f,
     ),
     AuroraBlob(
-        AuroraViolet,
+        AuroraOrange,
+        alpha = 0.15f,
         centerX = 0.85f,
         centerY = 0.45f,
         driftX = 0.10f,
@@ -61,7 +64,8 @@ private val AuroraBlobs = listOf(
         phase = 2.1f,
     ),
     AuroraBlob(
-        AuroraBlue,
+        AuroraSmoke,
+        alpha = 0.09f,
         centerX = 0.30f,
         centerY = 0.85f,
         driftX = 0.14f,
@@ -71,13 +75,12 @@ private val AuroraBlobs = listOf(
     ),
 )
 
-private const val AURORA_ALPHA = 0.38f
 private const val AURORA_CYCLE_MS = 28_000
 
-private val NightGradient = Brush.verticalGradient(listOf(NightBlue, DeepIndigo, NightViolet))
+private val NightGradient = Brush.verticalGradient(listOf(Ink, Graphite, Charcoal))
 
 /**
- * Fondo de todas las pantallas: degradado nocturno con manchas de color que se desplazan lento.
+ * Fondo de todas las pantallas: degradado casi negro con brasas ámbar y naranja que se desplazan lento.
  * Es la fuente que desenfocan los componentes de vidrio del [content].
  * El progreso de la animación se lee solo en la fase de dibujo, así que no recompone la pantalla.
  */
@@ -127,7 +130,7 @@ private fun DrawScope.drawAurora(progress: Float) {
         val radius = shortSide * blob.radius
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(blob.color.copy(alpha = AURORA_ALPHA), Color.Transparent),
+                colors = listOf(blob.color.copy(alpha = blob.alpha), Color.Transparent),
                 center = center,
                 radius = radius,
             ),

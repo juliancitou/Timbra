@@ -26,7 +26,7 @@ val LocalGlassHazeState = staticCompositionLocalOf<HazeState?> { null }
 val LocalGlassBlurEnabled = compositionLocalOf { true }
 
 /** Opacidad del relleno blanco sobre el desenfoque: el diseño pide 8–14 %. */
-const val GLASS_FILL_ALPHA = 0.10f
+const val GLASS_FILL_ALPHA = 0.08f
 
 /** Sin desenfoque el relleno sube al 20 % para que el texto siga separado de la aurora. */
 const val GLASS_FALLBACK_FILL_ALPHA = 0.20f
@@ -56,7 +56,7 @@ fun Modifier.glassSurface(
             blurEnabled(blurEnabled)
             blurRadius(GlassBlurRadius)
             noiseFactor(GLASS_NOISE)
-            backgroundColor(NightBlue)
+            backgroundColor(Ink)
             colorEffects(listOf(HazeColorEffect.tint(Color.White.copy(alpha = fillAlpha))))
             fallbackColorEffect(HazeColorEffect.tint(Color.White.copy(alpha = GLASS_FALLBACK_FILL_ALPHA)))
         }

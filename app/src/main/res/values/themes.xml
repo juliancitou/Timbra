@@ -2,6 +2,6 @@
 <resources>
 
     <style name="Theme.Timbra" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/night_blue</item>
+        <item name="android:windowBackground">@color/ink</item>
     </style>
 </resources>

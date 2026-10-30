@@ -41,7 +41,7 @@ fun GlassChip(
     val haptics = LocalHapticFeedback.current
     val accent = when (tone) {
         GlassChipTone.Normal -> MaterialTheme.colorScheme.primary
-        GlassChipTone.Warning -> MaterialTheme.colorScheme.tertiary
+        GlassChipTone.Warning -> MaterialTheme.colorScheme.error
     }
     val highlighted = selected || tone == GlassChipTone.Warning
     val surface = if (highlighted) {
