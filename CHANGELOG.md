@@ -19,6 +19,22 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `894f922` · docs: reorganizar plan con test de esferas
+- Decisión del usuario: el modo principal pasa a ser **"Encuentra tu ecualización"**, un test
+  tipo juego. Suena música y el usuario toca esferas, cada una con una ecualización distinta que
+  se escucha al instante; por rondas (balance, graves, claridad, voz, "S" y platillos, aire)
+  elige la favorita y al final exporta el preset a Poweramp.
+- La medición banda por banda queda como **modo avanzado** opcional, combinable con el test.
+- La app deja de ser solo para los FreeBuds Pro 4: funciona con **cualquier audífono** y
+  guardará una ecualización por cada par (perfiles).
+- La música del test la **genera la app** (bombo, bajo, pad, voz sintética, platillos, "s"):
+  sin archivos, sin derechos de autor y siempre disponible.
+- Claves técnicas: volumen igualado entre esferas (si no, gana la más fuerte), cambio sin clics
+  con fundido cruzado ≤ 50 ms y vista previa que imita el ecualizador de 25 bandas de Poweramp.
+- Nuevas fases: 2 audio seguro y ecualizador en vivo, 3 música generada, 4 test de esferas y
+  exportación, 5 modo avanzado, 6 perfiles e historial (`v1.0.0`); analizador y datos objetivos
+  quedan como 7 y 8 opcionales.
+
 ### 2026-10-30 · `4273571` · chore: desactivar respaldo y transferencia de datos
 - `android:allowBackup="false"` y reglas de extracción que excluyen todo, tanto del respaldo
   en la nube como de la copia a un teléfono nuevo (Android 12+ ignora `allowBackup` para esta
