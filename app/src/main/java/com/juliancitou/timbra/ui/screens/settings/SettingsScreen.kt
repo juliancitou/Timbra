@@ -19,7 +19,9 @@ import com.juliancitou.timbra.ui.theme.GlassButtonStyle
 import com.juliancitou.timbra.ui.theme.GlassChip
 import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.SectionLabel
+import com.juliancitou.timbra.ui.theme.SETTINGS_TRANSFORM_KEY
 import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.containerTransform
 
 @Composable
 fun SettingsScreen(
@@ -29,7 +31,11 @@ fun SettingsScreen(
     onOpenAbout: () -> Unit,
     onBack: () -> Unit,
 ) {
-    GlassScreen(title = stringResource(R.string.settings_title), onBack = onBack) {
+    GlassScreen(
+        title = stringResource(R.string.settings_title),
+        onBack = onBack,
+        modifier = Modifier.containerTransform(SETTINGS_TRANSFORM_KEY),
+    ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
             SectionLabel(stringResource(R.string.settings_section_blur))
             DetailText(stringResource(R.string.settings_blur_body))

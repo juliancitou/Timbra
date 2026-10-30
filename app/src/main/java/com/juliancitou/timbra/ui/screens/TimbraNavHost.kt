@@ -1,5 +1,13 @@
 package com.juliancitou.timbra.ui.screens
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavGraphBuilder
+import com.juliancitou.timbra.ui.theme.LocalNavAnimatedVisibilityScope
+import com.juliancitou.timbra.ui.theme.LocalSharedTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
@@ -57,63 +65,112 @@ fun TimbraNavHost(
     navController: NavHostController = rememberNavController(),
 ) {
     val animated = !isReducedMotionEnabled()
-    NavHost(
-        navController = navController,
-        startDestination = HomeRoute,
-        enterTransition = { if (animated) enterForward() else EnterTransition.None },
-        exitTransition = { if (animated) exitForward() else ExitTransition.None },
-        popEnterTransition = { if (animated) enterBackward() else EnterTransition.None },
-        popExitTransition = { if (animated) exitBackward() else ExitTransition.None },
-    ) {
-        val back: () -> Unit = { navController.popBackStack() }
-        composable<HomeRoute> {
-            HomeScreen(
-                onCreateEqualization = { navController.navigate(PreparationRoute) },
-                onOpenHistory = { navController.navigate(HistoryRoute) },
-                onOpenSettings = { navController.navigate(SettingsRoute) },
-            )
-        }
-        composable<PreparationRoute> {
-            PreparationScreen(onContinue = { navController.navigate(ComfortLevelRoute) }, onBack = back)
-        }
-        composable<ComfortLevelRoute> {
-            ComfortLevelScreen(onReady = { navController.navigate(MeasurementRoute) }, onBack = back)
-        }
-        composable<MeasurementRoute> {
-            MeasurementScreen(onFinished = { navController.navigate(ResultsRoute) }, onBack = back)
-        }
-        composable<ResultsRoute> {
-            ResultsScreen(onAdjustTaste = { navController.navigate(TasteRoute) }, onBack = back)
-        }
-        composable<TasteRoute> {
-            TasteScreen(onExport = { navController.navigate(ExportRoute) }, onBack = back)
-        }
-        composable<ExportRoute> {
-            ExportScreen(
-                onGoHome = { navController.popBackStack(HomeRoute, inclusive = false) },
-                onBack = back,
-            )
-        }
-        composable<HistoryRoute> {
-            HistoryScreen(onOpenMeasurement = { navController.navigate(ResultsRoute) }, onBack = back)
-        }
-        composable<SettingsRoute> {
-            SettingsScreen(
-                blurEnabled = blurEnabled,
-                onBlurEnabledChange = onBlurEnabledChange,
-                onOpenAudioTest = { navController.navigate(AudioTestRoute) },
-                onOpenAbout = { navController.navigate(AboutRoute) },
-                onBack = back,
-            )
-        }
-        composable<AudioTestRoute> {
-            AudioTestScreen(onBack = back)
-        }
-        composable<AboutRoute> {
-            AboutScreen(onBack = back)
+    SharedTransitionLayout {
+        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+            NavHost(
+                navController = navController,
+                startDestination = HomeRoute,
+                enterTransition = { if (animated) enterForward() else EnterTransition.None },
+                exitTransition = { if (animated) exitForward() else ExitTransition.None },
+                popEnterTransition = { if (animated) enterBackward() else EnterTransition.None },
+                popExitTransition = { if (animated) exitBackward() else ExitTransition.None },
+            ) {
+                val back: () -> Unit = { navController.popBackStack() }
+                screen<HomeRoute>(
+                    exitTransition = {
+                        when {
+                            !animated -> ExitTransition.None
+                            targetState.goesTo<SettingsRoute>() -> transformBackdropOut()
+                            else -> exitForward()
+                        }
+                    },
+                    popEnterTransition = {
+                        when {
+                            !animated -> EnterTransition.None
+                            initialState.goesTo<SettingsRoute>() -> transformBackdropIn()
+                            else -> enterBackward()
+                        }
+                    },
+                ) {
+                    HomeScreen(
+                        onCreateEqualization = { navController.navigate(PreparationRoute) },
+                        onOpenHistory = { navController.navigate(HistoryRoute) },
+                        onOpenSettings = { navController.navigate(SettingsRoute) },
+                    )
+                }
+                screen<PreparationRoute> {
+                    PreparationScreen(onContinue = { navController.navigate(ComfortLevelRoute) }, onBack = back)
+                }
+                screen<ComfortLevelRoute> {
+                    ComfortLevelScreen(onReady = { navController.navigate(MeasurementRoute) }, onBack = back)
+                }
+                screen<MeasurementRoute> {
+                    MeasurementScreen(onFinished = { navController.navigate(ResultsRoute) }, onBack = back)
+                }
+                screen<ResultsRoute> {
+                    ResultsScreen(onAdjustTaste = { navController.navigate(TasteRoute) }, onBack = back)
+                }
+                screen<TasteRoute> {
+                    TasteScreen(onExport = { navController.navigate(ExportRoute) }, onBack = back)
+                }
+                screen<ExportRoute> {
+                    ExportScreen(
+                        onGoHome = { navController.popBackStack(HomeRoute, inclusive = false) },
+                        onBack = back,
+                    )
+                }
+                screen<HistoryRoute> {
+                    HistoryScreen(onOpenMeasurement = { navController.navigate(ResultsRoute) }, onBack = back)
+                }
+                screen<SettingsRoute>(
+                    enterTransition = { if (animated) transformBackdropIn() else EnterTransition.None },
+                    popExitTransition = { if (animated) transformBackdropOut() else ExitTransition.None },
+                ) {
+                    SettingsScreen(
+                        blurEnabled = blurEnabled,
+                        onBlurEnabledChange = onBlurEnabledChange,
+                        onOpenAudioTest = { navController.navigate(AudioTestRoute) },
+                        onOpenAbout = { navController.navigate(AboutRoute) },
+                        onBack = back,
+                    )
+                }
+                screen<AudioTestRoute> {
+                    AudioTestScreen(onBack = back)
+                }
+                screen<AboutRoute> {
+                    AboutScreen(onBack = back)
+                }
+            }
         }
     }
 }
+
+/**
+ * Destino con su escena de animación disponible para `containerTransform`. Las transiciones nulas
+ * usan las generales del `NavHost`.
+ */
+private inline fun <reified T : Any> NavGraphBuilder.screen(
+    noinline enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? = null,
+    noinline exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? = null,
+    noinline popEnterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? = null,
+    noinline popExitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? = null,
+    noinline content: @Composable () -> Unit,
+) {
+    composable<T>(
+        enterTransition = enterTransition,
+        exitTransition = exitTransition,
+        popEnterTransition = popEnterTransition,
+        popExitTransition = popExitTransition,
+    ) {
+        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this) { content() }
+    }
+}
+
+private inline fun <reified T : Any> NavBackStackEntry.goesTo(): Boolean = destination.hasRoute<T>()
+
+/** Mientras el engrane crece hasta Ajustes, el resto solo se desvanece para no competir con él. */
+private fun transformBackdropIn(): EnterTransition = fadeIn(tween(MotionDuration.CONTAINER_TRANSFORM_MS))
+private fun transformBackdropOut(): ExitTransition = fadeOut(tween(MotionDuration.CONTAINER_TRANSFORM_MS / 2))
 
 private fun <T> enterSpec() = tween<T>(MotionDuration.LONG_MS, easing = EmphasizedDecelerate)
 private fun <T> exitSpec() = tween<T>(MotionDuration.SHORT_MS, easing = EmphasizedAccelerate)

@@ -48,6 +48,7 @@ fun GlassScreen(
                         iconRes = R.drawable.ic_arrow_back,
                         contentDescription = stringResource(R.string.action_back),
                         onClick = onBack,
+                        motion = IconMotion.NudgeBack,
                     )
                 }
                 Spacer(Modifier.weight(1f))

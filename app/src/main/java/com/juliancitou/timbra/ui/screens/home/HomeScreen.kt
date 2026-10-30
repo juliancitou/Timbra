@@ -8,10 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.BulletList
+import com.juliancitou.timbra.ui.theme.containerTransform
 import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassButtonStyle
 import com.juliancitou.timbra.ui.theme.GlassIconButton
 import com.juliancitou.timbra.ui.theme.GlassScreen
+import com.juliancitou.timbra.ui.theme.IconMotion
+import com.juliancitou.timbra.ui.theme.SETTINGS_TRANSFORM_KEY
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.StepList
@@ -31,6 +34,8 @@ fun HomeScreen(
                 iconRes = R.drawable.ic_settings,
                 contentDescription = stringResource(R.string.action_settings),
                 onClick = onOpenSettings,
+                modifier = Modifier.containerTransform(SETTINGS_TRANSFORM_KEY),
+                motion = IconMotion.Spin,
             )
         },
         actions = {
