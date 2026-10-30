@@ -19,7 +19,43 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
-_Nada todavía._
+### 2026-10-30 · `20c8d1d` · feat: agregar el test de esferas y la exportación
+- Flujo real: Inicio → Preparación (lista y nombre de los audífonos) → Nivel cómodo (elegir
+  género y volumen, con música real) → 12 rondas → Tu ecualización → Exportar.
+- Ronda: pregunta clara ("¿Cuánto bajo te gusta?"), instrucciones como líneas de código, cinco
+  nodos grandes con su valor y el sentido de cada extremo, la curva de la opción que suena y
+  "Reproducir/Pausar" + "Elegir". Atrás vuelve a la ronda anterior.
+- Cada opción suena con el volumen igualado (ponderación K sobre los primeros 4 s de la música) y
+  es exactamente el preset que se exportaría; la música resalta la zona de la ronda.
+- Resultado: curva final, comparar `[ Con ecualización ]` / `[ Sin ecualizar ]` con el volumen
+  igualado, nombre del preset (por defecto, el de los audífonos) y "Repetir el test".
+- Exportar: "Guardar archivo" con el selector del sistema (sin permisos de almacenamiento) y
+  "Compartir" con una copia temporal vía `FileProvider` (solo la carpeta `cache/presets`).
+- `EqualizerFinderViewModel` vive con la actividad, genera música y opciones en un hilo de baja
+  prioridad y crea la salida de audio solo cuando hace falta. El sonido del test se detiene al
+  salir de sus pantallas o al mandar la app al fondo.
+- La medición por bandas de ejemplo queda en Ajustes → Modo avanzado (vista previa, sin sonido)
+  hasta la Fase 5.
+
+### 2026-10-30 · `ab958c1` · ui: agregar nodos de opción y campo de texto
+- `OptionNodes`: cinco círculos de 60 dp en fila; el que suena se ilumina en ámbar con un punto
+  que crece con rebote y un anillo que "respira" mientras hay sonido. TalkBack los trata como
+  botones de opción con su valor en dB.
+- `TerminalTextField`: campo `$ texto` con cursor ámbar y subrayado punteado.
+
+### 2026-10-30 · `92d7a12` · feat: exportar presets de Poweramp con prueba golden
+- `PowerampExporter.toJson()` genera el formato exacto de Poweramp: un objeto con dos bandas de
+  tono en 0 dB y 25 gráficas, ganancias con un decimal, sin `-0.0` y nombre `Timbra - …` escapado.
+- Prueba golden contra `app/src/test/resources/golden/poweramp-voces-v5.json`: es el preset v5
+  del usuario, que ya se sabe que Poweramp importa, con el nombre cambiado. El exportador lo
+  reproduce carácter por carácter.
+- `fileName()` sugiere `timbra-mi-ecualizacion.json` (sin acentos ni espacios).
+
+### 2026-10-30 · `ee017d6` · feat: agregar el motor de rondas del test
+- `EqualizerFinder` (inmutable): 6 zonas (balance, graves, claridad, voz, "S" y aire), cada una
+  con pasada gruesa y de afinado (paso a la mitad): 12 rondas. Cinco opciones centradas en la
+  elección actual que se recorren hacia dentro cerca de los límites. Rangos conservadores (graves
+  hasta +3 dB para evitar el "bombeo"). `result()` aplica redondeo, rango y preamp de Poweramp.
 
 ## [0.4.0] · 2026-10-30 · Fase 3: música generada y estilo terminal
 

@@ -122,18 +122,20 @@ terminó en estilo terminal/ASCII).
 
 **Meta:** encontrar tu ecualización jugando con esferas y exportarla a Poweramp.
 
-- [ ] Rondas: balance, graves, claridad, voz, "S" y platillos, aire
-- [ ] Pasada de afinado con pasos más chicos alrededor de lo elegido
-- [ ] Pantalla de ronda con esferas y cambio de sonido instantáneo
-- [ ] Repetir ronda y volver a la anterior
-- [ ] Resultado: gráfica y comparar con/sin ecualización
-- [ ] Redondeo a 0.5 dB, rango −8 a +3 dB, cálculo de preamp
-- [ ] `PowerampExporter`: 2 bandas de tono en 0 dB + 25 bandas gráficas
-- [ ] Prueba golden del JSON en `app/src/test/resources/`
-- [ ] Guardar con el selector de archivos y compartir
-- [ ] Instrucciones de importación en la app
-- [ ] Perfil de audífono básico (nombre)
+- [x] Rondas: balance, graves, claridad, voz, "S" y platillos, aire
+- [x] Pasada de afinado con pasos más chicos alrededor de lo elegido
+- [x] Pantalla de ronda con esferas y cambio de sonido instantáneo
+- [x] Repetir ronda y volver a la anterior
+- [x] Resultado: gráfica y comparar con/sin ecualización
+- [x] Redondeo a 0.5 dB, rango −8 a +3 dB, cálculo de preamp
+- [x] `PowerampExporter`: 2 bandas de tono en 0 dB + 25 bandas gráficas
+- [x] Prueba golden del JSON en `app/src/test/resources/`
+- [x] Guardar con el selector de archivos y compartir
+- [x] Instrucciones de importación en la app
+- [x] Perfil de audífono básico (nombre)
 - [ ] Importar en Poweramp y comparar con la vista previa
+- [ ] Calibrar el ancho de banda (`POWERAMP_BAND_Q`) si la vista previa no suena igual que Poweramp
+- [ ] Probar el test completo en el teléfono (12 rondas, resultado y exportación)
 - [ ] Tag y release `v0.5.0`
 
 ## Fase 5 — Modo avanzado: medición por bandas · `v0.6.0`
