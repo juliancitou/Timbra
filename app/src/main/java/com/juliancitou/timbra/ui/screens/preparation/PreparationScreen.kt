@@ -1,8 +1,8 @@
 package com.juliancitou.timbra.ui.screens.preparation
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -11,10 +11,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.ui.theme.CheckRow
+import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.GlassButton
-import com.juliancitou.timbra.ui.theme.GlassCard
-import com.juliancitou.timbra.ui.theme.GlassChip
 import com.juliancitou.timbra.ui.theme.GlassScreen
+import com.juliancitou.timbra.ui.theme.SectionLabel
+import com.juliancitou.timbra.ui.theme.Spacing
 
 private val ChecklistItems = listOf(
     R.string.preparation_headphones,
@@ -32,7 +34,7 @@ fun PreparationScreen(onContinue: () -> Unit, onBack: () -> Unit) {
 
     GlassScreen(
         title = stringResource(R.string.preparation_title),
-        subtitle = stringResource(R.string.preparation_subtitle),
+        lead = stringResource(R.string.preparation_lead),
         onBack = onBack,
         actions = {
             GlassButton(
@@ -43,23 +45,19 @@ fun PreparationScreen(onContinue: () -> Unit, onBack: () -> Unit) {
             )
         },
     ) {
-        GlassCard {
+        Column {
             ChecklistItems.forEachIndexed { index, labelRes ->
                 val bit = 1 shl index
-                GlassChip(
+                CheckRow(
                     label = stringResource(labelRes),
-                    selected = checkedMask and bit != 0,
-                    onClick = { checkedMask = checkedMask xor bit },
-                    modifier = Modifier.fillMaxWidth(),
+                    checked = checkedMask and bit != 0,
+                    onToggle = { checkedMask = checkedMask xor bit },
                 )
             }
         }
-        GlassCard {
-            Text(
-                text = stringResource(R.string.preparation_why),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            SectionLabel(stringResource(R.string.preparation_section_why))
+            DetailText(stringResource(R.string.preparation_why))
         }
     }
 }

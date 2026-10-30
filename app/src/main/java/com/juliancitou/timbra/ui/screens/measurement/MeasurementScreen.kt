@@ -2,6 +2,7 @@ package com.juliancitou.timbra.ui.screens.measurement
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LinearProgressIndicator
@@ -20,9 +21,10 @@ import com.juliancitou.timbra.R
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
 import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassButtonStyle
-import com.juliancitou.timbra.ui.theme.GlassCard
 import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.GlassSlider
+import com.juliancitou.timbra.ui.theme.LeadText
+import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.formatHertz
 import com.juliancitou.timbra.ui.theme.withTabularNumbers
@@ -48,6 +50,7 @@ fun MeasurementScreen(onFinished: () -> Unit, onBack: () -> Unit) {
 
     GlassScreen(
         title = stringResource(R.string.measurement_title),
+        lead = stringResource(R.string.measurement_lead),
         onBack = onBack,
         actions = {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
@@ -71,39 +74,28 @@ fun MeasurementScreen(onFinished: () -> Unit, onBack: () -> Unit) {
             )
         },
     ) {
-        GlassCard {
-            Text(
-                text = stringResource(R.string.measurement_progress, bandIndex + 1, bandCount),
-                style = MaterialTheme.typography.labelLarge.withTabularNumbers(),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            SectionLabel(stringResource(R.string.measurement_progress, bandIndex + 1, bandCount))
             LinearProgressIndicator(
                 progress = { (bandIndex + 1f) / bandCount },
                 modifier = Modifier.fillMaxWidth(),
-                trackColor = Color.White.copy(alpha = 0.15f),
+                trackColor = Color.White.copy(alpha = 0.10f),
+                drawStopIndicator = {},
             )
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             Text(
                 text = formatHertz(frequencyHz),
-                style = MaterialTheme.typography.headlineMedium.withTabularNumbers(),
+                style = MaterialTheme.typography.displaySmall.withTabularNumbers(),
+                color = MaterialTheme.colorScheme.primary,
             )
-            Text(
-                text = stringResource(bandHintRes(frequencyHz)),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.secondary,
-            )
+            LeadText(stringResource(bandHintRes(frequencyHz)))
         }
-        GlassCard {
-            Text(
-                text = stringResource(R.string.measurement_instructions),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            GlassSlider(
-                valueDb = gainDb,
-                onValueChange = { gainDb = it },
-                label = stringResource(R.string.measurement_band_gain),
-            )
-        }
+        GlassSlider(
+            valueDb = gainDb,
+            onValueChange = { gainDb = it },
+            label = stringResource(R.string.measurement_band_gain),
+        )
     }
 }
 

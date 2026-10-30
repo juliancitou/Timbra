@@ -1,8 +1,6 @@
 package com.juliancitou.timbra.ui.screens.taste
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -18,6 +16,7 @@ import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassCard
 import com.juliancitou.timbra.ui.theme.GlassScreen
 import com.juliancitou.timbra.ui.theme.GlassSlider
+import com.juliancitou.timbra.ui.theme.GlassSliderSize
 
 private val TasteRangeDb = -6f..6f
 
@@ -32,7 +31,7 @@ fun TasteScreen(onExport: () -> Unit, onBack: () -> Unit) {
 
     GlassScreen(
         title = stringResource(R.string.taste_title),
-        subtitle = stringResource(R.string.taste_subtitle),
+        lead = stringResource(R.string.taste_lead),
         onBack = onBack,
         actions = {
             GlassButton(
@@ -49,24 +48,21 @@ fun TasteScreen(onExport: () -> Unit, onBack: () -> Unit) {
                 estimatedBandIndices = SampleData.estimatedBandIndices,
             )
         }
-        TasteControl(R.string.taste_bass, bassDb) { bassDb = it }
-        TasteControl(R.string.taste_voice, voiceDb) { voiceDb = it }
-        TasteControl(R.string.taste_brightness, brightnessDb) { brightnessDb = it }
+        TasteSlider(stringResource(R.string.taste_bass), bassDb) { bassDb = it }
+        TasteSlider(stringResource(R.string.taste_voice), voiceDb) { voiceDb = it }
+        TasteSlider(stringResource(R.string.taste_brightness), brightnessDb) { brightnessDb = it }
     }
 }
 
 @Composable
-private fun TasteControl(labelRes: Int, valueDb: Float, onValueChange: (Float) -> Unit) {
-    val label = stringResource(labelRes)
-    GlassCard {
-        Text(text = label, style = MaterialTheme.typography.titleMedium)
-        GlassSlider(
-            valueDb = valueDb,
-            onValueChange = onValueChange,
-            label = label,
-            valueRange = TasteRangeDb,
-        )
-    }
+private fun TasteSlider(label: String, valueDb: Float, onValueChange: (Float) -> Unit) {
+    GlassSlider(
+        valueDb = valueDb,
+        onValueChange = onValueChange,
+        label = label,
+        valueRange = TasteRangeDb,
+        size = GlassSliderSize.Compact,
+    )
 }
 
 /**

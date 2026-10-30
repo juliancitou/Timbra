@@ -1,5 +1,8 @@
 package com.juliancitou.timbra.ui.screens.export
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -9,14 +12,16 @@ import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.GlassButton
 import com.juliancitou.timbra.ui.theme.GlassButtonStyle
-import com.juliancitou.timbra.ui.theme.GlassCard
 import com.juliancitou.timbra.ui.theme.GlassScreen
+import com.juliancitou.timbra.ui.theme.SectionLabel
+import com.juliancitou.timbra.ui.theme.Spacing
+import com.juliancitou.timbra.ui.theme.StepList
 
 @Composable
 fun ExportScreen(onGoHome: () -> Unit, onBack: () -> Unit) {
     GlassScreen(
         title = stringResource(R.string.export_title),
-        subtitle = stringResource(R.string.export_subtitle),
+        lead = stringResource(R.string.export_lead),
         onBack = onBack,
         actions = {
             GlassButton(
@@ -24,35 +29,38 @@ fun ExportScreen(onGoHome: () -> Unit, onBack: () -> Unit) {
                 onClick = {},
                 modifier = Modifier.fillMaxWidth(),
             )
-            GlassButton(
-                text = stringResource(R.string.action_share),
-                onClick = {},
-                style = GlassButtonStyle.Secondary,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            GlassButton(
-                text = stringResource(R.string.action_go_home),
-                onClick = onGoHome,
-                style = GlassButtonStyle.Secondary,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+                GlassButton(
+                    text = stringResource(R.string.action_share),
+                    onClick = {},
+                    style = GlassButtonStyle.Secondary,
+                    modifier = Modifier.weight(1f),
+                )
+                GlassButton(
+                    text = stringResource(R.string.action_go_home),
+                    onClick = onGoHome,
+                    style = GlassButtonStyle.Secondary,
+                    modifier = Modifier.weight(1f),
+                )
+            }
         },
     ) {
-        GlassCard {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            SectionLabel(stringResource(R.string.export_section_name))
             Text(
                 text = stringResource(R.string.export_preset_name),
                 style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
             )
         }
-        GlassCard {
-            Text(
-                text = stringResource(R.string.export_steps_title),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = stringResource(R.string.export_steps_body),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
+            SectionLabel(stringResource(R.string.export_section_steps))
+            StepList(
+                listOf(
+                    stringResource(R.string.export_step_open),
+                    stringResource(R.string.export_step_presets),
+                    stringResource(R.string.export_step_select),
+                ),
             )
         }
     }

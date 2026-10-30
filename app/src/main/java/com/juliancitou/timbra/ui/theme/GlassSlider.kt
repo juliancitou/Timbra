@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -29,12 +30,15 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
+/** [Large] muestra el valor grande (medición); [Compact] etiqueta y valor en una línea (gusto). */
+enum class GlassSliderSize { Large, Compact }
+
 private val ThumbSize = 32.dp
 private val SliderHeight = 56.dp
 
 /**
  * Control de ganancia en dB, pensado para el pulgar. Avanza en pasos de [stepDb] con un "clic"
- * háptico en cada paso, y muestra el valor grande arriba con dígitos tabulares.
+ * háptico en cada paso; el valor va con dígitos tabulares para que no "baile".
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +49,7 @@ fun GlassSlider(
     modifier: Modifier = Modifier,
     valueRange: ClosedFloatingPointRange<Float> = -12f..12f,
     stepDb: Float = 0.5f,
+    size: GlassSliderSize = GlassSliderSize.Large,
     onValueChangeFinished: (() -> Unit)? = null,
 ) {
     val haptics = LocalHapticFeedback.current
@@ -58,11 +63,29 @@ fun GlassSlider(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacing.small),
     ) {
-        Text(
-            text = formattedValue,
-            style = MaterialTheme.typography.displayMedium.withTabularNumbers(),
-            color = colors.onSurface,
-        )
+        when (size) {
+            GlassSliderSize.Large -> Text(
+                text = formattedValue,
+                style = MaterialTheme.typography.displayMedium.withTabularNumbers(),
+                color = colors.onSurface,
+            )
+            GlassSliderSize.Compact -> Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = colors.onBackground,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = formattedValue,
+                    style = MaterialTheme.typography.titleMedium.withTabularNumbers(),
+                    color = colors.primary,
+                )
+            }
+        }
         Slider(
             value = valueDb,
             onValueChange = { newValue ->

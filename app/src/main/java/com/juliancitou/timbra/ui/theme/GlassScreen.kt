@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
@@ -21,15 +23,17 @@ import androidx.compose.ui.semantics.semantics
 import com.juliancitou.timbra.R
 
 /**
- * Estructura común de cada pantalla: encabezado con título (y botón de volver si [onBack] no es
- * nulo), contenido desplazable y acciones fijas abajo, al alcance del pulgar.
+ * Estructura común de cada pantalla, sin tarjetas de más: barra superior con volver y una acción
+ * opcional, título grande, la indicación principal ([lead]) en letra grande, el contenido
+ * desplazable y las acciones fijas abajo, al alcance del pulgar.
  */
 @Composable
 fun GlassScreen(
     title: String,
     modifier: Modifier = Modifier,
-    subtitle: String? = null,
+    lead: String? = null,
     onBack: (() -> Unit)? = null,
+    headerAction: (@Composable () -> Unit)? = null,
     actions: @Composable ColumnScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -40,37 +44,37 @@ fun GlassScreen(
             .padding(horizontal = Spacing.large, vertical = Spacing.medium),
         verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
-        ) {
-            if (onBack != null) {
-                GlassIconButton(
-                    iconRes = R.drawable.ic_arrow_back,
-                    contentDescription = stringResource(R.string.action_back),
-                    onClick = onBack,
-                )
+        if (onBack != null || headerAction != null) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                if (onBack != null) {
+                    GlassIconButton(
+                        iconRes = R.drawable.ic_arrow_back,
+                        contentDescription = stringResource(R.string.action_back),
+                        onClick = onBack,
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+                headerAction?.invoke()
             }
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.semantics { heading() },
-            )
         }
         Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(Spacing.large),
         ) {
-            if (subtitle != null) {
-                GlassCard {
-                    Text(text = subtitle, style = MaterialTheme.typography.bodyLarge)
-                }
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.semantics { heading() },
+                )
+                if (lead != null) LeadText(lead)
             }
             content()
+            Spacer(Modifier.height(Spacing.small))
         }
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.small), content = actions)
     }
