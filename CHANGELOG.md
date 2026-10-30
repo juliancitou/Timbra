@@ -19,6 +19,30 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `de27119` · ui: animar títulos, listas, casillas y controles
+- Títulos `> Título` que se escriben letra por letra en ~0.3 s; las letras pendientes ya ocupan
+  su lugar (transparentes), así que nada se mueve. TalkBack lee el título completo.
+- Listas `01 02 03`, `›` y la lista de preparación aparecen escalonadas (45 ms entre elementos).
+- Casillas `[ ]` → `[x]` con la "x" que aparece con rebote y colores que se deslizan.
+- Perilla del deslizador con forma de cursor `▌` que crece al arrastrarla.
+- Barra de progreso de Medición que avanza suave y gráfica que se transforma de una curva a otra
+  en 200 ms al mover los controles de gusto.
+- `PlayingIndicator`: medidor de barras decorativo junto al estado "Sonando".
+
+### 2026-10-30 · `f8511f1` · ui: girar el engrane y expandir Ajustes desde él
+- Al tocar el engrane gira media vuelta y Ajustes se expande desde él hasta llenar la pantalla
+  (transformación de contenedor con `SharedTransitionLayout`, 550 ms); al regresar se encoge de
+  vuelta. Entre Inicio y Ajustes el resto solo se desvanece para no competir con la animación.
+- El botón de volver se impulsa hacia la izquierda y regresa con rebote al tocarlo.
+- Con movimiento reducido no hay giro, impulso ni transformación.
+
+### 2026-10-30 · `eacea7e` · ui: botones estilo terminal con escuadras
+- Pedido del usuario: los botones redondos le quitaban el toque de programación. Ahora tienen
+  esquinas casi rectas (8 dp) y escuadras ⌜ ⌝ ⌞ ⌟ que se cierran hacia el centro al presionar,
+  con rebote. El secundario sigue siendo de vidrio, con borde fino.
+- Esquinas más rectas en todo: tarjetas de 28 a 14 dp, chips de 20 a 6 dp. Los chips cambian de
+  color con una transición en lugar de golpe.
+
 ### 2026-10-30 · `20d3c5e` · ui: agregar Acerca de con créditos y contacto
 - Pantalla "Acerca de", discreta: al final de Ajustes solo hay una línea "Más información ›".
 - Indica que Timbra es un proyecto personal creado por juliancitou, con enlaces a su perfil de
