@@ -36,6 +36,12 @@ class AudioRenderer(private val sampleRate: Int, initialSource: SignalSource) {
     @Volatile var isSilent: Boolean = true
         private set
 
+    /**
+     * `true` si nadie pidió sonido y ya terminó la salida suave. A diferencia de [isSilent], cambia
+     * en cuanto se llama a [play], aunque todavía no se haya procesado el siguiente buffer.
+     */
+    val isIdle: Boolean get() = !wantsSound && isSilent
+
     fun play() {
         stoppedByTimeLimit = false
         restartRequested = true
