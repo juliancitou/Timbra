@@ -24,7 +24,7 @@ enum class GlassChipTone { Normal, Warning }
 
 private val ChipShape = RoundedCornerShape(20.dp)
 private val ChipMinHeight = 40.dp
-private const val SELECTED_FILL_ALPHA = 0.22f
+private const val SELECTED_FILL_ALPHA = 0.14f
 
 /**
  * Opción seleccionable o, con [onClick] nulo, etiqueta de estado. El área táctil crece a 48 dp
@@ -74,7 +74,7 @@ fun GlassChip(
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
-            color = if (highlighted) accent else MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             softWrap = false,
         )

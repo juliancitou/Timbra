@@ -18,9 +18,9 @@ val SmokeLight = Color(0xFFB4B4BA)
 val SmokeDark = Color(0xFF6B6B73)
 
 val TextPrimary = Color(0xFFF4F4F5)
-val TextSecondary = Color(0xFFA1A1AA)
+val TextSecondary = Color(0xFFC2C2CA)
 val Outline = Color(0xFF52525B)
 
 /** Solo para avisos de seguridad auditiva: nunca se usa como acento decorativo. */
-val DangerRed = Color(0xFFFF6B6B)
+val DangerRed = Color(0xFFFF8A8A)
 val DangerRedDeep = Color(0xFF3F0808)
