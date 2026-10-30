@@ -57,3 +57,15 @@ class SineTone(
         return sample
     }
 }
+
+/** Repite [samples] sin fin, empezando en [startIndex] (para cambiar de mezcla sin volver al inicio). */
+class LoopSource(private val samples: DoubleArray, startIndex: Int = 0) : SignalSource {
+    var position = startIndex.mod(samples.size)
+        private set
+
+    override fun next(): Double {
+        val sample = samples[position]
+        position = (position + 1) % samples.size
+        return sample
+    }
+}
