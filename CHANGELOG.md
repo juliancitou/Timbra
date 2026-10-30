@@ -19,6 +19,23 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `53481e9` · ui: rediseñar pantallas con estilo minimalista
+- Pedido del usuario: menos tarjetas de vidrio y más jerarquía tipográfica. El texto va
+  directo sobre el fondo; el vidrio queda solo en la gráfica, botones y chips.
+- `GlassScreen`: barra superior con volver y una acción opcional, título grande y la
+  indicación principal (`lead`) en letra grande y blanca, lo primero que se lee.
+- `TerminalText.kt`: `LeadText`, `SectionLabel` (`// sección` en ámbar), `StepList`
+  (`01 02 03`), `BulletList` (`›`), `CheckRow` (casillas `[x]` / `[ ]` con vibración al
+  marcar), `DetailText` y `Hairline`.
+- Inicio con pasos y recomendaciones antes de empezar; Ajustes pasa a un ícono de engrane
+  arriba a la derecha. Historial como lista con separadores en lugar de tarjetas.
+- `GlassSlider` gana el tamaño `Compact` (etiqueta y valor en una línea) para los tres
+  controles de gusto.
+
+### 2026-10-30 · `3e050fc` · ui: fondo negro y gris más sutil
+- Se quitan las brasas ámbar y naranja: quedan dos nubes grises (7 % y 10 %) sobre el
+  degradado casi negro, con un ciclo más lento de 40 s.
+
 ### 2026-10-30 · `14e0958` · ui: animar navegación con zoom y atrás predictivo
 - Al entrar, la pantalla nueva crece desde 92 % mientras aparece y la anterior se agranda a
   106 % al desvanecerse; al regresar, la actual se encoge y se esconde y la anterior vuelve
