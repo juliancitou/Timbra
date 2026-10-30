@@ -19,6 +19,31 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `df4afc3` · ui: pasos como líneas de código y subtítulos más grandes
+- Pedido del usuario: que pasos e indicaciones se vean como código. `CodeLines` muestra cada
+  paso con número de línea tenue, una barra `│` que acompaña al texto aunque ocupe varios
+  renglones y resaltado sencillo: números en ámbar (literales) y texto entre comillas en naranja
+  (cadenas). El texto no cambia, para que cualquiera lo entienda. En Inicio, las recomendaciones
+  continúan la numeración de los pasos (1–3, 4–6), como un solo archivo.
+- `codeTokens()` separa la línea en partes y tiene 5 pruebas (números, comillas rectas y
+  tipográficas, números dentro de comillas y que unir las partes da la línea original).
+- Subtítulos `// sección` de 13 a 16 sp: más grandes que el texto normal (14 sp).
+- Reemplaza a `StepList`, `BulletList` y la viñeta `›`.
+
+### 2026-10-30 · `502edad` · refactor: renombrar componentes Glass a Terminal
+- `GlassBackground`, `GlassScreen`, `GlassCard`, `GlassButton`, `GlassIconButton`, `GlassChip` y
+  `GlassSlider` pasan a `TerminalBackground`, `TerminalScreen`, `TerminalPanel`, `TerminalButton`,
+  `TerminalIconButton`, `TerminalChip` y `TerminalSlider`: el nombre debe decir qué son, y ya no
+  son de vidrio. Cambio mecánico, sin efecto visible.
+
+### 2026-10-30 · `649b8d0` · ui: quitar el vidrio y usar paneles ASCII
+- Pedido del usuario: el liquid glass casi no se notaba y prefiere la dirección ASCII. Se quitan
+  Haze (dependencia, superficie de vidrio y fuente de desenfoque) y el interruptor "Efecto de
+  vidrio" de Ajustes. El fondo negro con su difuminado gris se conserva.
+- Las tarjetas pasan a ser recuadros ASCII sin fondo (`asciiFrame` gris al 35 %).
+- `ContrastTest` se simplifica: todo va directo sobre el fondo. Haze sale de los
+  agradecimientos del README y de la app porque ya no se usa.
+
 ### 2026-10-30 · `cb03326` · ui: chips con corchetes estilo terminal
 - Pedido del usuario: los chips quedan solo como la palabra entre corchetes, `[ Confiable ]`,
   sin fondo ni contorno. Gris sin seleccionar, ámbar seleccionado y rojo para avisos, con el

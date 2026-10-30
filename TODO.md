@@ -36,7 +36,8 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 
 ## Fase 1 — Diseño y navegación · `v0.2.0`
 
-**Meta:** se ve elegante y fluido en el teléfono, con estilo liquid glass y buen contraste.
+**Meta:** se ve elegante y fluido en el teléfono, con buen contraste (empezó como liquid glass y
+terminó en estilo terminal/ASCII).
 
 ### Tema
 - [x] Paleta: negro y grises, acento ámbar, secundario naranja, rojo solo para avisos
@@ -184,7 +185,5 @@ que mida banda por banda. Todo desde una app elegante y fácil de usar.
 
 ## Ideas y deuda técnica
 
-- [ ] Evaluar bibliotecas de "liquid glass" adicionales a Haze
-- [ ] Probar el efecto Glass de Haze 2 como alternativa al desenfoque clásico
 - [ ] Widget o acceso rápido para exportar el último preset
 - [ ] Modo claro opcional
