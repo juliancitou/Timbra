@@ -1,15 +1,13 @@
 package com.juliancitou.timbra.ui.screens
 
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,6 +21,8 @@ import com.juliancitou.timbra.ui.screens.preparation.PreparationScreen
 import com.juliancitou.timbra.ui.screens.results.ResultsScreen
 import com.juliancitou.timbra.ui.screens.settings.SettingsScreen
 import com.juliancitou.timbra.ui.screens.taste.TasteScreen
+import com.juliancitou.timbra.ui.theme.EmphasizedAccelerate
+import com.juliancitou.timbra.ui.theme.EmphasizedDecelerate
 import com.juliancitou.timbra.ui.theme.MotionDuration
 import com.juliancitou.timbra.ui.theme.isReducedMotionEnabled
 import kotlinx.serialization.Serializable
@@ -37,8 +37,14 @@ import kotlinx.serialization.Serializable
 @Serializable data object HistoryRoute
 @Serializable data object SettingsRoute
 
-/** Desplazamiento lateral de las transiciones, como fracción del ancho de pantalla. */
-private const val SLIDE_FRACTION = 0.12f
+/**
+ * Escalas del zoom entre pantallas: la que entra crece desde [SCALE_SMALL] y la que se va
+ * hacia adelante se agranda hasta [SCALE_LARGE], como si pasaras a través de ella. Al
+ * regresar ocurre lo contrario: la actual se encoge y se esconde.
+ */
+private const val SCALE_SMALL = 0.92f
+private const val SCALE_LARGE = 1.06f
+private const val FADE_DELAY_MS = 50
 
 @Composable
 fun TimbraNavHost(
@@ -93,16 +99,18 @@ fun TimbraNavHost(
     }
 }
 
-private fun <T> transitionSpec() = tween<T>(MotionDuration.MEDIUM_MS)
+private fun <T> enterSpec() = tween<T>(MotionDuration.LONG_MS, easing = EmphasizedDecelerate)
+private fun <T> exitSpec() = tween<T>(MotionDuration.SHORT_MS, easing = EmphasizedAccelerate)
+private fun fadeInSpec() = tween<Float>(MotionDuration.MEDIUM_MS - FADE_DELAY_MS, delayMillis = FADE_DELAY_MS)
 
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.enterForward(): EnterTransition =
-    fadeIn(transitionSpec()) + slideInHorizontally(transitionSpec()) { (it * SLIDE_FRACTION).toInt() }
+private fun enterForward(): EnterTransition =
+    scaleIn(enterSpec(), initialScale = SCALE_SMALL) + fadeIn(fadeInSpec())
 
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.exitForward(): ExitTransition =
-    fadeOut(transitionSpec()) + slideOutHorizontally(transitionSpec()) { -(it * SLIDE_FRACTION).toInt() }
+private fun exitForward(): ExitTransition =
+    scaleOut(exitSpec(), targetScale = SCALE_LARGE) + fadeOut(exitSpec())
 
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.enterBackward(): EnterTransition =
-    fadeIn(transitionSpec()) + slideInHorizontally(transitionSpec()) { -(it * SLIDE_FRACTION).toInt() }
+private fun enterBackward(): EnterTransition =
+    scaleIn(enterSpec(), initialScale = SCALE_LARGE) + fadeIn(fadeInSpec())
 
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.exitBackward(): ExitTransition =
-    fadeOut(transitionSpec()) + slideOutHorizontally(transitionSpec()) { (it * SLIDE_FRACTION).toInt() }
+private fun exitBackward(): ExitTransition =
+    scaleOut(exitSpec(), targetScale = SCALE_SMALL) + fadeOut(exitSpec())
