@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.PlaybackStatus
+import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.GlassButton
@@ -61,6 +62,15 @@ fun AudioTestScreen(onBack: () -> Unit, viewModel: AudioTestViewModel = viewMode
             }
         }
         if (state.signal == TestSignal.Music) {
+            ChoiceSection(R.string.audio_test_section_genre) {
+                Genre.entries.forEach { genre ->
+                    GlassChip(
+                        label = stringResource(genreLabel(genre)),
+                        selected = state.genre == genre,
+                        onClick = { viewModel.selectGenre(genre) },
+                    )
+                }
+            }
             ChoiceSection(R.string.audio_test_section_focus) {
                 MusicFocus.entries.forEach { focus ->
                     GlassChip(
@@ -135,6 +145,16 @@ private fun statusLabel(status: PlaybackStatus): Int = when (status) {
 }
 
 @StringRes
+private fun genreLabel(genre: Genre): Int = when (genre) {
+    Genre.Pop -> R.string.genre_pop
+    Genre.Rock -> R.string.genre_rock
+    Genre.Classical -> R.string.genre_classical
+    Genre.Electronic -> R.string.genre_electronic
+    Genre.HipHop -> R.string.genre_hip_hop
+    Genre.Jazz -> R.string.genre_jazz
+}
+
+@StringRes
 private fun focusLabel(focus: MusicFocus): Int = when (focus) {
     MusicFocus.Balanced -> R.string.audio_test_focus_balanced
     MusicFocus.Bass -> R.string.audio_test_focus_bass
@@ -155,6 +175,16 @@ private fun signalLabel(signal: TestSignal): Int = when (signal) {
 private fun equalizationLabel(equalization: TestEqualization): Int = when (equalization) {
     TestEqualization.Flat -> R.string.audio_test_eq_flat
     TestEqualization.SamplePreset -> R.string.audio_test_eq_sample
-    TestEqualization.MoreBass -> R.string.audio_test_eq_bass
-    TestEqualization.LessTreble -> R.string.audio_test_eq_treble
+    TestEqualization.MoreBass -> R.string.audio_test_eq_more_bass
+    TestEqualization.LessBass -> R.string.audio_test_eq_less_bass
+    TestEqualization.LessMud -> R.string.audio_test_eq_less_mud
+    TestEqualization.MoreVoice -> R.string.audio_test_eq_more_voice
+    TestEqualization.LessSibilance -> R.string.audio_test_eq_less_sibilance
+    TestEqualization.MoreBrightness -> R.string.audio_test_eq_more_brightness
+    TestEqualization.LessTreble -> R.string.audio_test_eq_less_treble
+    TestEqualization.VShape -> R.string.audio_test_eq_v_shape
+    TestEqualization.Warm -> R.string.audio_test_eq_warm
+    TestEqualization.Bright -> R.string.audio_test_eq_bright
+    TestEqualization.Rock -> R.string.audio_test_eq_rock
+    TestEqualization.Concert -> R.string.audio_test_eq_concert
 }

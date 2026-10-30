@@ -5,15 +5,20 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.juliancitou.timbra.audio.AudioOutput
 import com.juliancitou.timbra.audio.EqualizerSettings
+import com.juliancitou.timbra.audio.EqualizerShapes.bell
+import com.juliancitou.timbra.audio.EqualizerShapes.highShelf
+import com.juliancitou.timbra.audio.EqualizerShapes.lowShelf
+import com.juliancitou.timbra.audio.EqualizerShapes.sum
 import com.juliancitou.timbra.audio.LoopSource
 import com.juliancitou.timbra.audio.LoudnessMatcher
 import com.juliancitou.timbra.audio.PinkNoise
 import com.juliancitou.timbra.audio.PlaybackStatus
 import com.juliancitou.timbra.audio.SignalSource
 import com.juliancitou.timbra.audio.SineTone
+import com.juliancitou.timbra.audio.presetFromCurve
+import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.music.MusicLoop
-import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
 import com.juliancitou.timbra.ui.screens.SampleData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,17 +33,22 @@ import kotlinx.coroutines.sync.withLock
 
 enum class TestSignal { Music, PinkNoise, Tone }
 
-enum class TestEqualization { Flat, SamplePreset, MoreBass, LessTreble }
+/** Ecualizaciones para comparar de oído; las de curva siguen el formato de Poweramp (redondeo y preamp). */
+enum class TestEqualization {
+    Flat, SamplePreset, MoreBass, LessBass, LessMud, MoreVoice, LessSibilance,
+    MoreBrightness, LessTreble, VShape, Warm, Bright, Rock, Concert,
+}
 
 data class AudioTestUiState(
     val signal: TestSignal = TestSignal.Music,
+    val genre: Genre = Genre.Pop,
     val focus: MusicFocus = MusicFocus.Balanced,
     val equalization: TestEqualization = TestEqualization.Flat,
     val matchLoudness: Boolean = true,
-    val musicReady: Boolean = false,
+    val preparingMusic: Boolean = true,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
-    val canPlay: Boolean get() = signal != TestSignal.Music || musicReady
+    val canPlay: Boolean get() = signal != TestSignal.Music || !preparingMusic
 }
 
 private const val TONE_HZ = 1000.0
@@ -56,22 +66,18 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
     private val selection = MutableStateFlow(AudioTestUiState())
 
     private val musicMutex = Mutex()
-    private var musicLoop: MusicLoop? = null
-    private val mixes = mutableMapOf<MusicFocus, DoubleArray>()
+    private val musicLoops = mutableMapOf<Genre, MusicLoop>()
+    private val mixes = mutableMapOf<Pair<Genre, MusicFocus>, DoubleArray>()
     private val matchers = mutableMapOf<Any, LoudnessMatcher>()
     private var currentLoop: LoopSource? = null
+    private var currentGenre: Genre? = null
 
     val uiState: StateFlow<AudioTestUiState> = combine(selection, output.status) { selected, status ->
         selected.copy(status = status)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_SHARING_AFTER_MS), AudioTestUiState())
 
     init {
-        viewModelScope.launch(Dispatchers.Default) {
-            val mix = mixFor(MusicFocus.Balanced)
-            selection.update { it.copy(musicReady = true) }
-            if (selection.value.signal == TestSignal.Music) playLoop(mix)
-            applyEqualization()
-        }
+        viewModelScope.launch(Dispatchers.Default) { refreshMusic() }
     }
 
     fun togglePlayback() {
@@ -88,7 +94,7 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
         selection.update { it.copy(signal = signal) }
         viewModelScope.launch(Dispatchers.Default) {
             when (signal) {
-                TestSignal.Music -> if (selection.value.musicReady) playLoop(mixFor(selection.value.focus))
+                TestSignal.Music -> refreshMusic()
                 TestSignal.PinkNoise -> changeSource(PinkNoise())
                 TestSignal.Tone -> changeSource(SineTone(TONE_HZ, TONE_AMPLITUDE, output.sampleRate))
             }
@@ -96,12 +102,14 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun selectGenre(genre: Genre) {
+        selection.update { it.copy(genre = genre) }
+        viewModelScope.launch(Dispatchers.Default) { refreshMusic() }
+    }
+
     fun selectFocus(focus: MusicFocus) {
         selection.update { it.copy(focus = focus) }
-        viewModelScope.launch(Dispatchers.Default) {
-            if (selection.value.signal == TestSignal.Music) playLoop(mixFor(focus))
-            applyEqualization()
-        }
+        viewModelScope.launch(Dispatchers.Default) { refreshMusic() }
     }
 
     fun selectEqualization(equalization: TestEqualization) {
@@ -116,21 +124,43 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
 
     override fun onCleared() = output.release()
 
-    /** Cambia a [mix] en el mismo punto de la pieza, para que cambiar de zona no reinicie el bucle. */
-    private fun playLoop(mix: DoubleArray) {
-        val loop = LoopSource(mix, startIndex = currentLoop?.position ?: 0)
+    /**
+     * Genera (o toma de la memoria) la mezcla del género y la zona elegidos y la pone a sonar. La
+     * primera vez que se elige un género tarda un par de segundos; mientras, no se puede reproducir.
+     */
+    private suspend fun refreshMusic() {
+        val selected = selection.value
+        if (selected.signal != TestSignal.Music) return
+        selection.update { it.copy(preparingMusic = true) }
+        val mix = mixFor(selected.genre, selected.focus)
+        val latest = selection.value
+        if (latest.signal == TestSignal.Music && latest.genre == selected.genre && latest.focus == selected.focus) {
+            playLoop(mix, sameSong = currentGenre == selected.genre)
+            currentGenre = selected.genre
+            selection.update { it.copy(preparingMusic = false) }
+        }
+        applyEqualization()
+    }
+
+    /**
+     * Cambia a [mix]. Dentro de la misma canción conserva el punto de la pieza, para que cambiar de
+     * zona no reinicie el bucle; con otra canción empieza desde el inicio.
+     */
+    private fun playLoop(mix: DoubleArray, sameSong: Boolean) {
+        val loop = LoopSource(mix, startIndex = if (sameSong) currentLoop?.position ?: 0 else 0)
         currentLoop = loop
         output.renderer.changeSource(loop)
     }
 
     private fun changeSource(source: SignalSource) {
         currentLoop = null
+        currentGenre = null
         output.renderer.changeSource(source)
     }
 
-    private suspend fun mixFor(focus: MusicFocus): DoubleArray = musicMutex.withLock {
-        val loop = musicLoop ?: MusicLoop(output.sampleRate).also { musicLoop = it }
-        mixes.getOrPut(focus) { loop.mix(focus) }
+    private suspend fun mixFor(genre: Genre, focus: MusicFocus): DoubleArray = musicMutex.withLock {
+        val loop = musicLoops.getOrPut(genre) { MusicLoop(output.sampleRate, genre.song) }
+        mixes.getOrPut(genre to focus) { loop.mix(focus) }
     }
 
     private suspend fun applyEqualization() {
@@ -142,10 +172,10 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
 
     /** El volumen se iguala con la misma señal que está sonando; cada igualador se calcula una vez. */
     private suspend fun matcherFor(selected: AudioTestUiState): LoudnessMatcher {
-        val usesMusic = selected.signal == TestSignal.Music && selected.musicReady
-        val key: Any = if (usesMusic) selected.focus else selected.signal
+        val usesMusic = selected.signal == TestSignal.Music
+        val key: Any = if (usesMusic) selected.genre to selected.focus else selected.signal
         musicMutex.withLock { matchers[key] }?.let { return it }
-        val reference = if (usesMusic) mixFor(selected.focus) else pinkReference()
+        val reference = if (usesMusic) mixFor(selected.genre, selected.focus) else pinkReference()
         val matcher = LoudnessMatcher(output.sampleRate, reference)
         musicMutex.withLock { matchers[key] = matcher }
         return matcher
@@ -159,10 +189,23 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
     private fun settingsFor(equalization: TestEqualization): EqualizerSettings = when (equalization) {
         TestEqualization.Flat -> EqualizerSettings.Flat
         TestEqualization.SamplePreset -> EqualizerSettings(SampleData.curveDb, preampDb = -4.5f)
-        TestEqualization.MoreBass -> bandsWhere(gainDb = 3f) { it <= 112 }
-        TestEqualization.LessTreble -> bandsWhere(gainDb = -6f) { it >= 4743 }
+        TestEqualization.MoreBass -> presetFromCurve(lowShelf(120.0, 3.0))
+        TestEqualization.LessBass -> presetFromCurve(lowShelf(120.0, -4.0))
+        TestEqualization.LessMud -> presetFromCurve(bell(250.0, -3.0, widthOctaves = 1.5))
+        TestEqualization.MoreVoice -> presetFromCurve(bell(2000.0, 3.0, widthOctaves = 1.5))
+        TestEqualization.LessSibilance -> presetFromCurve(bell(7500.0, -5.0, widthOctaves = 1.0))
+        TestEqualization.MoreBrightness -> presetFromCurve(highShelf(6000.0, 3.0))
+        TestEqualization.LessTreble -> presetFromCurve(highShelf(5000.0, -5.0))
+        TestEqualization.VShape -> presetFromCurve(
+            sum(lowShelf(100.0, 3.0), bell(1000.0, -3.0, 2.0), highShelf(8000.0, 3.0)),
+        )
+        TestEqualization.Warm -> presetFromCurve(sum(lowShelf(200.0, 2.0), highShelf(4000.0, -3.0)))
+        TestEqualization.Bright -> presetFromCurve(sum(lowShelf(200.0, -2.0), highShelf(4000.0, 3.0)))
+        TestEqualization.Rock -> presetFromCurve(
+            sum(lowShelf(90.0, 3.0), bell(500.0, -2.0, 1.5), bell(3000.0, 2.0, 1.5)),
+        )
+        TestEqualization.Concert -> presetFromCurve(
+            sum(bell(250.0, -1.5, 1.5), bell(3500.0, 1.0, 2.0), highShelf(12_000.0, 1.5)),
+        )
     }
-
-    private fun bandsWhere(gainDb: Float, includes: (Int) -> Boolean) =
-        EqualizerSettings(POWERAMP_BAND_FREQUENCIES_HZ.map { if (includes(it)) gainDb else 0f })
 }
