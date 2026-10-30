@@ -30,9 +30,9 @@ Para quien quiera más precisión hay un **modo avanzado** que mide cómo escuch
 | Sí hace | No hace |
 |---|---|
 | Te deja elegir de oído, con esferas, cuánto grave, voz y brillo quieres | Medir el volumen real dentro de tu oído (para eso hace falta un micrófono de medición) |
-| Funciona con cualquier audífono, Bluetooth o de cable | Ecualizar Spotify u otras apps por sí misma: eso lo hace Poweramp con el preset |
+| Funciona con audífonos Bluetooth, de cable y con la bocina del teléfono | Ecualizar Spotify u otras apps por sí misma: eso lo hace Poweramp con el preset |
 | En modo avanzado, encuentra picos angostos (sibilancia, resonancias) | Cambiar ajustes de tu teléfono, de tus audífonos o de Poweramp |
-| Genera un archivo `.json` que importas en Poweramp | Conectarse a internet ni pedir cuentas |
+| Genera un archivo `.json` con la misma cantidad de bandas que usas en Poweramp | Conectarse a internet ni pedir cuentas |
 
 **Términos que verás en la app:**
 
@@ -170,8 +170,8 @@ adb devices                    # muestra los teléfonos conectados
 
 ### Encuentra tu ecualización (modo principal)
 
-1. **Prepara:** conecta tus audífonos, elige cuáles son y **apaga el ecualizador de Poweramp**
-   mientras haces el test.
+1. **Prepara:** elige la salida (audífonos Bluetooth, de cable o la bocina del teléfono), cuántas
+   bandas usas en Poweramp y **apaga el ecualizador de Poweramp** mientras haces el test.
 2. **Nivel cómodo:** suena la música del test. Ajusta el volumen del teléfono hasta que se oiga
    claro pero cómodo, nunca fuerte.
 3. **Rondas de esferas:** cada ronda se enfoca en algo: balance general, graves, claridad, voces,
@@ -180,7 +180,8 @@ adb devices                    # muestra los teléfonos conectados
 4. **Tu resultado:** escúchalo completo y compáralo con "sin ecualizar".
 5. **Exporta:** guarda o comparte el archivo `.json`.
 6. **Importa en Poweramp Equalizer:** abre la lista de presets, usa la opción de importar y elige
-   el archivo. La app muestra los pasos exactos al exportar.
+   el archivo. Después **asígnalo a su salida** (⋮ → Guardar/Asignar), para que Poweramp lo use
+   solo con esos audífonos o con la bocina. La app muestra los pasos exactos al exportar.
 
 ### Modo avanzado (opcional)
 

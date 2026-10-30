@@ -133,6 +133,25 @@ terminó en estilo terminal/ASCII).
 - [x] Guardar con el selector de archivos y compartir
 - [x] Instrucciones de importación en la app
 - [x] Perfil de audífono básico (nombre)
+
+### Salida de audio
+- [ ] Elegir la salida: Bluetooth, cable o bocina del teléfono
+- [ ] Detectar la salida conectada (sin permisos) y avisar si no coincide con la elegida
+- [ ] Bluetooth: punto de partida pensado en los HUAWEI FreeBuds Pro 4
+- [ ] Cable: punto de partida plano, válido para cualquier audífono
+- [ ] Bocina: recorte de graves, rangos propios, sin ronda de aire y preparación distinta
+- [ ] Nombre del preset con la salida: `Timbra - FreeBuds Pro 4 (Bluetooth)`
+- [ ] Instrucciones para asignar el preset a la salida en Poweramp
+
+### Bandas de Poweramp
+- [ ] Revisar en Poweramp las frecuencias de las opciones fijas (5, 8, 10, 12, 15, 16, 24, 31, 32)
+- [ ] `BandLayout`: personalizada (N de 5 a 32, inicio y fin) y fijas confirmadas
+- [ ] Elegir la configuración de bandas en la app (por defecto: 25 bandas, 20 Hz–20 kHz)
+- [ ] Exportar y previsualizar con la configuración elegida (Q según la separación de bandas)
+- [ ] Gráfica y textos con cualquier cantidad de bandas
+- [ ] Pruebas golden por configuración de bandas
+
+### Verificación
 - [ ] Importar en Poweramp y comparar con la vista previa
 - [ ] Calibrar el ancho de banda (`POWERAMP_BAND_Q`) si la vista previa no suena igual que Poweramp
 - [ ] Probar el test completo en el teléfono (12 rondas, resultado y exportación)
