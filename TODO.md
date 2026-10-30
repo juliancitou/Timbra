@@ -70,8 +70,8 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 - [x] Todos los textos en `strings.xml` (español de México)
 
 ### Revisión
-- [ ] Contraste AA en todos los textos
-- [ ] Objetivos táctiles ≥ 48 dp y `contentDescription` en iconos
+- [x] Contraste AA en todos los textos (verificado con `ContrastTest`)
+- [x] Objetivos táctiles ≥ 48 dp y `contentDescription` en iconos
 - [ ] Probar con texto grande del sistema
 - [ ] Probar fluidez en el POCO (sin tirones al desenfocar)
 - [ ] Tag y release `v0.2.0`

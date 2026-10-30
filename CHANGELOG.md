@@ -19,6 +19,23 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `5f75358` · ui: mejorar lectura con TalkBack y letra grande
+- TalkBack ya no lee los adornos de terminal: `//` de las secciones, números `01` y viñetas
+  `›` de las listas y los corchetes de `[x]` (la casilla anuncia "marcada / sin marcar").
+- Letra grande del sistema: los chips pueden usar dos líneas y en Resultados pasan a la fila
+  siguiente; los márgenes de la gráfica se calculan midiendo sus etiquetas; los valores grandes
+  ("+12.0 dB", "11.2 kHz") se reducen para caber en una línea (`FitText`); los títulos largos
+  bajan de línea sin sacar el cursor de la pantalla.
+- Revisado en código: todo lo tocable mide al menos 48 dp y los íconos tienen descripción.
+  Falta confirmarlo en el teléfono con el tamaño de letra al máximo.
+
+### 2026-10-30 · `9902a0c` · test: verificar contraste AA de la paleta
+- `ContrastTest` calcula el contraste WCAG 2.1 de cada pareja texto/fondo, con el vidrio sin
+  desenfoque sobre el fondo más claro como peor caso: 4.5:1 para texto y 3:1 para gráficos.
+- Ajustes para cumplir: gris secundario `#A1A1AA` → `#C2C2CA` (estaba en 3.67:1 sobre vidrio),
+  rojo de aviso `#FF6B6B` → `#FF8A8A`, relleno de chips seleccionados del 22 % al 14 % y texto
+  de chips seleccionados en blanco (el borde y el relleno de color marcan la selección).
+
 ### 2026-10-30 · `69982c3` · ui: más aire en pantalla y títulos estilo terminal
 - Pedido del usuario: que el contenido no llene la pantalla. Márgenes laterales de 24 a 32 dp,
   tipografía un 10–15 % más chica (título 23 sp, indicación principal 18 sp, cuerpo 14 sp,
