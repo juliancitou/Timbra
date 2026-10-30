@@ -19,6 +19,47 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-30 · `af09bcd` · ui: mostrar componentes en pantalla de prueba
+- Pantalla temporal con tarjeta, deslizador, chips y botones para revisarlos en el teléfono;
+  se reemplaza por la navegación real más adelante en la Fase 1.
+
+### 2026-10-30 · `0809fca` · ui: crear GlassSlider y formato de dB y Hz
+- `GlassSlider`: rango −12 a +12 dB en pasos de 0.5 dB, perilla de 32 dp, 56 dp de alto,
+  valor grande con dígitos tabulares y vibración ligera en cada paso. Usa el `thumb`
+  personalizado de Material 3, que aún es API experimental (`@OptIn`).
+- `formatDecibels` ("+1.5 dB", "−3.0 dB", sin "−0.0") y `formatHertz` ("843 Hz", "8.4 kHz",
+  "20 kHz"), independientes del idioma del teléfono, con 7 pruebas unitarias.
+
+### 2026-10-30 · `17b5319` · ui: crear GlassChip
+- Chip de opción o, sin `onClick`, de estado. Tono ámbar solo para avisos de seguridad.
+  Se ve de 40 dp pero el área táctil es de 48 dp; el texto nunca se parte en dos líneas.
+
+### 2026-10-30 · `70ea842` · ui: crear GlassButton con respuesta háptica
+- Principal sólido en aqua (uno por pantalla) y secundario de vidrio. 56 dp de alto,
+  vibración de confirmación al tocar y leve reducción de tamaño al presionar (200 ms),
+  desactivada si el sistema pide reducir movimiento.
+
+### 2026-10-30 · `dba0042` · ui: crear GlassCard con Haze
+- Haze 2.0.1 (`haze` + `haze-blur`). La aurora es la fuente (`hazeSource`) y los
+  componentes la desenfocan con `hazeBlur(HazeInput.Backdrop(...))`.
+- `glassSurface`: desenfoque de 28 dp, velo blanco al 10 %, ruido 0.06, borde de 1 dp con
+  degradado blanco, esquinas de 28 dp y sombra suave. Sin fuente o con
+  `LocalGlassBlurEnabled = false` usa relleno blanco al 20 %.
+- Haze 2 también trae un efecto "Glass"; queda como idea para probar más adelante.
+
+### 2026-10-30 · `252be21` · ui: agregar fondo aurora animado
+- Degradado azul noche → índigo → violeta con tres manchas (aqua, violeta, azul) que dan una
+  vuelta cada 28 s. La animación se lee solo al dibujar, sin recomponer la pantalla.
+- Si la escala de animación del sistema está en 0, la aurora queda fija.
+
+### 2026-10-30 · `9f2adb7` · ui: crear tema oscuro de Timbra
+- Paleta: fondo `#0B1026`, acento aqua `#6FE7DD`, secundario violeta `#B79CFF`, ámbar y rojo
+  solo para avisos. Tema siempre oscuro, sin colores dinámicos del sistema.
+- Fuente del sistema con `withTabularNumbers()` para dB y Hz. Formas con esquinas de 28 dp y
+  espaciados de 4/8/16/24/32 dp.
+- Ventana con fondo azul noche (sin destello blanco al abrir) y barras del sistema con iconos
+  claros. Se quitaron los restos de la plantilla que marcaba lint.
+
 ### 2026-10-29 · `7e46e84` · chore: crear proyecto Android base
 - Proyecto creado con la plantilla *Empty Activity* (Compose) de Android Studio Rabbit 2
   (2026.2.2): paquete `com.juliancitou.timbra`, `minSdk 33`, `compileSdk`/`targetSdk 37`

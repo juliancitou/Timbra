@@ -39,20 +39,20 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 **Meta:** se ve elegante y fluido en el teléfono, con estilo liquid glass y buen contraste.
 
 ### Tema
-- [ ] Paleta: fondo azul noche → violeta, acento aqua, secundario violeta, ámbar/rojo para avisos
-- [ ] Tipografía (Inter o sistema) con números tabulares para dB y Hz
-- [ ] Formas: esquinas de 28 dp, espaciados consistentes
-- [ ] Tema oscuro como principal
-- [ ] Quitar restos de la plantilla (colores sin usar, etiqueta repetida, chequeo de SDK innecesario)
+- [x] Paleta: fondo azul noche → violeta, acento aqua, secundario violeta, ámbar/rojo para avisos
+- [x] Tipografía (Inter o sistema) con números tabulares para dB y Hz
+- [x] Formas: esquinas de 28 dp, espaciados consistentes
+- [x] Tema oscuro como principal
+- [x] Quitar restos de la plantilla (colores sin usar, etiqueta repetida, chequeo de SDK innecesario)
 
 ### Componentes de vidrio (`ui/theme/`)
-- [ ] `GlassBackground`: degradado + 2–3 manchas aurora con movimiento lento
-- [ ] Desactivar animación si el sistema pide reducir movimiento
-- [ ] Integrar Haze para desenfoque de fondo
-- [ ] `GlassCard`: relleno 8–14 %, borde con degradado, sombra suave
-- [ ] `GlassButton` (principal y secundario) con respuesta háptica
-- [ ] `GlassSlider`: grande, cómodo con el pulgar, valor en dB visible
-- [ ] `GlassChip` para opciones y estados
+- [x] `GlassBackground`: degradado + 2–3 manchas aurora con movimiento lento
+- [x] Desactivar animación si el sistema pide reducir movimiento
+- [x] Integrar Haze para desenfoque de fondo
+- [x] `GlassCard`: relleno 8–14 %, borde con degradado, sombra suave
+- [x] `GlassButton` (principal y secundario) con respuesta háptica
+- [x] `GlassSlider`: grande, cómodo con el pulgar, valor en dB visible
+- [x] `GlassChip` para opciones y estados
 - [ ] `FrequencyChart`: curva sobre las 25 bandas, ejes en Hz y dB
 - [ ] Respaldo sin desenfoque (relleno al 20 %)
 
@@ -167,5 +167,6 @@ controlados, bajos presentes sin tapar voces y medios claros, obtenido en una me
 
 - [ ] Decidir `android:allowBackup` (la plantilla lo deja en `true`: respaldo en la nube de Android)
 - [ ] Evaluar bibliotecas de "liquid glass" adicionales a Haze
+- [ ] Probar el efecto Glass de Haze 2 como alternativa al desenfoque clásico
 - [ ] Widget o acceso rápido para exportar el último preset
 - [ ] Modo claro opcional
