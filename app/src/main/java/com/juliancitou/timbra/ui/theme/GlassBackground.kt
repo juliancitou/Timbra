@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +21,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -75,6 +78,7 @@ private val NightGradient = Brush.verticalGradient(listOf(NightBlue, DeepIndigo,
 
 /**
  * Fondo de todas las pantallas: degradado nocturno con manchas de color que se desplazan lento.
+ * Es la fuente que desenfocan los componentes de vidrio del [content].
  * El progreso de la animación se lee solo en la fase de dibujo, así que no recompone la pantalla.
  */
 @Composable
@@ -83,14 +87,18 @@ fun GlassBackground(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val progress = rememberAuroraProgress(animated = !isReducedMotionEnabled())
+    val hazeState = rememberHazeState()
     Box(modifier = modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .hazeSource(hazeState)
                 .background(NightGradient)
                 .drawBehind { drawAurora(progress.value) },
         )
-        content()
+        CompositionLocalProvider(LocalGlassHazeState provides hazeState) {
+            content()
+        }
     }
 }
 
