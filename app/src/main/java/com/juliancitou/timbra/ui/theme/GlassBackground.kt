@@ -1,20 +1,16 @@
 package com.juliancitou.timbra.ui.theme
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -23,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -66,6 +63,7 @@ private val AuroraBlobs = listOf(
 )
 
 private const val AURORA_CYCLE_MS = 40_000
+private const val AURORA_FRAMES_PER_SECOND = 15
 
 private val NightGradient = Brush.verticalGradient(listOf(Ink, Graphite, Charcoal))
 
@@ -95,18 +93,25 @@ fun GlassBackground(
     }
 }
 
+/**
+ * Progreso de la aurora (0 a 1) actualizado a [AURORA_FRAMES_PER_SECOND]. Se mueve tan lento que
+ * a 15 cuadros por segundo no se nota, y así el fondo no obliga a recalcular todos los
+ * desenfoques de vidrio en cada cuadro de una pantalla de 120 Hz.
+ */
 @Composable
 private fun rememberAuroraProgress(animated: Boolean): State<Float> {
-    if (!animated) return remember { mutableFloatStateOf(0f) }
-    return rememberInfiniteTransition(label = "aurora").animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = AURORA_CYCLE_MS, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "auroraProgress",
-    )
+    val progress = remember { mutableFloatStateOf(0f) }
+    if (animated) {
+        LaunchedEffect(Unit) {
+            val start = withFrameMillis { it }
+            while (true) {
+                val elapsed = withFrameMillis { it } - start
+                progress.floatValue = (elapsed % AURORA_CYCLE_MS).toFloat() / AURORA_CYCLE_MS
+                delay(1000L / AURORA_FRAMES_PER_SECOND)
+            }
+        }
+    }
+    return progress
 }
 
 private fun DrawScope.drawAurora(progress: Float) {

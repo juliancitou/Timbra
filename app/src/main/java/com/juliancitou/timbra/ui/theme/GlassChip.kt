@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
@@ -26,6 +27,7 @@ enum class GlassChipTone { Normal, Warning }
 private val ChipShape = RoundedCornerShape(20.dp)
 private val ChipMinHeight = 40.dp
 private const val SELECTED_FILL_ALPHA = 0.14f
+private const val UNSELECTED_BORDER_ALPHA = 0.16f
 
 /**
  * Opción seleccionable o, con [onClick] nulo, etiqueta de estado. El área táctil crece a 48 dp
@@ -51,7 +53,12 @@ fun GlassChip(
             .background(accent.copy(alpha = SELECTED_FILL_ALPHA))
             .border(1.dp, accent, ChipShape)
     } else {
-        Modifier.glassSurface(shape = ChipShape, elevated = false)
+        // Sin desenfoque a propósito: una pantalla puede tener decenas de chips y cada desenfoque
+        // se recalcula en cada cuadro. A este tamaño el relleno translúcido se ve casi igual.
+        Modifier
+            .clip(ChipShape)
+            .background(Color.White.copy(alpha = GLASS_FILL_ALPHA))
+            .border(1.dp, Color.White.copy(alpha = UNSELECTED_BORDER_ALPHA), ChipShape)
     }
     val interaction = if (onClick != null) {
         Modifier

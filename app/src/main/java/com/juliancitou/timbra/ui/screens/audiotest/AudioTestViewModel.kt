@@ -1,6 +1,7 @@
 package com.juliancitou.timbra.ui.screens.audiotest
 
 import android.app.Application
+import android.os.Process
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.juliancitou.timbra.audio.AudioOutput
@@ -20,7 +21,7 @@ import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.music.MusicLoop
 import com.juliancitou.timbra.ui.screens.SampleData
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +29,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import java.util.concurrent.Executors
 
 enum class TestSignal { Music, PinkNoise, Tone }
 
@@ -65,7 +65,17 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
     private val output = AudioOutput(application) { PinkNoise() }
     private val selection = MutableStateFlow(AudioTestUiState())
 
-    private val musicMutex = Mutex()
+    /**
+     * Hilo único y de baja prioridad para generar música e igualar volumen: el trabajo pesado no le
+     * quita tiempo a la interfaz, y al ser un solo hilo no hace falta sincronizar las memorias.
+     */
+    private val synthesis = Executors.newSingleThreadExecutor { task ->
+        Thread({
+            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)
+            task.run()
+        }, "TimbraSynthesis")
+    }.asCoroutineDispatcher()
+
     private val musicLoops = mutableMapOf<Genre, MusicLoop>()
     private val mixes = mutableMapOf<Pair<Genre, MusicFocus>, DoubleArray>()
     private val matchers = mutableMapOf<Any, LoudnessMatcher>()
@@ -77,7 +87,7 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_SHARING_AFTER_MS), AudioTestUiState())
 
     init {
-        viewModelScope.launch(Dispatchers.Default) { refreshMusic() }
+        viewModelScope.launch(synthesis) { refreshMusic() }
     }
 
     fun togglePlayback() {
@@ -92,7 +102,7 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun selectSignal(signal: TestSignal) {
         selection.update { it.copy(signal = signal) }
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(synthesis) {
             when (signal) {
                 TestSignal.Music -> refreshMusic()
                 TestSignal.PinkNoise -> changeSource(PinkNoise())
@@ -104,31 +114,34 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun selectGenre(genre: Genre) {
         selection.update { it.copy(genre = genre) }
-        viewModelScope.launch(Dispatchers.Default) { refreshMusic() }
+        viewModelScope.launch(synthesis) { refreshMusic() }
     }
 
     fun selectFocus(focus: MusicFocus) {
         selection.update { it.copy(focus = focus) }
-        viewModelScope.launch(Dispatchers.Default) { refreshMusic() }
+        viewModelScope.launch(synthesis) { refreshMusic() }
     }
 
     fun selectEqualization(equalization: TestEqualization) {
         selection.update { it.copy(equalization = equalization) }
-        viewModelScope.launch(Dispatchers.Default) { applyEqualization() }
+        viewModelScope.launch(synthesis) { applyEqualization() }
     }
 
     fun setLoudnessMatching(enabled: Boolean) {
         selection.update { it.copy(matchLoudness = enabled) }
-        viewModelScope.launch(Dispatchers.Default) { applyEqualization() }
+        viewModelScope.launch(synthesis) { applyEqualization() }
     }
 
-    override fun onCleared() = output.release()
+    override fun onCleared() {
+        output.release()
+        synthesis.close()
+    }
 
     /**
      * Genera (o toma de la memoria) la mezcla del género y la zona elegidos y la pone a sonar. La
      * primera vez que se elige un género tarda un par de segundos; mientras, no se puede reproducir.
      */
-    private suspend fun refreshMusic() {
+    private fun refreshMusic() {
         val selected = selection.value
         if (selected.signal != TestSignal.Music) return
         selection.update { it.copy(preparingMusic = true) }
@@ -158,12 +171,12 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
         output.renderer.changeSource(source)
     }
 
-    private suspend fun mixFor(genre: Genre, focus: MusicFocus): DoubleArray = musicMutex.withLock {
+    private fun mixFor(genre: Genre, focus: MusicFocus): DoubleArray {
         val loop = musicLoops.getOrPut(genre) { MusicLoop(output.sampleRate, genre.song) }
-        mixes.getOrPut(genre to focus) { loop.mix(focus) }
+        return mixes.getOrPut(genre to focus) { loop.mix(focus) }
     }
 
-    private suspend fun applyEqualization() {
+    private fun applyEqualization() {
         val selected = selection.value
         val settings = settingsFor(selected.equalization)
         val final = if (selected.matchLoudness) matcherFor(selected).compensated(settings) else settings
@@ -171,13 +184,13 @@ class AudioTestViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     /** El volumen se iguala con la misma señal que está sonando; cada igualador se calcula una vez. */
-    private suspend fun matcherFor(selected: AudioTestUiState): LoudnessMatcher {
+    private fun matcherFor(selected: AudioTestUiState): LoudnessMatcher {
         val usesMusic = selected.signal == TestSignal.Music
         val key: Any = if (usesMusic) selected.genre to selected.focus else selected.signal
-        musicMutex.withLock { matchers[key] }?.let { return it }
+        matchers[key]?.let { return it }
         val reference = if (usesMusic) mixFor(selected.genre, selected.focus) else pinkReference()
         val matcher = LoudnessMatcher(output.sampleRate, reference)
-        musicMutex.withLock { matchers[key] = matcher }
+        matchers[key] = matcher
         return matcher
     }
 
