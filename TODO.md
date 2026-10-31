@@ -157,6 +157,9 @@ terminó en estilo terminal/ASCII).
 - [x] Nodos sin dB, con la opción "actual" marcada, y resumen en palabras del resultado
 - [x] Botones y opciones con bordes claros; Inicio con el flujo actual
 - [ ] Probar una canción real en el teléfono: MP3, FLAC y un archivo que no se pueda leer
+- [x] Ecualizar Spotify en vivo durante el test
+- [ ] Comprobar en el teléfono que Spotify conecta y que el cambio se oye, con Poweramp Equalizer apagado
+- [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp
 
 ### Verificación
 - [ ] Importar en Poweramp y comparar con la vista previa

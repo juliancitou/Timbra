@@ -19,6 +19,19 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `dd68a6d` · feat: ecualizar Spotify en vivo durante el test
+- Pedido del usuario: dejar Spotify en segundo plano y oír cada opción sobre su música. Spotify
+  anuncia su sesión de audio al reproducir y pausar; se comprobó en el teléfono que lo hace, y Timbra
+  se registra para recibir esos anuncios. El efecto se aplica con `DynamicsProcessing`, sin copiar audio.
+- Nuevo permiso `MODIFY_AUDIO_SETTINGS`, aprobado por el usuario; es de tipo normal y no pide nada.
+- El nivel de `SafetyLimiter` no aplica a otra app. La regla ahí es no sonar más fuerte que sin
+  ecualizar: ganancia de entrada ≤ 0 dB y limitador en −1 dB.
+- Al no poder medir la música de Spotify, el volumen entre opciones se iguala con ruido rosa: es una
+  aproximación. `DynamicsProcessing` tampoco filtra igual que Poweramp, así que lo que se oye puede
+  diferir un poco del preset. Sus cambios no tienen fundido.
+- Limitaciones: falta comprobar en el teléfono que el anuncio llegue a Timbra y que el cambio se oiga.
+  Poweramp Equalizer debe estar apagado.
+
 ### 2026-10-31 · `999ada0` · ui: dar bordes claros a botones y opciones
 - Pedido del usuario: que se note dónde empieza y dónde termina cada opción. El botón principal va
   relleno de ámbar con letra oscura, como video inverso; el secundario y las opciones llevan línea
