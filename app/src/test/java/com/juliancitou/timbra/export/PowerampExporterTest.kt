@@ -56,4 +56,13 @@ class PowerampExporterTest {
         assertEquals("timbra-freebuds-pro-4-anc.json", PowerampExporter.fileName("FreeBuds Pro 4 (ANC)"))
         assertEquals("timbra-preset.json", PowerampExporter.fileName("¿¿??"))
     }
+
+    /** No viene de Poweramp: fija el formato con otra cantidad de bandas para que no cambie sin querer. */
+    @Test
+    fun exportsACustomLayoutWithItsOwnBands() {
+        val layout = BandLayout(count = 10)
+        val gains = listOf(-3f, -2f, -1f, 0f, 0.5f, 1f, 0f, -1.5f, -3f, -2f)
+        val settings = EqualizerSettings(gains, preampDb = -4.5f, bandFrequenciesHz = layout.frequenciesHz)
+        assertEquals(resource("golden/poweramp-10-bands.json"), PowerampExporter.toJson("Diez bandas", settings))
+    }
 }

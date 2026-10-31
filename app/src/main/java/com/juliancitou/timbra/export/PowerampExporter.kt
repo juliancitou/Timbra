@@ -7,7 +7,7 @@ import java.util.Locale
 /**
  * Preset para Poweramp Equalizer en el formato que importa su modo gráfico: un arreglo con un
  * objeto, dos bandas de tono (grave tipo 0 en 90 Hz y aguda tipo 1 en 10 kHz) siempre en 0 dB y
- * luego las 25 bandas gráficas (tipo 2). El texto sale igual al de un preset que ya se sabe que
+ * luego las bandas gráficas (tipo 2) de la configuración elegida. El texto sale igual al de un preset que ya se sabe que
  * Poweramp importa bien (ver la prueba golden), así que no conviene cambiar espacios ni orden.
  */
 object PowerampExporter {
@@ -23,7 +23,7 @@ object PowerampExporter {
 
     fun toJson(presetName: String, settings: EqualizerSettings): String {
         val bands = toneBands.map { band(it.type, it.frequencyHz, it.q, 0f) } +
-            POWERAMP_BAND_FREQUENCIES_HZ.zip(settings.bandGainsDb) { hz, gain -> band(GRAPHIC_BAND_TYPE, hz, 0f, gain) }
+            settings.bandFrequenciesHz.zip(settings.bandGainsDb) { hz, gain -> band(GRAPHIC_BAND_TYPE, hz, 0f, gain) }
         return buildString {
             append("[\n  {\n")
             append("    \"name\": ${jsonString(NAME_PREFIX + presetName.trim())},\n")

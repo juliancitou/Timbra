@@ -39,7 +39,7 @@ private val GainGridStepsDb = listOf(-12f, -6f, 0f, 6f, 12f)
 private val FrequencyGridHz = listOf(20, 100, 1000, 10_000, 20_000)
 
 /**
- * Curva de ganancia sobre las 25 bandas de Poweramp. [gainsDb] va en el mismo orden que
+ * Curva de ganancia sobre las bandas de Poweramp. [gainsDb] va en el mismo orden que
  * [frequenciesHz]. Las bandas de [estimatedBandIndices] se dibujan huecas (no se midieron con
  * confianza) y [highlightedBandIndex] marca la banda en curso.
  */

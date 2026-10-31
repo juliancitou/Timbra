@@ -14,36 +14,53 @@ private val HALF_GAIN_WIDTH_TO_SIGMA = 2 * sqrt(2 * ln(2.0))
 private const val SHELF_STEEPNESS = 4.4
 
 /**
- * Curvas suaves sobre las 25 bandas de Poweramp, en dB por banda. Trabajan en escala de octavas
+ * Curvas suaves sobre las bandas de Poweramp, en dB por banda. Trabajan en escala de octavas
  * (como el oído) y se suman entre sí. Son la base de los presets de prueba y de las "dimensiones"
  * que mueven las esferas del test.
  */
 object EqualizerShapes {
-    private val octaves = POWERAMP_BAND_FREQUENCIES_HZ.map { log2(it.toDouble()) }
-
     /** Campana centrada en [centerHz]: [gainDb] en el centro y la mitad a [widthOctaves]/2 de cada lado. */
-    fun bell(centerHz: Double, gainDb: Double, widthOctaves: Double = 1.0): List<Double> {
+    fun bell(
+        centerHz: Double,
+        gainDb: Double,
+        widthOctaves: Double = 1.0,
+        frequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ,
+    ): List<Double> {
         val sigma = widthOctaves / HALF_GAIN_WIDTH_TO_SIGMA
         val center = log2(centerHz)
-        return octaves.map { gainDb * exp(-0.5 * ((it - center) / sigma).let { x -> x * x }) }
+        return frequenciesHz.map { log2(it.toDouble()) }.map { gainDb * exp(-0.5 * ((it - center) / sigma).let { x -> x * x }) }
     }
 
     /** Estante bajo: [gainDb] en todo lo que queda bajo [cornerHz] (la mitad justo en [cornerHz]). */
-    fun lowShelf(cornerHz: Double, gainDb: Double, transitionOctaves: Double = 1.0): List<Double> =
-        shelf(cornerHz, gainDb, transitionOctaves, rising = false)
+    fun lowShelf(
+        cornerHz: Double,
+        gainDb: Double,
+        transitionOctaves: Double = 1.0,
+        frequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ,
+    ): List<Double> = shelf(cornerHz, gainDb, transitionOctaves, rising = false, frequenciesHz)
 
     /** Estante alto: [gainDb] en todo lo que queda sobre [cornerHz] (la mitad justo en [cornerHz]). */
-    fun highShelf(cornerHz: Double, gainDb: Double, transitionOctaves: Double = 1.0): List<Double> =
-        shelf(cornerHz, gainDb, transitionOctaves, rising = true)
+    fun highShelf(
+        cornerHz: Double,
+        gainDb: Double,
+        transitionOctaves: Double = 1.0,
+        frequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ,
+    ): List<Double> = shelf(cornerHz, gainDb, transitionOctaves, rising = true, frequenciesHz)
 
     fun sum(vararg curves: List<Double>): List<Double> =
-        octaves.indices.map { band -> curves.sumOf { it[band] } }
+        curves.first().indices.map { band -> curves.sumOf { it[band] } }
 
-    private fun shelf(cornerHz: Double, gainDb: Double, transitionOctaves: Double, rising: Boolean): List<Double> {
+    private fun shelf(
+        cornerHz: Double,
+        gainDb: Double,
+        transitionOctaves: Double,
+        rising: Boolean,
+        frequenciesHz: List<Int>,
+    ): List<Double> {
         val corner = log2(cornerHz)
         val steepness = transitionOctaves / SHELF_STEEPNESS
-        return octaves.map { octave ->
-            val distance = (octave - corner) / steepness
+        return frequenciesHz.map { frequencyHz ->
+            val distance = (log2(frequencyHz.toDouble()) - corner) / steepness
             gainDb / (1 + exp(if (rising) -distance else distance))
         }
     }
@@ -66,7 +83,10 @@ fun List<Double>.toPowerampGains(): List<Float> =
 fun powerampPreampDb(gainsDb: List<Float>): Float = minOf(-4.5f, -((gainsDb.maxOrNull() ?: 0f).coerceAtLeast(0f) + 3f))
 
 /** Preset completo a partir de una curva: ganancias de Poweramp y su preamp. */
-fun presetFromCurve(curveDb: List<Double>): EqualizerSettings {
+fun presetFromCurve(
+    curveDb: List<Double>,
+    frequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ,
+): EqualizerSettings {
     val gains = curveDb.toPowerampGains()
-    return EqualizerSettings(gains, preampDb = powerampPreampDb(gains))
+    return EqualizerSettings(gains, preampDb = powerampPreampDb(gains), bandFrequenciesHz = frequenciesHz)
 }

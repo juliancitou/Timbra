@@ -1,5 +1,6 @@
 package com.juliancitou.timbra.audio
 
+import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -62,5 +63,30 @@ class GraphicEqualizerTest {
     @Test(expected = IllegalArgumentException::class)
     fun wrongNumberOfBandsIsRejected() {
         EqualizerSettings(listOf(1f, 2f, 3f))
+    }
+
+    @Test
+    fun defaultBandsKeepTheCalibratedWidth() {
+        assertEquals(POWERAMP_BAND_Q, powerampBandQ(BandLayout.Default.spacingOctaves), 1e-9)
+    }
+
+    @Test
+    fun fewerBandsAreWiderSoTheCurveHasNoGaps() {
+        assertTrue(powerampBandQ(BandLayout(count = 10).spacingOctaves) < POWERAMP_BAND_Q)
+        assertTrue(powerampBandQ(BandLayout(count = 32).spacingOctaves) > POWERAMP_BAND_Q)
+    }
+
+    @Test
+    fun anyLayoutReachesItsGainAtItsBand() {
+        val layout = BandLayout(count = 10, firstHz = 31, lastHz = 16_000)
+        val gains = List(10) { if (it == 5) -4f else 0f }
+        val settings = EqualizerSettings(gains, bandFrequenciesHz = layout.frequenciesHz)
+        val equalizer = GraphicEqualizer(SAMPLE_RATE, settings)
+        assertEquals(-4.0, equalizer.magnitudeDb(layout.frequenciesHz[5].toDouble()), 0.01)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun gainsMustMatchTheBands() {
+        EqualizerSettings(List(25) { 0f }, bandFrequenciesHz = BandLayout(count = 10).frequenciesHz)
     }
 }

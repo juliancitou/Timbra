@@ -1,7 +1,10 @@
 package com.juliancitou.timbra.audio
 
+import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
+import kotlin.math.log2
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * Ancho de cada banda del ecualizador gráfico. Poweramp no publica el suyo. Las bandas están a
@@ -15,13 +18,37 @@ const val POWERAMP_BAND_Q = 2.0
 /** No se filtran bandas por encima de esta fracción de la frecuencia de muestreo (cerca de Nyquist). */
 private const val MAX_BAND_FRACTION_OF_SAMPLE_RATE = 0.45
 
-/** Ganancias en dB de las 25 bandas de Poweramp, en orden, más el preamp en dB. */
-data class EqualizerSettings(val bandGainsDb: List<Float>, val preampDb: Float = 0f) {
+/** Separación en octavas de las bandas con las que se eligió [POWERAMP_BAND_Q]. */
+private val REFERENCE_SPACING_OCTAVES = BandLayout.Default.spacingOctaves
+
+/**
+ * Q de una banda según la separación entre bandas, en octavas. Conserva la misma superposición que
+ * [POWERAMP_BAND_Q] tiene con 25 bandas: con menos bandas, cada una es más ancha y la curva sigue
+ * sin huecos. Usa la relación estándar `√r / (r − 1)`, con `r` la razón de frecuencias vecinas.
+ */
+fun powerampBandQ(spacingOctaves: Double): Double {
+    fun proportionalQ(octaves: Double): Double {
+        val ratio = 2.0.pow(octaves)
+        return sqrt(ratio) / (ratio - 1)
+    }
+    return POWERAMP_BAND_Q * proportionalQ(spacingOctaves) / proportionalQ(REFERENCE_SPACING_OCTAVES)
+}
+
+/** Ganancias en dB de cada banda de [bandFrequenciesHz], en orden, más el preamp en dB. */
+data class EqualizerSettings(
+    val bandGainsDb: List<Float>,
+    val preampDb: Float = 0f,
+    val bandFrequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ,
+) {
     init {
-        require(bandGainsDb.size == POWERAMP_BAND_FREQUENCIES_HZ.size) {
-            "Se esperaban ${POWERAMP_BAND_FREQUENCIES_HZ.size} bandas"
+        require(bandGainsDb.size == bandFrequenciesHz.size) {
+            "Se esperaban ${bandFrequenciesHz.size} bandas"
         }
     }
+
+    /** Separación promedio entre bandas, en octavas. */
+    val spacingOctaves: Double
+        get() = log2(bandFrequenciesHz.last().toDouble() / bandFrequenciesHz.first()) / (bandFrequenciesHz.size - 1)
 
     companion object {
         val Flat = EqualizerSettings(List(POWERAMP_BAND_FREQUENCIES_HZ.size) { 0f })
@@ -29,15 +56,16 @@ data class EqualizerSettings(val bandGainsDb: List<Float>, val preampDb: Float =
 }
 
 /**
- * Ecualizador gráfico que imita al de Poweramp: una campana por banda en las mismas 25
+ * Ecualizador gráfico que imita al de Poweramp: una campana por banda en las mismas
  * frecuencias, en serie, y el preamp como ganancia final. Las bandas en 0 dB no se calculan.
  */
 class GraphicEqualizer(private val sampleRate: Int, val settings: EqualizerSettings) {
     private val bandCoefficients: List<BiquadCoefficients> =
-        POWERAMP_BAND_FREQUENCIES_HZ.zip(settings.bandGainsDb)
+        settings.bandFrequenciesHz.zip(settings.bandGainsDb)
             .filter { (frequencyHz, gainDb) -> gainDb != 0f && isFilterable(frequencyHz) }
             .map { (frequencyHz, gainDb) ->
-                BiquadCoefficients.peaking(frequencyHz.toDouble(), gainDb.toDouble(), POWERAMP_BAND_Q, sampleRate)
+                val q = powerampBandQ(settings.spacingOctaves)
+                BiquadCoefficients.peaking(frequencyHz.toDouble(), gainDb.toDouble(), q, sampleRate)
             }
     private val filters = bandCoefficients.map { Biquad(it) }
     private val preampGain = 10.0.pow(settings.preampDb / 20.0)
