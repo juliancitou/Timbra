@@ -135,26 +135,28 @@ terminó en estilo terminal/ASCII).
 - [x] Perfil de audífono básico (nombre)
 
 ### Salida de audio
-- [ ] Elegir la salida: Bluetooth, cable o bocina del teléfono
-- [ ] Detectar la salida conectada (sin permisos) y avisar si no coincide con la elegida
-- [ ] Bluetooth: punto de partida pensado en los HUAWEI FreeBuds Pro 4
-- [ ] Cable: punto de partida plano, válido para cualquier audífono
-- [ ] Bocina: recorte de graves, rangos propios, sin ronda de aire y preparación distinta
-- [ ] Nombre del preset con la salida: `Timbra - FreeBuds Pro 4 (Bluetooth)`
-- [ ] Instrucciones para asignar el preset a la salida en Poweramp
+- [x] Elegir la salida: Bluetooth, cable o bocina del teléfono
+- [x] Detectar la salida conectada (sin permisos) y avisar si no coincide con la elegida
+- [x] Bluetooth: punto de partida pensado en los HUAWEI FreeBuds Pro 4
+- [x] Cable: punto de partida plano, válido para cualquier audífono
+- [x] Bocina: recorte de graves, rangos propios, sin ronda de aire y preparación distinta
+- [x] Nombre del preset con la salida: `Timbra - FreeBuds Pro 4 (Bluetooth)`
+- [x] Instrucciones para asignar el preset a la salida en Poweramp
 
 ### Bandas de Poweramp
-- [ ] Revisar en Poweramp las frecuencias de las opciones fijas (5, 8, 10, 12, 15, 16, 24, 31, 32)
-- [ ] `BandLayout`: personalizada (N de 5 a 32, inicio y fin) y fijas confirmadas
-- [ ] Elegir la configuración de bandas en la app (por defecto: 25 bandas, 20 Hz–20 kHz)
-- [ ] Exportar y previsualizar con la configuración elegida (Q según la separación de bandas)
-- [ ] Gráfica y textos con cualquier cantidad de bandas
-- [ ] Pruebas golden por configuración de bandas
+- [x] `BandLayout`: personalizada (N de 5 a 32, inicio y fin)
+- [ ] Opciones fijas (5, 10, 12, 15, 16, 24, 31, 32): falta confirmar sus frecuencias en Poweramp
+- [x] Elegir la configuración de bandas en la app (por defecto: 25 bandas, 20 Hz–20 kHz)
+- [x] Exportar y previsualizar con la configuración elegida (Q según la separación de bandas)
+- [x] Gráfica y textos con cualquier cantidad de bandas
+- [x] Prueba golden de una configuración personalizada (10 bandas)
 
 ### Verificación
 - [ ] Importar en Poweramp y comparar con la vista previa
 - [ ] Calibrar el ancho de banda (`POWERAMP_BAND_Q`) si la vista previa no suena igual que Poweramp
-- [ ] Probar el test completo en el teléfono (12 rondas, resultado y exportación)
+- [ ] Probar el test completo en el teléfono (12 rondas, 10 en bocina; resultado y exportación)
+- [ ] Comprobar en el teléfono la detección de salida y el nombre de los audífonos
+- [ ] Importar en Poweramp un preset con otra cantidad de bandas
 - [ ] Tag y release `v0.5.0`
 
 ## Fase 5 — Modo avanzado: medición por bandas · `v0.6.0`

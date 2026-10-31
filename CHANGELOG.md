@@ -19,6 +19,41 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `cde4081` · ui: elegir salida y bandas en la preparación
+- Preparación con `[ Bluetooth ] [ Cable ] [ Bocina ]`, preseleccionada según lo detectado hasta
+  que el usuario elija otra. Si no coincide, solo avisa y no bloquea, porque Android podría no
+  reportar bien algún accesorio.
+- La lista de preparación cambia con la salida: "audífonos conectados" desaparece porque ya se
+  detecta, cable no pregunta por cancelación de ruido y bocina pide posición y bocina destapada.
+- Editor plegable de bandas con los límites de Poweramp (5–32, 5–200 Hz, 14–20 kHz en pasos de
+  100 Hz); se recuerda en `SharedPreferences`.
+- Nombre sugerido con la salida: `Timbra - FreeBuds Pro 4 (Bluetooth)`. Exportar indica qué bandas
+  usar y cómo asignar el preset a la salida (⋮ → Guardar/Asignar).
+- Limitación: hay que comprobar en el teléfono la detección y el nombre del accesorio.
+
+### 2026-10-31 · `afcd4f0` · audio: detectar la salida de audio activa
+- `OutputDetector` pregunta a qué dispositivo iría la música (`getAudioDevicesForAttributes`) y
+  vigila los cambios con `AudioDeviceCallback`. No requiere permisos y no cambia la ruta de audio.
+- Si el sistema no responde, prefiere Bluetooth sobre cable y cable sobre bocina.
+
+### 2026-10-31 · `02ec322` · feat: adaptar las rondas a la salida y a las bandas
+- `OutputKind`: Bluetooth parte de la tendencia de los FreeBuds Pro 4 (graves −1, claridad −2,
+  voz +1, "S" −3, aire −1 dB); cable parte de plano; bocina parte de graves −4 y voz −1 dB, con
+  rangos propios y 10 rondas en vez de 12, sin la de aire.
+- En bocina, la ronda de graves nunca los sube, pero un balance muy cálido aún puede levantarlos
+  hasta unos 2 dB.
+- Los puntos de partida son una estimación inicial; hay que confirmarlos escuchando.
+
+### 2026-10-31 · `6649c6e` · audio: ecualizar y exportar con bandas configurables
+- `BandLayout`: de 5 a 32 bandas, repartidas de forma logarítmica entre la primera y la última
+  frecuencia. La configuración por defecto reproduce las 25 bandas de siempre.
+- Vista previa con Q según la separación entre bandas, `Q ∝ √r/(r−1)`, para conservar el solape que
+  tiene Q = 2 con 25 bandas. Es una aproximación: falta compararla con Poweramp.
+- El golden de 25 bandas no cambió. El nuevo golden de 10 bandas fija el formato, pero no viene de
+  un archivo de Poweramp: falta comprobar que las importe.
+- Las opciones fijas (10, 15, 31…) quedan fuera hasta confirmar sus frecuencias; la de 8 bandas se
+  quitó de las notas porque Poweramp no la ofrece.
+
 ### 2026-10-30 · `5a9315d` · docs: planear salidas de audio y bandas de Poweramp
 - Pedido del usuario, agregado a la Fase 4 antes de la `v0.5.0`:
   - **Salida de audio:** Bluetooth (pensada en los HUAWEI FreeBuds Pro 4), cable (cualquier
