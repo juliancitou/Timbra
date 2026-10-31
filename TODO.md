@@ -151,6 +151,13 @@ terminó en estilo terminal/ASCII).
 - [x] Gráfica y textos con cualquier cantidad de bandas
 - [x] Prueba golden de una configuración personalizada (10 bandas)
 
+### Test para quien no sabe de audio
+- [x] "No me gustó ninguno": la zona se queda como estaba y se pasa a la siguiente
+- [x] Probar con una canción guardada en el teléfono, en estéreo
+- [x] Nodos sin dB, con la opción "actual" marcada, y resumen en palabras del resultado
+- [x] Botones y opciones con bordes claros; Inicio con el flujo actual
+- [ ] Probar una canción real en el teléfono: MP3, FLAC y un archivo que no se pueda leer
+
 ### Verificación
 - [ ] Importar en Poweramp y comparar con la vista previa
 - [ ] Calibrar el ancho de banda (`POWERAMP_BAND_Q`) si la vista previa no suena igual que Poweramp

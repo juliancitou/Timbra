@@ -19,6 +19,38 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `999ada0` · ui: dar bordes claros a botones y opciones
+- Pedido del usuario: que se note dónde empieza y dónde termina cada opción. El botón principal va
+  relleno de ámbar con letra oscura, como video inverso; el secundario y las opciones llevan línea
+  continua gris, y la opción elegida se rellena. Esquinas de 2 dp, casi rectas.
+- Las etiquetas de estado conservan los corchetes, sin caja, para no parecer botones.
+- Inicio describe el flujo actual, en vez de la medición por bandas, y deja de mostrar "Mis
+  mediciones", que aún no guarda nada. La pantalla sigue en el código para la Fase 6.
+
+### 2026-10-31 · `6f997fa` · feat: usar una canción propia y rechazar opciones
+- Nivel cómodo permite elegir un archivo con el selector del sistema, sin permisos. Se usan sus
+  primeros 2 minutos, en memoria; no se copia ni sale del teléfono. Una canción no se reinicia
+  entre rondas: solo cambia la ecualización. No funciona con Spotify u otras apps.
+- Botón "No me gustó ninguno". Los nodos muestran A–E y "actual" en vez de dB, y al entrar a una
+  ronda se escucha de inicio lo que ya hay, también cerca de los límites, donde no es el centro.
+- La gráfica sale de las rondas, para simplificarlas, y queda en el resultado junto a un resumen
+  en palabras de lo que cambió.
+- Nota: este commit no compila por sí solo porque `HomeScreen` se actualizó en el siguiente.
+
+### 2026-10-31 · `13e9257` · audio: preparar canciones del usuario en estéreo
+- La cadena de audio pasa a estéreo: un ecualizador por canal y limitador con ganancia común, para
+  que limitar no mueva el sonido hacia un lado. Los límites de nivel no cambian.
+- Las canciones se igualan a −24 LUFS en su parte más fuerte, porque suelen venir mucho más altas y
+  el limitador las aplastaría. La compensación de volumen también se mide en esa parte.
+- Remuestreo sinc con ventana de Blackman, porque uno lineal apagaría los agudos que se van a juzgar.
+- Limitación: falta probar el decodificador con archivos reales en el teléfono.
+
+### 2026-10-31 · `e47a371` · feat: dejar una zona como estaba si no gusta ninguna
+- `keepCurrent()` conserva el valor de la zona. En la pasada gruesa también salta el afinado, porque
+  no tiene sentido afinar algo que no gustó; en el afinado conserva lo elegido en la pasada gruesa.
+- Con la música de la app, cada ronda resalta instrumentos distintos, así que la mezcla cambia
+  aunque el ajuste no cambie. Con una canción propia eso no pasa.
+
 ### 2026-10-31 · `cde4081` · ui: elegir salida y bandas en la preparación
 - Preparación con `[ Bluetooth ] [ Cable ] [ Bocina ]`, preseleccionada según lo detectado hasta
   que el usuario elija otra. Si no coincide, solo avisa y no bloquea, porque Android podría no
