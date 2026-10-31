@@ -1,5 +1,7 @@
 package com.juliancitou.timbra.measure
 
+private val RECHECKED_ZONES = listOf(FinderDimension.Bass, FinderDimension.Voice)
+
 /**
  * Salida para la que se busca la ecualización. Cambia de dónde parte el test y hasta dónde llega.
  *
@@ -36,11 +38,15 @@ enum class OutputKind(
         skipped = setOf(FinderDimension.Air),
     );
 
-    /** Cada zona tiene una pasada gruesa seguida de una de afinado. */
+    /**
+     * Cada zona tiene una pasada gruesa seguida de una de afinado. Al final se comprueban graves y voz,
+     * que son las zonas que más cambian lo que se oye.
+     */
     val rounds: List<FinderRound> by lazy {
-        FinderDimension.entries.filterNot { it in skipped }.flatMap { dimension ->
+        val zones = FinderDimension.entries.filterNot { it in skipped }.flatMap { dimension ->
             listOf(FinderRound(dimension, fine = false), FinderRound(dimension, fine = true))
         }
+        zones + RECHECKED_ZONES.map { FinderRound(it, fine = true, recheck = true) }
     }
 
     fun rangeDb(dimension: FinderDimension): ClosedFloatingPointRange<Double> =

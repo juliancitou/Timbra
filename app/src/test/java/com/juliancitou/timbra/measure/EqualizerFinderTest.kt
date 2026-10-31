@@ -9,17 +9,19 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.abs
 
 class EqualizerFinderTest {
 
     private fun gainAt(curve: List<Double>, hz: Int) = curve[POWERAMP_BAND_FREQUENCIES_HZ.indexOf(hz)]
 
     @Test
-    fun thereAreTwelveRoundsCoarseThenFine() {
-        assertEquals(12, OutputKind.Wired.rounds.size)
+    fun roundsAreCoarseThenFineAndEndWithChecks() {
+        assertEquals(14, OutputKind.Wired.rounds.size)
         assertEquals(FinderRound(FinderDimension.Balance, fine = false), OutputKind.Wired.rounds[0])
         assertEquals(FinderRound(FinderDimension.Balance, fine = true), OutputKind.Wired.rounds[1])
-        assertEquals(FinderDimension.Air, OutputKind.Wired.rounds.last().dimension)
+        assertEquals(FinderRound(FinderDimension.Air, fine = true), OutputKind.Wired.rounds[11])
+        assertTrue(OutputKind.Wired.rounds.takeLast(2).all { it.recheck })
     }
 
     @Test
@@ -118,7 +120,7 @@ class EqualizerFinderTest {
     @Test
     fun speakerNeverBoostsBassAndHasNoAirRound() {
         val speaker = OutputKind.Speaker
-        assertEquals(10, speaker.rounds.size)
+        assertEquals(12, speaker.rounds.size)
         assertTrue(speaker.rounds.none { it.dimension == FinderDimension.Air })
         var finder = EqualizerFinder(output = speaker)
         repeat(speaker.rounds.size) {
@@ -185,5 +187,43 @@ class EqualizerFinderTest {
             it.copy(valuesDb = it.valuesDb + (FinderDimension.Bass to 3.0))
         }
         assertEquals(3.0, finder.options()[finder.currentOptionIndex], 1e-9)
+    }
+
+    private fun atFirstRecheck(): EqualizerFinder {
+        var finder = EqualizerFinder()
+        while (!finder.round.recheck) finder = finder.choose(finder.currentValueDb)
+        return finder
+    }
+
+    @Test
+    fun recheckDoesNotPutTheCurrentValueInTheCenter() {
+        val finder = atFirstRecheck()
+        assertTrue(finder.options().any { abs(it - finder.currentValueDb) < 1e-9 })
+        assertTrue(abs(finder.options()[OPTIONS_PER_ROUND / 2] - finder.currentValueDb) > 0.1)
+    }
+
+    @Test
+    fun recheckAveragesAndNotesADoubtWhenItDisagrees() {
+        val finder = atFirstRecheck()
+        val current = finder.currentValueDb
+        val far = finder.options().maxBy { abs(it - current) }
+        val next = finder.choose(far)
+        assertEquals((current + far) / 2, next.valuesDb.getValue(finder.round.dimension), 1e-9)
+        assertTrue(finder.round.dimension in next.doubts)
+    }
+
+    @Test
+    fun recheckWithTheSameChoiceChangesNothing() {
+        val finder = atFirstRecheck()
+        val next = finder.choose(finder.currentValueDb)
+        assertEquals(finder.valuesDb, next.valuesDb)
+        assertTrue(next.doubts.isEmpty())
+    }
+
+    @Test
+    fun calibrationPresetFollowsTheContract() {
+        val preset = calibrationPreset(BandLayout.Default)
+        assertTrue(preset.bandGainsDb.any { it == POWERAMP_MIN_GAIN_DB })
+        assertEquals(-4.5f, preset.preampDb, 0f)
     }
 }

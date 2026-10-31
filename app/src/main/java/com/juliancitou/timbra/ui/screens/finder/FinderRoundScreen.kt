@@ -14,11 +14,12 @@ import com.juliancitou.timbra.measure.FinderDimension
 import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.OptionNodes
-import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
+import com.juliancitou.timbra.ui.theme.TerminalHoldChip
 import com.juliancitou.timbra.ui.theme.TerminalScreen
+import com.juliancitou.timbra.ui.theme.TerminalSection
 
 /** Textos de cada zona: título, pregunta, qué cambia y qué significa cada extremo. */
 internal data class DimensionTexts(
@@ -67,6 +68,7 @@ fun FinderRoundScreen(
     onAudition: (Int) -> Unit,
     onChoose: () -> Unit,
     onKeepCurrent: () -> Unit,
+    onHoldCurrent: (Boolean) -> Unit,
     onTogglePlayback: () -> Unit,
     onPreviousRound: () -> Boolean,
     onExit: () -> Unit,
@@ -84,7 +86,7 @@ fun FinderRoundScreen(
         lead = stringResource(texts.question),
         onBack = goBack,
         actions = {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
                 TerminalButton(
                     text = stringResource(state.playbackLabelRes()),
                     onClick = onTogglePlayback,
@@ -108,44 +110,57 @@ fun FinderRoundScreen(
             )
         },
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-            val progress = if (round.fine) R.string.finder_progress_fine else R.string.finder_progress_coarse
-            SectionLabel(stringResource(progress, finder.roundIndex + 1, finder.rounds.size))
-            CodeLines(
-                listOf(
-                    stringResource(R.string.finder_step_listen),
-                    stringResource(R.string.finder_step_choose),
-                    stringResource(R.string.finder_step_none),
+        val progress = when {
+            round.recheck -> R.string.finder_progress_recheck
+            round.fine -> R.string.finder_progress_fine
+            else -> R.string.finder_progress_coarse
+        }
+        TerminalSection(stringResource(progress, finder.roundIndex + 1, finder.rounds.size)) {
+            DetailText(
+                stringResource(
+                    when {
+                        state.preparing -> R.string.finder_preparing
+                        round.recheck -> R.string.finder_recheck_hint
+                        round.fine -> R.string.finder_fine_hint
+                        else -> texts.hint
+                    },
                 ),
             )
         }
         val currentLabel = stringResource(R.string.finder_node_current)
         val labels = options.indices.map { index ->
-            if (index == currentIndex) currentLabel else ('A' + index).toString()
+            if (index == currentIndex && !round.recheck) currentLabel else ('A' + index).toString()
         }
         val descriptions = options.indices.map { index ->
             val position = stringResource(R.string.finder_node_description, index + 1, options.size)
-            if (index == currentIndex) "$position, $currentLabel" else position
+            if (index == currentIndex && !round.recheck) "$position, $currentLabel" else position
         }
-        OptionNodes(
-            values = labels,
-            selectedIndex = state.auditionIndex,
-            onSelect = onAudition,
-            lowerLabel = stringResource(texts.lower),
-            upperLabel = stringResource(texts.upper),
-            nodeDescription = { descriptions[it] },
-            enabled = !state.preparing,
-            playing = state.isPlaying,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        DetailText(
-            stringResource(
-                when {
-                    state.preparing -> R.string.finder_preparing
-                    round.fine -> R.string.finder_fine_hint
-                    else -> texts.hint
-                },
-            ),
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.large)) {
+            OptionNodes(
+                values = labels,
+                selectedIndex = state.auditionIndex,
+                onSelect = onAudition,
+                lowerLabel = stringResource(texts.lower),
+                upperLabel = stringResource(texts.upper),
+                nodeDescription = { descriptions[it] },
+                enabled = !state.preparing,
+                playing = state.isPlaying,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (!round.recheck) {
+                TerminalHoldChip(stringResource(R.string.finder_hold_current), onHoldCurrent)
+            }
+        }
+        if (finder.roundIndex == 0) {
+            TerminalSection(stringResource(R.string.finder_section_how)) {
+                CodeLines(
+                    listOf(
+                        stringResource(R.string.finder_step_listen),
+                        stringResource(R.string.finder_step_choose),
+                        stringResource(R.string.finder_step_none),
+                    ),
+                )
+            }
+        }
     }
 }

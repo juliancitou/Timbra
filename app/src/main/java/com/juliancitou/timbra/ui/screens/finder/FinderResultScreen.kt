@@ -2,7 +2,6 @@ package com.juliancitou.timbra.ui.screens.finder
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,14 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.theme.CodeLines
+import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.FrequencyChart
-import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalChip
 import com.juliancitou.timbra.ui.theme.TerminalPanel
 import com.juliancitou.timbra.ui.theme.TerminalScreen
+import com.juliancitou.timbra.ui.theme.TerminalSection
 import com.juliancitou.timbra.ui.theme.TerminalTextField
 
 /** Menos que esto, en dB, casi no se distingue de oído. */
@@ -75,9 +75,8 @@ fun FinderResultScreen(
                 frequenciesHz = preset.bandFrequenciesHz,
             )
         }
-        ChangesSummary(state)
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             verticalArrangement = Arrangement.spacedBy(Spacing.small),
         ) {
             TerminalChip(
@@ -97,6 +96,7 @@ fun FinderResultScreen(
             label = stringResource(R.string.finder_preset_label),
             placeholder = suggestedPresetName(state),
         )
+        ChangesSummary(state)
     }
 }
 
@@ -112,8 +112,10 @@ private fun ChangesSummary(state: FinderUiState) {
         }
         stringResource(R.string.finder_summary_line, stringResource(texts.title), change)
     }
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-        SectionLabel(stringResource(R.string.finder_section_changes))
+    TerminalSection(stringResource(R.string.finder_section_changes)) {
         CodeLines(lines)
+        state.finder.doubts.sortedBy { it.ordinal }.forEach { dimension ->
+            DetailText(stringResource(R.string.finder_summary_doubt, stringResource(dimension.texts().title)))
+        }
     }
 }

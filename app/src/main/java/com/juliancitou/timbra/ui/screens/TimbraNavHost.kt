@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.screens.about.AboutScreen
 import com.juliancitou.timbra.ui.screens.audiotest.AudioTestScreen
+import com.juliancitou.timbra.ui.screens.calibration.CalibrationScreen
 import com.juliancitou.timbra.ui.screens.comfort.ComfortLevelScreen
 import com.juliancitou.timbra.ui.screens.export.ExportScreen
 import com.juliancitou.timbra.ui.screens.finder.EqualizerFinderViewModel
@@ -40,6 +41,7 @@ import com.juliancitou.timbra.ui.screens.finder.suggestedPresetName
 import com.juliancitou.timbra.ui.screens.history.HistoryScreen
 import com.juliancitou.timbra.ui.screens.home.HomeScreen
 import com.juliancitou.timbra.ui.screens.measurement.MeasurementScreen
+import com.juliancitou.timbra.ui.screens.preparation.ChecklistScreen
 import com.juliancitou.timbra.ui.screens.preparation.PreparationScreen
 import com.juliancitou.timbra.ui.screens.results.ResultsScreen
 import com.juliancitou.timbra.ui.screens.settings.SettingsScreen
@@ -54,6 +56,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object HomeRoute
 @Serializable data object PreparationRoute
+@Serializable data object ChecklistRoute
+@Serializable data object CalibrationRoute
 @Serializable data object ComfortLevelRoute
 @Serializable data object MeasurementRoute
 @Serializable data object ResultsRoute
@@ -124,7 +128,25 @@ fun TimbraNavHost(
                         onBandLayoutChange = finder::setBandLayout,
                         headphonesName = finderState.headphonesName,
                         onHeadphonesNameChange = finder::setHeadphonesName,
+                        onContinue = { navController.navigate(ChecklistRoute) },
+                        onBack = back,
+                    )
+                }
+                screen<ChecklistRoute> {
+                    ChecklistScreen(
+                        output = finderState.finder.output,
                         onContinue = { navController.navigate(ComfortLevelRoute) },
+                        onBack = back,
+                    )
+                }
+                screen<CalibrationRoute> {
+                    CalibrationScreen(
+                        state = finderState,
+                        presetJson = finder::calibrationJson,
+                        fileName = finder.calibrationFileName(),
+                        onStart = finder::startCalibration,
+                        onSelectShape = finder::setBandShape,
+                        onOpenSpotify = finder::openSpotify,
                         onBack = back,
                     )
                 }
@@ -154,6 +176,7 @@ fun TimbraNavHost(
                             onAudition = finder::audition,
                             onChoose = finder::chooseAudition,
                             onKeepCurrent = finder::keepCurrent,
+                            onHoldCurrent = finder::holdCurrent,
                             onTogglePlayback = finder::togglePlayback,
                             onPreviousRound = finder::previousRound,
                             onExit = back,
@@ -209,6 +232,7 @@ fun TimbraNavHost(
                 ) {
                     SettingsScreen(
                         onOpenAudioTest = { navController.navigate(AudioTestRoute) },
+                        onOpenCalibration = { navController.navigate(CalibrationRoute) },
                         onOpenAdvancedPreview = { navController.navigate(MeasurementRoute) },
                         onOpenAbout = { navController.navigate(AboutRoute) },
                         onBack = back,
@@ -230,7 +254,8 @@ fun TimbraNavHost(
  * usan las generales del `NavHost`.
  */
 /** Pantallas del test en las que puede sonar la música; en cualquier otra, el sonido se detiene. */
-private val FinderSoundRoutes = listOf(ComfortLevelRoute::class, FinderRoundRoute::class, FinderResultRoute::class)
+private val FinderSoundRoutes =
+    listOf(ComfortLevelRoute::class, FinderRoundRoute::class, FinderResultRoute::class, CalibrationRoute::class)
 
 /**
  * Detiene el sonido del test al salir de sus pantallas y cuando la app pasa a segundo plano o se

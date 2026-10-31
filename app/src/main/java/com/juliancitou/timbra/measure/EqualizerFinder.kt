@@ -50,9 +50,13 @@ enum class FinderDimension(
     }
 }
 
-/** Una ronda: qué zona se ajusta y si es la pasada de afinado (pasos de la mitad de tamaño). */
-data class FinderRound(val dimension: FinderDimension, val fine: Boolean) {
-    val stepDb: Double get() = if (fine) dimension.coarseStepDb / 2 else dimension.coarseStepDb
+/**
+ * Una ronda: qué zona se ajusta y si es la pasada de afinado (pasos de la mitad de tamaño). [recheck]
+ * es la comprobación final: la misma zona otra vez, sin marcar cuál es la actual y con los pasos
+ * gruesos, para ver si se vuelve a elegir lo mismo.
+ */
+data class FinderRound(val dimension: FinderDimension, val fine: Boolean, val recheck: Boolean = false) {
+    val stepDb: Double get() = if (fine && !recheck) dimension.coarseStepDb / 2 else dimension.coarseStepDb
 }
 
 /**
@@ -65,6 +69,8 @@ data class EqualizerFinder(
     val valuesDb: Map<FinderDimension, Double> = output.startValuesDb(),
     val roundIndex: Int = 0,
     val previous: EqualizerFinder? = null,
+    /** Zonas donde la comprobación final no coincidió con lo elegido antes. */
+    val doubts: Set<FinderDimension> = emptySet(),
 ) {
     val rounds: List<FinderRound> get() = output.rounds
     val isFinished: Boolean get() = roundIndex >= rounds.size
@@ -80,17 +86,25 @@ data class EqualizerFinder(
         val range = output.rangeDb(round.dimension)
         val step = round.stepDb
         val half = (OPTIONS_PER_ROUND / 2) * step
-        val center = currentValueDb.coerceIn(range.start + half, range.endInclusive - half)
+        val center = (currentValueDb + recheckOffsetDb()).coerceIn(range.start + half, range.endInclusive - half)
         return (0 until OPTIONS_PER_ROUND).map { index -> center + (index - OPTIONS_PER_ROUND / 2) * step }
     }
 
+    /**
+     * Guarda la elección y avanza. En la comprobación final no reemplaza lo anterior: una sola escucha
+     * puede engañar, así que queda el punto medio de las dos, y si difieren más de un paso se anota
+     * la duda.
+     */
     fun choose(valueDb: Double): EqualizerFinder {
         check(!isFinished) { "El test ya terminó" }
         val dimension = round.dimension
+        val value = if (round.recheck) (currentValueDb + valueDb) / 2 else valueDb
+        val disagrees = round.recheck && abs(valueDb - currentValueDb) > round.stepDb
         return copy(
-            valuesDb = valuesDb + (dimension to valueDb.coerceIn(output.rangeDb(dimension))),
+            valuesDb = valuesDb + (dimension to value.coerceIn(output.rangeDb(dimension))),
             roundIndex = roundIndex + 1,
             previous = this,
+            doubts = if (disagrees) doubts + dimension else doubts,
         )
     }
 
@@ -117,6 +131,12 @@ data class EqualizerFinder(
 
     /** El preset final, con redondeo, rango y preamp de Poweramp. */
     fun result(): EqualizerSettings = presetFromCurve(curveDb(), layout.frequenciesHz)
+
+    /** En la comprobación, lo actual no queda en el centro: así no se elige por la posición. */
+    private fun recheckOffsetDb(): Double {
+        if (!round.recheck) return 0.0
+        return round.stepDb * if (round.dimension.ordinal % 2 == 0) 1 else -1
+    }
 
     private fun curveFor(values: Map<FinderDimension, Double>): List<Double> {
         val frequencies = layout.frequenciesHz

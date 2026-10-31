@@ -8,7 +8,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
@@ -28,13 +27,13 @@ import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.measure.OutputKind
 import com.juliancitou.timbra.ui.screens.preparation.bandSummary
 import com.juliancitou.timbra.ui.theme.CodeLines
-import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalChip
 import com.juliancitou.timbra.ui.theme.TerminalChipTone
 import com.juliancitou.timbra.ui.theme.TerminalScreen
+import com.juliancitou.timbra.ui.theme.TerminalSection
 import java.io.File
 
 private enum class SaveResult { Saved, Failed }
@@ -75,7 +74,7 @@ fun ExportScreen(
                 onClick = { saveLauncher.launch(fileName) },
                 modifier = Modifier.fillMaxWidth(),
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
                 TerminalButton(
                     text = stringResource(R.string.action_share),
                     onClick = { share(context, fileName, presetJson(), shareTitle) },
@@ -91,8 +90,7 @@ fun ExportScreen(
             }
         },
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-            SectionLabel(stringResource(R.string.export_section_name))
+        TerminalSection(stringResource(R.string.export_section_name)) {
             Text(
                 text = PowerampExporter.NAME_PREFIX + presetName,
                 style = MaterialTheme.typography.titleLarge,
@@ -113,8 +111,7 @@ fun ExportScreen(
                 tone = if (result == SaveResult.Failed) TerminalChipTone.Warning else TerminalChipTone.Normal,
             )
         }
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
-            SectionLabel(stringResource(R.string.export_section_steps))
+        TerminalSection(stringResource(R.string.export_section_steps)) {
             CodeLines(
                 listOf(
                     stringResource(R.string.export_step_open),
@@ -123,8 +120,7 @@ fun ExportScreen(
                 ),
             )
         }
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
-            SectionLabel(stringResource(R.string.export_section_assign))
+        TerminalSection(stringResource(R.string.export_section_assign)) {
             CodeLines(
                 listOf(
                     stringResource(R.string.export_step_bands, bandSummary(bandLayout)),
@@ -142,7 +138,7 @@ private fun OutputKind.assignTargetRes(): Int = when (this) {
     OutputKind.Speaker -> R.string.export_assign_speaker
 }
 
-private fun writeTo(context: Context, uri: Uri, json: String): Boolean = runCatching {
+internal fun writeTo(context: Context, uri: Uri, json: String): Boolean = runCatching {
     val stream = context.contentResolver.openOutputStream(uri, "wt") ?: error("No se pudo abrir el archivo")
     stream.use { it.write(json.toByteArray()) }
 }.isSuccess

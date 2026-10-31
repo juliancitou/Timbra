@@ -26,16 +26,19 @@ private const val LIMITER_POST_GAIN_DB = 0f
 class SessionEqualizer {
     private var effect: DynamicsProcessing? = null
     private var attachedSession = 0
-    private var attachedBands = 0
+    private var appliedBands: List<PreviewBand> = emptyList()
 
-    fun apply(sessionId: Int, settings: EqualizerSettings): SessionEqualizerResult = runCatching {
-        val current = effectFor(sessionId, settings.bandGainsDb.size)
+    fun apply(sessionId: Int, preampDb: Float, bands: List<PreviewBand>): SessionEqualizerResult = runCatching {
+        val current = effectFor(sessionId, bands.size)
         if (!current.hasControl()) return SessionEqualizerResult.Blocked
-        current.setInputGainAllChannelsTo(settings.preampDb.coerceAtMost(0f))
-        val edges = bandUpperEdgesHz(settings.bandFrequenciesHz)
-        settings.bandGainsDb.forEachIndexed { band, gainDb ->
-            current.setPreEqBandAllChannelsTo(band, DynamicsProcessing.EqBand(true, edges[band], gainDb))
+        current.setInputGainAllChannelsTo(preampDb.coerceAtMost(0f))
+        // Cada banda es una llamada a otro proceso: solo se envían las que cambiaron.
+        bands.forEachIndexed { index, band ->
+            if (band != appliedBands.getOrNull(index)) {
+                current.setPreEqBandAllChannelsTo(index, DynamicsProcessing.EqBand(true, band.upperEdgeHz, band.gainDb))
+            }
         }
+        appliedBands = bands
         current.enabled = true
         SessionEqualizerResult.Applied
     }.getOrElse {
@@ -47,11 +50,11 @@ class SessionEqualizer {
         runCatching { effect?.release() }
         effect = null
         attachedSession = 0
-        attachedBands = 0
+        appliedBands = emptyList()
     }
 
     private fun effectFor(sessionId: Int, bandCount: Int): DynamicsProcessing {
-        effect?.takeIf { attachedSession == sessionId && attachedBands == bandCount }?.let { return it }
+        effect?.takeIf { attachedSession == sessionId && appliedBands.size == bandCount }?.let { return it }
         release()
         val config = DynamicsProcessing.Config.Builder(
             DynamicsProcessing.VARIANT_FAVOR_FREQUENCY_RESOLUTION,
@@ -79,7 +82,6 @@ class SessionEqualizer {
         )
         effect = created
         attachedSession = sessionId
-        attachedBands = bandCount
         return created
     }
 }

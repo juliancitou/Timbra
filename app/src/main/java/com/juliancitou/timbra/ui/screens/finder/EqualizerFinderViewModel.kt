@@ -11,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.AudioOutput
+import com.juliancitou.timbra.audio.BandShape
 import com.juliancitou.timbra.audio.EqualizerSettings
 import com.juliancitou.timbra.audio.LoopSource
 import com.juliancitou.timbra.audio.LoudnessMatcher
@@ -28,12 +29,15 @@ import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.music.MusicLoop
 import com.juliancitou.timbra.audio.prepareSong
+import com.juliancitou.timbra.audio.previewBands
 import com.juliancitou.timbra.audio.resample
 import com.juliancitou.timbra.data.BandLayoutPreferences
+import com.juliancitou.timbra.data.BandShapePreferences
 import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.measure.EqualizerFinder
 import com.juliancitou.timbra.measure.OutputKind
+import com.juliancitou.timbra.measure.calibrationPreset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -63,6 +67,7 @@ data class FinderUiState(
     val loadingSong: Boolean = false,
     val songFailed: Boolean = false,
     val spotify: SpotifyLink = SpotifyLink.Off,
+    val bandShape: BandShape = BandShape.Direct,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
     val isPlaying: Boolean get() = status == PlaybackStatus.Playing
@@ -72,12 +77,15 @@ data class FinderUiState(
     fun effectivePresetName(suggested: String): String = presetName.ifBlank { suggested }
 
     /** Otro estado del test, escuchando de entrada lo que ya hay y no lo que esté en el centro. */
-    fun withFinder(next: EqualizerFinder): FinderUiState =
-        copy(finder = next, auditionIndex = if (next.isFinished) CENTER_OPTION else next.currentOptionIndex)
+    fun withFinder(next: EqualizerFinder): FinderUiState {
+        val startsOnCurrent = !next.isFinished && !next.round.recheck
+        return copy(finder = next, auditionIndex = if (startsOnCurrent) next.currentOptionIndex else CENTER_OPTION)
+    }
 }
 
 private const val CENTER_OPTION = 2
 private const val REFERENCE_SECONDS = 4
+private const val CALIBRATION_NAME = "Calibracion"
 
 /** Con 2 minutos basta para el test, y una canción en estéreo no ocupa más de ~50 MB de memoria. */
 private const val MAX_SONG_SECONDS = 120
@@ -105,7 +113,10 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     }
     private val output by outputHolder
     private val bandPreferences = BandLayoutPreferences(application)
-    private val state = MutableStateFlow(FinderUiState(finder = EqualizerFinder(layout = bandPreferences.load())))
+    private val shapePreferences = BandShapePreferences(application)
+    private val state = MutableStateFlow(
+        FinderUiState(finder = EqualizerFinder(layout = bandPreferences.load()), bandShape = shapePreferences.load()),
+    )
     private val playback = MutableStateFlow(PlaybackStatus.Stopped)
 
     private val musicLoops = mutableMapOf<Genre, MusicLoop>()
@@ -126,6 +137,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private val effectThread = Dispatchers.Default.limitedParallelism(1)
     private val sessionEqualizer = SessionEqualizer()
     private var spotifySettings: EqualizerSettings = EqualizerSettings.Flat
+    private var calibrating = false
 
     val uiState: StateFlow<FinderUiState> = combine(state, playback) { current, status ->
         current.copy(status = status)
@@ -200,6 +212,10 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     /** Al salir de las pantallas del test, Spotify vuelve a sonar sin ecualizar. */
     fun stopTestAudio() {
         stopSound()
+        if (calibrating) {
+            calibrating = false
+            leaveSpotify()
+        }
         viewModelScope.launch(effectThread) { sessionEqualizer.release() }
     }
 
@@ -209,6 +225,33 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         stopSound()
         state.update { it.copy(spotify = SpotifyLink.Waiting, songName = null, songFailed = false) }
         refresh()
+    }
+
+    /** Spotify suena con el preset de calibración, para compararlo con el mismo preset en Poweramp. */
+    fun startCalibration() {
+        stopSound()
+        calibrating = true
+        state.update { it.copy(spotify = SpotifyLink.Waiting, songName = null, songFailed = false) }
+        applyEqualization(calibrationSettings())
+    }
+
+    fun setBandShape(shape: BandShape) {
+        shapePreferences.save(shape)
+        state.update { it.copy(bandShape = shape) }
+        if (calibrating) applyEqualization(calibrationSettings()) else refresh()
+    }
+
+    fun calibrationJson(): String =
+        PowerampExporter.toJson(CALIBRATION_NAME, calibrationPreset(state.value.finder.layout))
+
+    fun calibrationFileName(): String = PowerampExporter.fileName(CALIBRATION_NAME)
+
+    /** Mientras se mantiene presionado, se escucha cómo estaba esta zona antes de la ronda. */
+    fun holdCurrent(holding: Boolean) {
+        val current = state.value
+        if (current.finder.isFinished) return
+        val index = if (holding) current.finder.currentOptionIndex else current.auditionIndex
+        optionSettings.getOrNull(index)?.let(::applyEqualization)
     }
 
     fun openSpotify() {
@@ -292,11 +335,11 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
                 song != null -> playUserSong(song)
                 else -> playAppMusic(snapshot)
             }
-            optionSettings = optionsFor(snapshot.finder, matcher)
+            optionSettings = optionsFor(snapshot, matcher)
             val latest = state.value
             val settings = when {
                 latest.finder.isFinished && latest.bypass -> matcher.compensated(EqualizerSettings.Flat)
-                latest.finder.isFinished -> matcher.compensated(latest.finder.result())
+                latest.finder.isFinished -> matcher.compensated(latest.finder.result().shapedAs(latest.bandShape))
                 else -> optionSettings.getOrNull(latest.auditionIndex) ?: EqualizerSettings.Flat
             }
             applyEqualization(settings)
@@ -334,7 +377,9 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             sessionEqualizer.release()
             SpotifyLink.Waiting
         } else {
-            when (sessionEqualizer.apply(sessionId, spotifySettings)) {
+            val shape = state.value.bandShape
+            val bands = previewBands(spotifySettings, shape, output.sampleRate)
+            when (sessionEqualizer.apply(sessionId, spotifySettings.preampDb, bands)) {
                 SessionEqualizerResult.Applied -> SpotifyLink.Connected
                 SessionEqualizerResult.Blocked -> SpotifyLink.Blocked
                 SessionEqualizerResult.Failed -> SpotifyLink.Failed
@@ -407,12 +452,20 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    private fun optionsFor(finder: EqualizerFinder, matcher: LoudnessMatcher): List<EqualizerSettings> =
-        if (finder.isFinished) {
-            emptyList()
-        } else {
-            finder.options().map { option -> matcher.compensated(finder.presetWithCandidate(option)) }
+    private fun optionsFor(snapshot: FinderUiState, matcher: LoudnessMatcher): List<EqualizerSettings> {
+        val finder = snapshot.finder
+        if (finder.isFinished) return emptyList()
+        return finder.options().map { option ->
+            matcher.compensated(finder.presetWithCandidate(option).shapedAs(snapshot.bandShape))
         }
+    }
+
+    private fun EqualizerSettings.shapedAs(shape: BandShape) = copy(widthFactor = shape.widthFactor ?: 1.0)
+
+    private fun calibrationSettings(): EqualizerSettings {
+        val current = state.value
+        return calibrationPreset(current.finder.layout).shapedAs(current.bandShape)
+    }
 
     private fun playLoop(mix: DoubleArray, sameSong: Boolean) {
         val loop = LoopSource(mix, startIndex = if (sameSong) currentLoop?.position ?: 0 else 0)

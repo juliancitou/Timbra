@@ -20,7 +20,7 @@
 
     <!-- Preparación -->
     <string name="preparation_title">Preparación</string>
-    <string name="preparation_lead">Haz el test igual que como escuchas música. Marca cada punto cuando esté listo.</string>
+    <string name="preparation_lead">¿Dónde vas a escuchar?</string>
     <string name="preparation_noise_cancelling">Cancelación de ruido en tu modo habitual</string>
     <string name="preparation_poweramp_off">Ecualizador de Poweramp apagado</string>
     <string name="preparation_quiet_place">Estoy en un lugar silencioso</string>
@@ -29,9 +29,9 @@
 
     <!-- Nivel cómodo -->
     <string name="comfort_title">Nivel cómodo</string>
-    <string name="comfort_lead">Elige qué escuchar y pulsa Reproducir. Sube el volumen del teléfono poco a poco hasta que se oiga claro, pero nunca fuerte.</string>
+    <string name="comfort_lead">Elige qué escuchar y pulsa Reproducir. Sube el volumen poco a poco, sin llegar a fuerte.</string>
     <string name="comfort_section_safety">seguridad</string>
-    <string name="comfort_safety">Si en algún momento te molesta, pausa. El sonido nunca supera un nivel seguro.</string>
+    <string name="comfort_safety">Si te molesta, pausa. El sonido nunca supera un nivel seguro.</string>
     <string name="action_play">Reproducir</string>
     <string name="action_pause">Pausar</string>
     <string name="action_ready">Listo</string>
@@ -167,7 +167,7 @@
     <!-- Preparación: audífonos -->
     <string name="preparation_headphones_label">tus audífonos</string>
     <string name="preparation_headphones_placeholder">por ejemplo, FreeBuds Pro 4</string>
-    <string name="comfort_section_genre">música del test</string>
+    <string name="comfort_section_genre">género</string>
 
     <!-- Test: rondas -->
     <string name="finder_progress_coarse">ronda %1$d de %2$d · primera pasada</string>
@@ -246,8 +246,8 @@
     <string name="preparation_speaker_uncovered">Bocina destapada, sin la mano ni la funda encima</string>
     <string name="preparation_why_speaker">La bocina suena distinto según dónde esté el teléfono. Usa esta misma posición al escuchar.</string>
     <string name="preparation_section_bands">bandas de poweramp</string>
-    <string name="preparation_bands_summary">Tu preset tendrá: %1$s.</string>
-    <string name="preparation_bands_hint">Déjalas igual que en Poweramp: Ajustes del ecualizador, "bandas personalizadas".</string>
+    <string name="preparation_bands_summary">%1$s.</string>
+    <string name="preparation_bands_hint">Deja las mismas que en Poweramp, en \"bandas personalizadas\".</string>
     <string name="preparation_bands_change">Cambiar</string>
     <string name="preparation_bands_done">Listo</string>
     <string name="preparation_bands_reset">Restablecer</string>
@@ -264,29 +264,60 @@
 
     <!-- Test: no me gustó ninguno, canción propia y resumen -->
     <string name="action_none">No me gustó ninguno</string>
-    <string name="finder_step_none">Si ninguno te convence, se queda como estaba y seguimos.</string>
+    <string name="finder_step_none">Si ninguno convence, se queda como estaba.</string>
     <string name="finder_node_current">actual</string>
     <string name="finder_section_changes">qué cambió</string>
     <string name="finder_summary_line">%1$s: %2$s</string>
     <string name="finder_summary_same">sin cambios</string>
-    <string name="comfort_section_song">o usa tu música</string>
-    <string name="action_pick_song">Elegir una canción de mi teléfono</string>
-    <string name="comfort_song_hint">Debe ser un archivo guardado en tu teléfono; no funciona con Spotify. Se usan sus primeros 2 minutos y no sale de tu teléfono.</string>
+    <string name="comfort_section_song">tu canción</string>
+    <string name="action_pick_song">Elegir canción</string>
+    <string name="comfort_song_hint">Un archivo guardado en tu teléfono. Se usan sus primeros 2 minutos y no sale de aquí.</string>
     <string name="comfort_song_loading">Preparando tu canción…</string>
     <string name="comfort_song_failed">No pude leer ese archivo. Prueba con otro, por ejemplo MP3 o FLAC.</string>
     <string name="comfort_song_selected">Tu canción: %1$s</string>
     <string name="comfort_song_fallback">tu canción</string>
 
     <!-- Spotify en vivo -->
-    <string name="comfort_section_spotify">o usa spotify</string>
-    <string name="action_use_spotify">Ecualizar Spotify en vivo</string>
+    <string name="comfort_section_spotify">spotify</string>
     <string name="action_open_spotify">Abrir Spotify</string>
     <string name="action_play_pause">Pausar / reanudar</string>
-    <string name="comfort_spotify_hint">Spotify sigue sonando y cada opción que toques se oye al instante. Apaga antes Poweramp Equalizer.</string>
     <string name="comfort_spotify_step_play">Abre Spotify y pon una canción.</string>
     <string name="comfort_spotify_step_return">Regresa aquí y espera a que diga conectado.</string>
-    <string name="comfort_spotify_step_retry">Si no conecta, pausa y reanuda en Spotify, o elige Timbra en su ajuste Ecualizador.</string>
+    <string name="comfort_spotify_step_retry">Si no conecta, pausa y reanuda en Spotify.</string>
     <string name="comfort_spotify_connected">Conectado a Spotify. Ya puedes seguir.</string>
     <string name="comfort_spotify_blocked">Otro ecualizador está controlando Spotify. Apaga Poweramp Equalizer e inténtalo de nuevo.</string>
     <string name="comfort_spotify_failed">Android no dejó ecualizar Spotify. Prueba con una canción de tu teléfono.</string>
+
+    <!-- Pantallas separadas, comparar y comprobar -->
+    <string name="checklist_title">Antes de empezar</string>
+    <string name="checklist_lead">Marca cada punto cuando esté listo.</string>
+    <string name="comfort_section_source">qué escuchar</string>
+    <string name="comfort_source_app">Música de la app</string>
+    <string name="comfort_source_spotify">Spotify</string>
+    <string name="comfort_source_song">Mi canción</string>
+    <string name="comfort_safety_spotify">Apaga Poweramp Equalizer antes de seguir. Timbra no sube el volumen de Spotify, pero empieza con él moderado.</string>
+    <string name="finder_section_how">cómo se juega</string>
+    <string name="finder_hold_current">Mantén para oír como estaba</string>
+    <string name="finder_progress_recheck">ronda %1$d de %2$d · comprobar</string>
+    <string name="finder_recheck_hint">Elige otra vez, sin marcas. Así vemos si de verdad te gusta.</string>
+    <string name="finder_summary_doubt">%1$s: elegiste distinto al comprobar, así que dejé un punto medio.</string>
+
+    <!-- Calibración -->
+    <string name="settings_section_calibration">calibrar con poweramp</string>
+    <string name="settings_calibration_body">Ajusta lo que oyes en Timbra para que suene igual que en tu Poweramp.</string>
+    <string name="action_calibrate">Calibrar</string>
+    <string name="calibration_title">Calibrar</string>
+    <string name="calibration_lead">Haz que Timbra suene igual que tu Poweramp.</string>
+    <string name="calibration_section_steps">pasos</string>
+    <string name="calibration_step_import">Descarga el preset de prueba e impórtalo en Poweramp.</string>
+    <string name="calibration_step_listen">Con Poweramp encendido, pon una canción en Spotify y escúchala.</string>
+    <string name="calibration_step_return">Apaga Poweramp, deja la canción sonando y regresa aquí.</string>
+    <string name="calibration_step_choose">Prueba cada forma y deja la que suene igual.</string>
+    <string name="calibration_section_shape">forma</string>
+    <string name="calibration_shape_direct">Directa</string>
+    <string name="calibration_shape_narrow">Angosta</string>
+    <string name="calibration_shape_medium">Media</string>
+    <string name="calibration_shape_wide">Ancha</string>
+    <string name="calibration_download">Descargar</string>
+    <string name="calibration_waiting">Esperando a Spotify: pausa y reanuda la canción.</string>
 </resources>

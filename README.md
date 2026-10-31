@@ -179,12 +179,19 @@ adb devices                    # muestra los teléfonos conectados
 3. **Rondas de esferas:** cada ronda se enfoca en algo: balance general, graves, claridad, voces,
    la "S" y los platillos, y el aire de los agudos. Toca las esferas para escuchar cada opción;
    todas suenan igual de fuertes, así que eliges solo por cómo suenan. Cuando una te guste, elígela;
-   si ninguna te convence, pulsa **No me gustó ninguno** y esa parte se queda como estaba.
+   si ninguna te convence, pulsa **No me gustó ninguno** y esa parte se queda como estaba. Mantén
+   presionado **Mantén para oír como estaba** para comparar. Al final se repiten graves y voz sin
+   marcas, para comprobar tu elección.
 4. **Tu resultado:** escúchalo completo y compáralo con "sin ecualizar".
 5. **Exporta:** descarga o comparte el archivo `.json`.
 6. **Importa en Poweramp Equalizer:** abre la lista de presets, usa la opción de importar y elige
    el archivo. Después **asígnalo a su salida** (⋮ → Guardar/Asignar), para que Poweramp lo use
    solo con esos audífonos o con la bocina. La app muestra los pasos exactos al exportar.
+
+### Calibrar con Poweramp (opcional)
+
+Desde Ajustes. Importa un preset de prueba en Poweramp, escúchalo con Spotify y elige en Timbra la
+forma que suene igual. Así lo que oyes durante el test se parece más a lo que oirás en Poweramp.
 
 ### Modo avanzado (opcional)
 

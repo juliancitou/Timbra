@@ -39,6 +39,8 @@ data class EqualizerSettings(
     val bandGainsDb: List<Float>,
     val preampDb: Float = 0f,
     val bandFrequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ,
+    /** Solo para escuchar: multiplica el Q de las bandas. No se exporta. */
+    val widthFactor: Double = 1.0,
 ) {
     init {
         require(bandGainsDb.size == bandFrequenciesHz.size) {
@@ -64,7 +66,7 @@ class GraphicEqualizer(private val sampleRate: Int, val settings: EqualizerSetti
         settings.bandFrequenciesHz.zip(settings.bandGainsDb)
             .filter { (frequencyHz, gainDb) -> gainDb != 0f && isFilterable(frequencyHz) }
             .map { (frequencyHz, gainDb) ->
-                val q = powerampBandQ(settings.spacingOctaves)
+                val q = powerampBandQ(settings.spacingOctaves) * settings.widthFactor
                 BiquadCoefficients.peaking(frequencyHz.toDouble(), gainDb.toDouble(), q, sampleRate)
             }
     private val filters = bandCoefficients.map { Biquad(it) }

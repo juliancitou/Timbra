@@ -20,11 +20,13 @@ import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalScreen
+import com.juliancitou.timbra.ui.theme.TerminalSection
 import com.juliancitou.timbra.ui.theme.containerTransform
 
 @Composable
 fun SettingsScreen(
     onOpenAudioTest: () -> Unit,
+    onOpenCalibration: () -> Unit,
     onOpenAdvancedPreview: () -> Unit,
     onOpenAbout: () -> Unit,
     onBack: () -> Unit,
@@ -40,6 +42,15 @@ fun SettingsScreen(
             TerminalButton(
                 text = stringResource(R.string.action_audio_test),
                 onClick = onOpenAudioTest,
+                style = TerminalButtonStyle.Secondary,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        TerminalSection(stringResource(R.string.settings_section_calibration)) {
+            DetailText(stringResource(R.string.settings_calibration_body))
+            TerminalButton(
+                text = stringResource(R.string.action_calibrate),
+                onClick = onOpenCalibration,
                 style = TerminalButtonStyle.Secondary,
                 modifier = Modifier.fillMaxWidth(),
             )

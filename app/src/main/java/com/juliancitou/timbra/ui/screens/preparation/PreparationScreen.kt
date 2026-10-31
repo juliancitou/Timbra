@@ -25,12 +25,11 @@ import com.juliancitou.timbra.measure.OutputKind
 import com.juliancitou.timbra.ui.screens.finder.labelRes
 import com.juliancitou.timbra.ui.theme.CheckRow
 import com.juliancitou.timbra.ui.theme.DetailText
-import com.juliancitou.timbra.ui.theme.Hairline
-import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalChip
 import com.juliancitou.timbra.ui.theme.TerminalScreen
+import com.juliancitou.timbra.ui.theme.TerminalSection
 import com.juliancitou.timbra.ui.theme.TerminalSlider
 import com.juliancitou.timbra.ui.theme.TerminalSliderSize
 import com.juliancitou.timbra.ui.theme.TerminalTextField
@@ -56,8 +55,8 @@ private fun checklistFor(output: OutputKind): List<Int> = when (output) {
 }
 
 /**
- * Qué se va a ecualizar, la lista de preparación, el nombre de los audífonos y las bandas. La salida
- * sigue a la detectada hasta que el usuario elige otra. Un desacuerdo solo avisa y no bloquea,
+ * Primer paso: dónde se va a escuchar, cómo se llaman los audífonos y qué bandas usa Poweramp. La
+ * salida sigue a la detectada hasta que el usuario elige otra. Un desacuerdo solo avisa y no bloquea,
  * porque hay accesorios que Android podría no reportar bien.
  */
 @Composable
@@ -86,9 +85,6 @@ fun PreparationScreen(
             onHeadphonesNameChange(filledName)
         }
     }
-    val checklist = checklistFor(output)
-    // Un bit por punto de la lista: sobrevive a rotaciones y se reinicia si cambia la salida.
-    var checkedMask by rememberSaveable(output) { mutableIntStateOf(0) }
 
     TerminalScreen(
         title = stringResource(R.string.preparation_title),
@@ -98,7 +94,6 @@ fun PreparationScreen(
             TerminalButton(
                 text = stringResource(R.string.action_continue),
                 onClick = onContinue,
-                enabled = checkedMask == (1 shl checklist.size) - 1,
                 modifier = Modifier.fillMaxWidth(),
             )
         },
@@ -111,18 +106,6 @@ fun PreparationScreen(
                 onOutputChange(it)
             },
         )
-        Column {
-            checklist.forEachIndexed { index, labelRes ->
-                val bit = 1 shl index
-                if (index > 0) Hairline()
-                CheckRow(
-                    label = stringResource(labelRes),
-                    checked = checkedMask and bit != 0,
-                    onToggle = { checkedMask = checkedMask xor bit },
-                    modifier = Modifier.staggeredEntrance(index),
-                )
-            }
-        }
         if (output != OutputKind.Speaker) {
             TerminalTextField(
                 value = headphonesName,
@@ -132,8 +115,41 @@ fun PreparationScreen(
             )
         }
         BandsSection(bandLayout, onBandLayoutChange)
+    }
+}
+
+/** Segundo paso: lo que hay que dejar listo antes de que suene algo. */
+@Composable
+fun ChecklistScreen(output: OutputKind, onContinue: () -> Unit, onBack: () -> Unit) {
+    val checklist = checklistFor(output)
+    // Un bit por punto de la lista: sobrevive a rotaciones y se reinicia si cambia la salida.
+    var checkedMask by rememberSaveable(output) { mutableIntStateOf(0) }
+
+    TerminalScreen(
+        title = stringResource(R.string.checklist_title),
+        lead = stringResource(R.string.checklist_lead),
+        onBack = onBack,
+        actions = {
+            TerminalButton(
+                text = stringResource(R.string.action_continue),
+                onClick = onContinue,
+                enabled = checkedMask == (1 shl checklist.size) - 1,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+    ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-            SectionLabel(stringResource(R.string.preparation_section_why))
+            checklist.forEachIndexed { index, labelRes ->
+                val bit = 1 shl index
+                CheckRow(
+                    label = stringResource(labelRes),
+                    checked = checkedMask and bit != 0,
+                    onToggle = { checkedMask = checkedMask xor bit },
+                    modifier = Modifier.staggeredEntrance(index),
+                )
+            }
+        }
+        TerminalSection(stringResource(R.string.preparation_section_why)) {
             DetailText(
                 stringResource(
                     if (output == OutputKind.Speaker) R.string.preparation_why_speaker else R.string.preparation_why,
@@ -145,10 +161,9 @@ fun PreparationScreen(
 
 @Composable
 private fun OutputSection(output: OutputKind, detected: DetectedOutput?, onSelect: (OutputKind) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-        SectionLabel(stringResource(R.string.preparation_section_output))
+    TerminalSection(stringResource(R.string.preparation_section_output)) {
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             verticalArrangement = Arrangement.spacedBy(Spacing.small),
         ) {
             OutputKind.entries.forEach { kind ->
@@ -196,11 +211,10 @@ fun bandSummary(layout: BandLayout): String = stringResource(
 @Composable
 private fun BandsSection(layout: BandLayout, onChange: (BandLayout) -> Unit) {
     var editing by rememberSaveable { mutableStateOf(false) }
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-        SectionLabel(stringResource(R.string.preparation_section_bands))
+    TerminalSection(stringResource(R.string.preparation_section_bands)) {
         DetailText(stringResource(R.string.preparation_bands_summary, bandSummary(layout)))
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             verticalArrangement = Arrangement.spacedBy(Spacing.small),
         ) {
             TerminalChip(
