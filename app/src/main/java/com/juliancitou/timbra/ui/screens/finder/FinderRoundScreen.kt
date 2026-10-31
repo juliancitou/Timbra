@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
-import com.juliancitou.timbra.measure.FINDER_ROUNDS
 import com.juliancitou.timbra.measure.FinderDimension
 import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.DetailText
@@ -105,7 +104,7 @@ fun FinderRoundScreen(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             val progress = if (round.fine) R.string.finder_progress_fine else R.string.finder_progress_coarse
-            SectionLabel(stringResource(progress, finder.roundIndex + 1, FINDER_ROUNDS.size))
+            SectionLabel(stringResource(progress, finder.roundIndex + 1, finder.rounds.size))
             CodeLines(listOf(stringResource(R.string.finder_step_listen), stringResource(R.string.finder_step_choose)))
         }
         val labels = options.map { formatDecibels(it.toFloat()).removeSuffix(" dB") }
@@ -136,6 +135,7 @@ fun FinderRoundScreen(
             FrequencyChart(
                 gainsDb = finder.curveWithCandidateDb(options[state.auditionIndex]).map { it.toFloat() },
                 contentDescription = stringResource(R.string.finder_result_chart),
+                frequenciesHz = finder.layout.frequenciesHz,
             )
         }
     }

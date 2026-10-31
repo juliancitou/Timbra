@@ -7,6 +7,7 @@ import com.juliancitou.timbra.audio.EqualizerShapes.lowShelf
 import com.juliancitou.timbra.audio.EqualizerShapes.sum
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.presetFromCurve
+import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
 
 /** Opciones que se escuchan en cada ronda; la del centro es la elección actual. */
@@ -34,17 +35,17 @@ enum class FinderDimension(
     Sibilance(MusicFocus.Sibilance, coarseStepDb = 1.5, rangeDb = -8.0..2.0),
     Air(MusicFocus.Air, coarseStepDb = 1.0, rangeDb = -5.0..3.0);
 
-    /** Curva de esta zona sobre las 25 bandas cuando vale [valueDb]. */
-    fun curve(valueDb: Double): List<Double> = when (this) {
+    /** Curva de esta zona sobre [frequenciesHz] cuando vale [valueDb]. */
+    fun curve(valueDb: Double, frequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ): List<Double> = when (this) {
         Balance -> sum(
-            lowShelf(400.0, -valueDb / 2, transitionOctaves = 2.0),
-            highShelf(2500.0, valueDb / 2, transitionOctaves = 2.0),
+            lowShelf(400.0, -valueDb / 2, transitionOctaves = 2.0, frequenciesHz = frequenciesHz),
+            highShelf(2500.0, valueDb / 2, transitionOctaves = 2.0, frequenciesHz = frequenciesHz),
         )
-        Bass -> lowShelf(120.0, valueDb)
-        Clarity -> bell(250.0, valueDb, widthOctaves = 1.5)
-        Voice -> bell(2000.0, valueDb, widthOctaves = 1.5)
-        Sibilance -> bell(7000.0, valueDb, widthOctaves = 1.2)
-        Air -> highShelf(11_000.0, valueDb)
+        Bass -> lowShelf(120.0, valueDb, frequenciesHz = frequenciesHz)
+        Clarity -> bell(250.0, valueDb, widthOctaves = 1.5, frequenciesHz = frequenciesHz)
+        Voice -> bell(2000.0, valueDb, widthOctaves = 1.5, frequenciesHz = frequenciesHz)
+        Sibilance -> bell(7000.0, valueDb, widthOctaves = 1.2, frequenciesHz = frequenciesHz)
+        Air -> highShelf(11_000.0, valueDb, frequenciesHz = frequenciesHz)
     }
 }
 
@@ -53,22 +54,20 @@ data class FinderRound(val dimension: FinderDimension, val fine: Boolean) {
     val stepDb: Double get() = if (fine) dimension.coarseStepDb / 2 else dimension.coarseStepDb
 }
 
-/** Cada zona tiene una pasada gruesa seguida de una de afinado: 12 rondas en total. */
-val FINDER_ROUNDS: List<FinderRound> = FinderDimension.entries.flatMap { dimension ->
-    listOf(FinderRound(dimension, fine = false), FinderRound(dimension, fine = true))
-}
-
 /**
  * Estado del test "Encuentra tu ecualización". Es inmutable: cada elección devuelve un estado
  * nuevo, y [previous] permite volver a la ronda anterior con lo que se había elegido entonces.
  */
 data class EqualizerFinder(
-    val valuesDb: Map<FinderDimension, Double> = FinderDimension.entries.associateWith { 0.0 },
+    val output: OutputKind = OutputKind.Wired,
+    val layout: BandLayout = BandLayout.Default,
+    val valuesDb: Map<FinderDimension, Double> = output.startValuesDb(),
     val roundIndex: Int = 0,
     val previous: EqualizerFinder? = null,
 ) {
-    val isFinished: Boolean get() = roundIndex >= FINDER_ROUNDS.size
-    val round: FinderRound get() = FINDER_ROUNDS[roundIndex.coerceAtMost(FINDER_ROUNDS.lastIndex)]
+    val rounds: List<FinderRound> get() = output.rounds
+    val isFinished: Boolean get() = roundIndex >= rounds.size
+    val round: FinderRound get() = rounds[roundIndex.coerceAtMost(rounds.lastIndex)]
     val currentValueDb: Double get() = valuesDb.getValue(round.dimension)
 
     /**
@@ -77,7 +76,7 @@ data class EqualizerFinder(
      * dentro, así siempre hay cinco opciones distintas.
      */
     fun options(): List<Double> {
-        val range = round.dimension.rangeDb
+        val range = output.rangeDb(round.dimension)
         val step = round.stepDb
         val half = (OPTIONS_PER_ROUND / 2) * step
         val center = currentValueDb.coerceIn(range.start + half, range.endInclusive - half)
@@ -87,8 +86,8 @@ data class EqualizerFinder(
     fun choose(valueDb: Double): EqualizerFinder {
         check(!isFinished) { "El test ya terminó" }
         val dimension = round.dimension
-        return EqualizerFinder(
-            valuesDb = valuesDb + (dimension to valueDb.coerceIn(dimension.rangeDb)),
+        return copy(
+            valuesDb = valuesDb + (dimension to valueDb.coerceIn(output.rangeDb(dimension))),
             roundIndex = roundIndex + 1,
             previous = this,
         )
@@ -97,14 +96,19 @@ data class EqualizerFinder(
     /** Curva completa con lo elegido hasta ahora: la suma de todas las zonas. */
     fun curveDb(): List<Double> = curveFor(valuesDb)
 
-    /** Curva completa si en la ronda actual se eligiera [candidateDb]; es lo que se escucha al tocar un nodo. */
+    /** Curva completa si en la ronda actual se eligiera [candidateDb]; es lo que suena al tocar un nodo. */
     fun curveWithCandidateDb(candidateDb: Double): List<Double> = curveFor(valuesDb + (round.dimension to candidateDb))
 
+    /** El preset que se exportaría si en la ronda actual se eligiera [candidateDb]. */
+    fun presetWithCandidate(candidateDb: Double): EqualizerSettings =
+        presetFromCurve(curveWithCandidateDb(candidateDb), layout.frequenciesHz)
+
     /** El preset final, con redondeo, rango y preamp de Poweramp. */
-    fun result(): EqualizerSettings = presetFromCurve(curveDb())
+    fun result(): EqualizerSettings = presetFromCurve(curveDb(), layout.frequenciesHz)
 
     private fun curveFor(values: Map<FinderDimension, Double>): List<Double> {
-        val zero = List(POWERAMP_BAND_FREQUENCIES_HZ.size) { 0.0 }
-        return values.entries.fold(zero) { total, (dimension, value) -> sum(total, dimension.curve(value)) }
+        val frequencies = layout.frequenciesHz
+        val zero = List(frequencies.size) { 0.0 }
+        return values.entries.fold(zero) { total, (dimension, value) -> sum(total, dimension.curve(value, frequencies)) }
     }
 }

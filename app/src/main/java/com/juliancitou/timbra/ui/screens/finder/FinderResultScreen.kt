@@ -66,6 +66,7 @@ fun FinderResultScreen(
             FrequencyChart(
                 gainsDb = preset.bandGainsDb,
                 contentDescription = stringResource(R.string.finder_result_chart),
+                frequenciesHz = preset.bandFrequenciesHz,
             )
         }
         FlowRow(

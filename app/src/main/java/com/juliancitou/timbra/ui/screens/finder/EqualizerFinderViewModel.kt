@@ -13,7 +13,6 @@ import com.juliancitou.timbra.audio.SignalSource
 import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.music.MusicLoop
-import com.juliancitou.timbra.audio.presetFromCurve
 import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.measure.EqualizerFinder
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -189,7 +188,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         if (finder.isFinished) {
             emptyList()
         } else {
-            finder.options().map { option -> matcher.compensated(presetFromCurve(finder.curveWithCandidateDb(option))) }
+            finder.options().map { option -> matcher.compensated(finder.presetWithCandidate(option)) }
         }
 
     private fun playLoop(mix: DoubleArray, sameSong: Boolean) {
