@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -171,6 +172,15 @@ fun DetailText(text: String, modifier: Modifier = Modifier, color: Color = Color
 
 private const val LINE_NUMBER_ALPHA = 0.55f
 
+/** Un subtítulo `// sección` con su contenido, con la misma separación en toda la app. */
+@Composable
+fun TerminalSection(label: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
+        SectionLabel(label)
+        content()
+    }
+}
+
 /**
  * Pasos o indicaciones con aspecto de código: número de línea tenue, una barra `│` que acompaña
  * al texto aunque ocupe varios renglones, y resaltado de sintaxis sencillo (números en ámbar como
@@ -183,7 +193,7 @@ fun CodeLines(lines: List<String>, modifier: Modifier = Modifier, firstLine: Int
     val dim = colors.onSurfaceVariant.copy(alpha = LINE_NUMBER_ALPHA)
     val style = MaterialTheme.typography.bodyLarge
     val gutterDigits = (firstLine + lines.size - 1).toString().length.coerceAtLeast(2)
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
         lines.forEachIndexed { index, line ->
             Row(
                 modifier = Modifier

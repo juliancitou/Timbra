@@ -39,7 +39,7 @@ fun TerminalScreen(
             .fillMaxSize()
             .safeDrawingPadding()
             .padding(horizontal = Spacing.screenHorizontal, vertical = Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(Spacing.large),
     ) {
         if (onBack != null || headerAction != null) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -60,15 +60,15 @@ fun TerminalScreen(
                 .weight(1f)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Spacing.large),
+            verticalArrangement = Arrangement.spacedBy(Spacing.section),
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.large)) {
                 TerminalTitle(text = title, showCursor = showCursor)
                 if (lead != null) LeadText(lead)
             }
             content()
             Spacer(Modifier.height(Spacing.small))
         }
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small), content = actions)
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.inSection), content = actions)
     }
 }

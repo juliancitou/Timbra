@@ -43,7 +43,7 @@ val Typography = Typography(
     titleLarge = Base.titleLarge.mono(FontWeight.SemiBold).copy(fontSize = 18.sp, lineHeight = 26.sp),
     titleMedium = Base.titleMedium.mono(FontWeight.SemiBold).copy(fontSize = 15.sp),
     titleSmall = Base.titleSmall.mono(FontWeight.Medium),
-    bodyLarge = Base.bodyLarge.mono().copy(fontSize = 14.sp, lineHeight = 22.sp),
+    bodyLarge = Base.bodyLarge.mono().copy(fontSize = 14.sp, lineHeight = 24.sp),
     bodyMedium = Base.bodyMedium.mono().copy(fontSize = 13.sp, lineHeight = 20.sp),
     bodySmall = Base.bodySmall.mono(),
     labelLarge = Base.labelLarge.mono(FontWeight.SemiBold).copy(fontSize = 13.sp),

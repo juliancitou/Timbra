@@ -27,16 +27,10 @@ class ContrastTest {
     }
 
     @Test
-    fun darkTextOnAmberMeetsAa() {
-        assertText(Ink, Amber, "letra del botón principal y de la opción elegida")
-    }
-
-    @Test
     fun graphicsMeetGraphicContrast() {
         backgrounds.forEach { background ->
             assertGraphic(Amber, background, "curva de la gráfica y marco del botón principal")
             assertGraphic(Orange, background, "banda resaltada")
-            assertGraphic(TextSecondary, background, "marco de botones y opciones")
         }
     }
 

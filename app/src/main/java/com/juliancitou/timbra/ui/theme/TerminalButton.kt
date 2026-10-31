@@ -2,15 +2,13 @@ package com.juliancitou.timbra.ui.theme
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -20,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -33,13 +30,13 @@ enum class TerminalButtonStyle { Primary, Secondary }
 private val ButtonMinHeight = 52.dp
 private const val PRESSED_SCALE = 0.98f
 private const val DISABLED_ALPHA = 0.38f
-private val FrameWidth = 1.5.dp
+private const val SECONDARY_FRAME_ALPHA = 0.55f
 
 /**
- * Botón de bordes claros, para que se vea dónde empieza y dónde termina cada opción.
- * [TerminalButtonStyle.Primary] va relleno de ámbar con letra oscura, como el video inverso de una
- * terminal, y debe haber uno solo por pantalla; [TerminalButtonStyle.Secondary] lleva línea continua
- * gris y letra blanca.
+ * Botón con aspecto de recuadro ASCII (┌ - - ┐ │ texto │ └ - - ┘), sin fondo: solo el contorno y
+ * el texto. [TerminalButtonStyle.Primary] va en ámbar y debe haber uno solo por pantalla;
+ * [TerminalButtonStyle.Secondary] va en gris y blanco. Al presionar, los guiones se unen en una línea
+ * continua.
  */
 @Composable
 fun TerminalButton(
@@ -52,18 +49,22 @@ fun TerminalButton(
     val haptics = LocalHapticFeedback.current
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
+    val animate = !isReducedMotionEnabled()
     val scale by animateFloatAsState(
-        targetValue = if (pressed && !isReducedMotionEnabled()) PRESSED_SCALE else 1f,
+        targetValue = if (pressed && animate) PRESSED_SCALE else 1f,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = 900f),
         label = "buttonScale",
     )
+    val joined by animateFloatAsState(
+        targetValue = if (pressed) 1f else 0f,
+        animationSpec = if (animate) tween(MotionDuration.SHORT_MS, easing = EmphasizedDecelerate) else tween(0),
+        label = "frameJoined",
+    )
     val colors = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(ButtonCornerRadius)
-    val surface = when (style) {
-        TerminalButtonStyle.Primary -> Modifier.background(colors.primary, shape)
-        TerminalButtonStyle.Secondary -> Modifier.border(FrameWidth, colors.onSurfaceVariant, shape)
+    val (frameColor, textColor) = when (style) {
+        TerminalButtonStyle.Primary -> colors.primary to colors.primary
+        TerminalButtonStyle.Secondary -> colors.onSurfaceVariant.copy(alpha = SECONDARY_FRAME_ALPHA) to colors.onSurface
     }
-    val textColor = if (style == TerminalButtonStyle.Primary) Ink else colors.onSurface
 
     Box(
         modifier = modifier
@@ -73,18 +74,17 @@ fun TerminalButton(
             }
             .alpha(if (enabled) 1f else DISABLED_ALPHA)
             .defaultMinSize(minHeight = ButtonMinHeight)
-            .then(surface)
-            .clip(shape)
+            .asciiFrame(color = frameColor, pressed = { joined })
             .clickable(
                 interactionSource = interactionSource,
-                indication = ripple(color = textColor),
+                indication = ripple(color = frameColor),
                 enabled = enabled,
                 role = Role.Button,
             ) {
                 haptics.performHapticFeedback(HapticFeedbackType.Confirm)
                 onClick()
             }
-            .padding(horizontal = Spacing.medium, vertical = 14.dp),
+            .padding(horizontal = Spacing.large, vertical = 14.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
