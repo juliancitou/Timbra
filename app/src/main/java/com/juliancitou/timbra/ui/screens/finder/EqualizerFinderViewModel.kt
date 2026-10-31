@@ -11,7 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.AudioOutput
-import com.juliancitou.timbra.audio.BandShape
+import com.juliancitou.timbra.audio.BandOverlap
 import com.juliancitou.timbra.audio.EqualizerSettings
 import com.juliancitou.timbra.audio.LoopSource
 import com.juliancitou.timbra.audio.LoudnessMatcher
@@ -38,7 +38,7 @@ import com.juliancitou.timbra.audio.prepareSong
 import com.juliancitou.timbra.audio.previewBands
 import com.juliancitou.timbra.audio.resample
 import com.juliancitou.timbra.data.BandLayoutPreferences
-import com.juliancitou.timbra.data.BandShapePreferences
+import com.juliancitou.timbra.data.BandOverlapPreferences
 import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.measure.EqualizerFinder
@@ -88,7 +88,7 @@ data class FinderUiState(
     val loadingSong: Boolean = false,
     val songFailed: Boolean = false,
     val spotify: SpotifyLink = SpotifyLink.Off,
-    val bandShape: BandShape = BandShape.Direct,
+    val bandOverlap: BandOverlap = BandOverlap.Envelope,
     val sounding: SoundingCheck? = null,
     val poweramp: PowerampState = PowerampState.Unknown,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
@@ -137,9 +137,9 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     }
     private val output by outputHolder
     private val bandPreferences = BandLayoutPreferences(application)
-    private val shapePreferences = BandShapePreferences(application)
+    private val overlapPreferences = BandOverlapPreferences(application)
     private val state = MutableStateFlow(
-        FinderUiState(finder = EqualizerFinder(layout = bandPreferences.load()), bandShape = shapePreferences.load()),
+        FinderUiState(finder = EqualizerFinder(layout = bandPreferences.load()), bandOverlap = overlapPreferences.load()),
     )
     private val playback = MutableStateFlow(PlaybackStatus.Stopped)
 
@@ -307,9 +307,9 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         applyEqualization(calibrationSettings())
     }
 
-    fun setBandShape(shape: BandShape) {
-        shapePreferences.save(shape)
-        state.update { it.copy(bandShape = shape) }
+    fun setBandOverlap(shape: BandOverlap) {
+        overlapPreferences.save(shape)
+        state.update { it.copy(bandOverlap = shape) }
         if (calibrating) applyEqualization(calibrationSettings()) else refresh()
     }
 
@@ -412,7 +412,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             val latest = state.value
             val settings = when {
                 latest.finder.isFinished && latest.bypass -> matcher.compensated(flatFor(latest.finder))
-                latest.finder.isFinished -> matcher.compensated(latest.finder.result().shapedAs(latest.bandShape))
+                latest.finder.isFinished -> matcher.compensated(latest.finder.result().overlappingAs(latest.bandOverlap))
                 else -> optionSettings.getOrNull(latest.auditionIndex) ?: EqualizerSettings.Flat
             }
             applyEqualization(settings)
@@ -438,7 +438,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             return
         }
         if (current.usesSpotify) return
-        val preset = current.finder.result().shapedAs(current.bandShape)
+        val preset = current.finder.result().overlappingAs(current.bandOverlap)
         val key = listOf(preset, song ?: current.genre)
         if (measuredFor != key) {
             val samples = song?.reference ?: mixFor(current.genre, MusicFocus.Balanced)
@@ -500,7 +500,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             sessionEqualizer.release()
             SpotifyLink.Waiting
         } else {
-            val shape = state.value.bandShape
+            val shape = state.value.bandOverlap
             val bands = previewBands(spotifySettings, shape, output.sampleRate)
             when (sessionEqualizer.apply(sessionId, spotifySettings.preampDb, bands)) {
                 SessionEqualizerResult.Applied -> {
@@ -582,15 +582,15 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         val finder = snapshot.finder
         if (finder.isFinished) return emptyList()
         return finder.options().map { option ->
-            matcher.compensated(finder.presetWithCandidate(option).shapedAs(snapshot.bandShape))
+            matcher.compensated(finder.presetWithCandidate(option).overlappingAs(snapshot.bandOverlap))
         }
     }
 
-    private fun EqualizerSettings.shapedAs(shape: BandShape) = copy(widthFactor = shape.widthFactor ?: 1.0)
+    private fun EqualizerSettings.overlappingAs(shape: BandOverlap) = copy(overlap = shape)
 
     private fun calibrationSettings(): EqualizerSettings {
         val current = state.value
-        return calibrationPreset(current.finder.layout).shapedAs(current.bandShape)
+        return calibrationPreset(current.finder.layout).overlappingAs(current.bandOverlap)
     }
 
     private fun playLoop(mix: DoubleArray, sameSong: Boolean) {

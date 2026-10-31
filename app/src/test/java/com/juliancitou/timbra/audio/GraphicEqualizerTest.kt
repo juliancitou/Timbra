@@ -54,6 +54,33 @@ class GraphicEqualizerTest {
     }
 
     @Test
+    fun envelopePassesThroughEveryBandWithoutAddingNeighbours() {
+        val gains = POWERAMP_BAND_FREQUENCIES_HZ.map { if (it in 200..2000) -3f else 0f }
+        val equalizer = GraphicEqualizer(SAMPLE_RATE, EqualizerSettings(gains))
+        POWERAMP_BAND_FREQUENCIES_HZ.subList(1, 23).zip(gains.subList(1, 23)).forEach { (hz, gain) ->
+            assertEquals("$hz Hz", gain.toDouble(), equalizer.magnitudeDb(hz.toDouble()), 0.05)
+        }
+    }
+
+    @Test
+    fun cascadeAddsNeighbouringBands() {
+        val settings = EqualizerSettings(List(POWERAMP_BAND_FREQUENCIES_HZ.size) { 3f }, overlap = BandOverlap.Cascade)
+        assertTrue(GraphicEqualizer(SAMPLE_RATE, settings).magnitudeDb(1125.0) > 6.0)
+    }
+
+    @Test
+    fun envelopeWorksWithEveryBandLayoutAndARealisticCurve() {
+        listOf(BandLayout.Default, BandLayout(32, 5, 20_000), BandLayout(5)).forEach { layout ->
+            val gains = layout.frequenciesHz.map { if (it in 100..300) -4f else if (it > 5000) 1.5f else 0f }
+            val settings = EqualizerSettings(gains, bandFrequenciesHz = layout.frequenciesHz)
+            val equalizer = GraphicEqualizer(SAMPLE_RATE, settings)
+            layout.frequenciesHz.zip(gains).filter { (hz, _) -> hz < 18_000 }.forEach { (hz, gain) ->
+                assertEquals("$layout $hz Hz", gain.toDouble(), equalizer.magnitudeDb(hz.toDouble()), 0.2)
+            }
+        }
+    }
+
+    @Test
     fun bandsNearNyquistAreSkippedAtLowSampleRates() {
         val lastIndex = POWERAMP_BAND_FREQUENCIES_HZ.lastIndex
         val equalizer = GraphicEqualizer(32_000, settingsWith(lastIndex to 3f))

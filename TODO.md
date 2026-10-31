@@ -170,6 +170,10 @@ terminó en estilo terminal/ASCII).
 - [ ] Comprobar que Poweramp vuelve a sus ajustes después del test
 - [x] Pasos más grandes entre opciones y graves de bocina donde sí se oyen
 - [ ] Comprobar en el teléfono que cada ronda se distingue, sobre todo Aire, Claridad y las de afinar
+- [x] Vista previa en modo Envolvente, como Poweramp, y elegible en Calibrar
+- [x] Ajustes recomendados de Poweramp en Exportar
+- [ ] Comprobar de oído que Timbra y Poweramp suenan igual con los ajustes recomendados
+- [ ] Probar si `preference` de la API de Poweramp sirve desde Timbra para revisar sus ajustes
 - [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp (Ajustes → Calibrar)
 - [x] Vista previa con la curva completa del preset y forma elegible al calibrar
 - [x] Mantener presionado para oír como estaba y comprobación final de graves y voz

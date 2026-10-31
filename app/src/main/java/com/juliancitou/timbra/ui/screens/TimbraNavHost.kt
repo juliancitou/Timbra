@@ -148,7 +148,7 @@ fun TimbraNavHost(
                         presetJson = finder::calibrationJson,
                         fileName = finder.calibrationFileName(),
                         onStart = finder::startCalibration,
-                        onSelectShape = finder::setBandShape,
+                        onSelectOverlap = finder::setBandOverlap,
                         onOpenSpotify = finder::openSpotify,
                         onBack = back,
                     )

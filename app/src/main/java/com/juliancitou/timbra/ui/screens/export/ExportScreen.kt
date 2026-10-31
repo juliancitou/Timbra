@@ -111,6 +111,17 @@ fun ExportScreen(
                 tone = if (result == SaveResult.Failed) TerminalChipTone.Warning else TerminalChipTone.Normal,
             )
         }
+        TerminalSection(stringResource(R.string.export_section_poweramp)) {
+            CodeLines(
+                listOf(
+                    stringResource(R.string.export_setting_overlap),
+                    stringResource(R.string.export_setting_smooth),
+                    stringResource(R.string.export_setting_preamp),
+                    stringResource(R.string.export_setting_clean),
+                    stringResource(R.string.export_setting_pipeline),
+                ),
+            )
+        }
         TerminalSection(stringResource(R.string.export_section_steps)) {
             CodeLines(
                 listOf(

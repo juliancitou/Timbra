@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
-import com.juliancitou.timbra.audio.BandShape
+import com.juliancitou.timbra.audio.BandOverlap
 import com.juliancitou.timbra.ui.screens.export.writeTo
 import com.juliancitou.timbra.ui.screens.finder.FinderUiState
 import com.juliancitou.timbra.ui.screens.finder.SpotifyLink
@@ -27,11 +27,9 @@ import com.juliancitou.timbra.ui.theme.TerminalSection
 
 private const val PRESET_MIME_TYPE = "application/json"
 
-private fun BandShape.labelRes() = when (this) {
-    BandShape.Direct -> R.string.calibration_shape_direct
-    BandShape.Narrow -> R.string.calibration_shape_narrow
-    BandShape.Medium -> R.string.calibration_shape_medium
-    BandShape.Wide -> R.string.calibration_shape_wide
+private fun BandOverlap.labelRes() = when (this) {
+    BandOverlap.Envelope -> R.string.calibration_overlap_envelope
+    BandOverlap.Cascade -> R.string.calibration_overlap_cascade
 }
 
 /**
@@ -44,7 +42,7 @@ fun CalibrationScreen(
     presetJson: () -> String,
     fileName: String,
     onStart: () -> Unit,
-    onSelectShape: (BandShape) -> Unit,
+    onSelectOverlap: (BandOverlap) -> Unit,
     onOpenSpotify: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -95,11 +93,11 @@ fun CalibrationScreen(
                 horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
                 verticalArrangement = Arrangement.spacedBy(Spacing.small),
             ) {
-                BandShape.entries.forEach { shape ->
+                BandOverlap.entries.forEach { shape ->
                     TerminalChip(
                         label = stringResource(shape.labelRes()),
-                        selected = state.bandShape == shape,
-                        onClick = { onSelectShape(shape) },
+                        selected = state.bandOverlap == shape,
+                        onClick = { onSelectOverlap(shape) },
                     )
                 }
             }

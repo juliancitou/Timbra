@@ -76,6 +76,12 @@
     <string name="export_title">Exportar</string>
     <string name="export_lead">Descarga el archivo en tu teléfono y luego impórtalo en Poweramp Equalizer.</string>
     <string name="export_section_name">nombre del preset</string>
+    <string name="export_section_poweramp">ajustes de Poweramp</string>
+    <string name="export_setting_overlap">Superposición de bandas: "Envolvente"</string>
+    <string name="export_setting_smooth">Ecualizador suave: apagado. Con el volumen alto cambiaría tu preset.</string>
+    <string name="export_setting_preamp">Sin DVC, reducción de preamp: 0 dB. Baja antes el volumen: sonará más fuerte.</string>
+    <string name="export_setting_clean">Tono en 0 y compresor apagado.</string>
+    <string name="export_setting_pipeline">Modo Pipeline: "Por defecto", salvo que falle el sonido.</string>
     <string name="export_section_steps">cómo importarlo</string>
     <string name="export_step_open">Abre Poweramp Equalizer.</string>
     <string name="export_step_presets">Entra a la lista de presets y elige importar.</string>
@@ -337,12 +343,10 @@
     <string name="calibration_step_import">Descarga el preset de prueba e impórtalo en Poweramp.</string>
     <string name="calibration_step_listen">Con Poweramp encendido, pon una canción en Spotify y escúchala.</string>
     <string name="calibration_step_return">Apaga Poweramp, deja la canción sonando y regresa aquí.</string>
-    <string name="calibration_step_choose">Prueba cada forma y deja la que suene igual.</string>
-    <string name="calibration_section_shape">forma</string>
-    <string name="calibration_shape_direct">Directa</string>
-    <string name="calibration_shape_narrow">Angosta</string>
-    <string name="calibration_shape_medium">Media</string>
-    <string name="calibration_shape_wide">Ancha</string>
+    <string name="calibration_step_choose">Elige la "Superposición de bandas" que tienes en los ajustes del ecualizador de Poweramp.</string>
+    <string name="calibration_section_shape">superposición de bandas</string>
+    <string name="calibration_overlap_envelope">Envolvente</string>
+    <string name="calibration_overlap_cascade">Cascada</string>
     <string name="calibration_download">Descargar</string>
     <string name="calibration_waiting">Esperando a Spotify: pausa y reanuda la canción.</string>
 </resources>

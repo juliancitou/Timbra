@@ -32,33 +32,29 @@ class DynamicsBandsTest {
     }
 
     @Test
-    fun directShapeKeepsThePresetBands() {
-        val bands = previewBands(oneBandDown, BandShape.Direct, RATE)
-        assertEquals(oneBandDown.bandGainsDb, bands.map { it.gainDb })
-    }
-
-    @Test
-    fun denseShapesFollowTheCurveOfTheModel() {
-        val bands = previewBands(oneBandDown, BandShape.Medium, RATE)
+    fun bandsFollowTheCurveOfTheModel() {
+        val bands = previewBands(oneBandDown, BandOverlap.Envelope, RATE)
         assertTrue(bands.size > 25)
         val model = GraphicEqualizer(RATE, oneBandDown)
-        assertEquals(model.magnitudeDb(1125.0).toFloat(), gainNear(bands, 1125f), 0.5f)
+        assertEquals(model.magnitudeDb(1125.0).toFloat(), gainNear(bands, 1125f), 0.8f)
         assertEquals(0f, gainNear(bands, 100f), 0.1f)
     }
 
     @Test
-    fun wideShapeReachesFurtherThanNarrow() {
-        val wide = gainNear(previewBands(oneBandDown, BandShape.Wide, RATE), 1700f)
-        val narrow = gainNear(previewBands(oneBandDown, BandShape.Narrow, RATE), 1700f)
-        assertTrue("ancha $wide, angosta $narrow", wide < narrow)
+    fun cascadeReachesFurtherThanEnvelope() {
+        val settings = EqualizerSettings(List(25) { if (it in 12..16) -4f else 0f })
+        val envelope = gainNear(previewBands(settings, BandOverlap.Envelope, RATE), 1125f)
+        val cascade = gainNear(previewBands(settings, BandOverlap.Cascade, RATE), 1125f)
+        assertEquals(-4f, envelope, 0.5f)
+        assertTrue("cascada $cascade", cascade < -6f)
     }
 
     @Test
     fun presetGainIsNotMixedWithThePreamp() {
         val withPreamp = oneBandDown.copy(preampDb = -6f)
         assertEquals(
-            previewBands(oneBandDown, BandShape.Medium, RATE),
-            previewBands(withPreamp, BandShape.Medium, RATE),
+            previewBands(oneBandDown, BandOverlap.Envelope, RATE),
+            previewBands(withPreamp, BandOverlap.Envelope, RATE),
         )
     }
 }
