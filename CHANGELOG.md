@@ -19,6 +19,17 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `21d9f64` · audio: escuchar con la curva Envolvente de Poweramp
+- Poweramp tiene "Superposición de bandas": en Envolvente la curva pasa por el valor de cada banda y en
+  Cascada las bandas se suman. Timbra sumaba, así que con música de la app o una canción propia una zona
+  ancha sonaba más del doble de fuerte (+3 dB daba ~+7 dB) que el preset en Envolvente.
+- `GraphicEqualizer` resuelve ahora qué ganancia debe tener cada filtro para pasar por el valor de cada banda,
+  con un sistema de ecuaciones y dos correcciones. Es el modo por defecto. La forma exacta entre bandas de
+  Poweramp no está publicada: Timbra coincide en los centros de banda, no necesariamente entre ellos.
+- Spotify usa también esa curva, en bandas de 1/6 de octava. Antes usaba escalones por banda.
+- Calibrar ofrece Envolvente y Cascada en lugar de las cuatro formas anteriores.
+- Exportar muestra los ajustes recomendados de Poweramp. El formato del preset no cambia.
+
 ### 2026-10-31 · `cdb1252` · audio: hacer audibles los cambios entre opciones
 - Al calcular el preset ya redondeado, dos opciones vecinas de una ronda de afinado podían diferir 0.5 dB en
   solo 2 a 5 bandas, y eso casi no se oye.
