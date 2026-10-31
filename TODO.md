@@ -163,6 +163,10 @@ terminó en estilo terminal/ASCII).
 - [x] Afinar los graves del efecto en Spotify (bloque de ~85 ms en vez de 10 ms)
 - [x] Recordar el ecualizador del teléfono y abrir los ajustes de sonido en "Antes de empezar"
 - [ ] Comprobar en el teléfono que "Sin ecualizar" y "Con ecualización" se oyen distintos y que el resultado confirma las bandas
+- [x] "Antes de empezar" marca solo Poweramp y el ruido; botón para apagar Poweramp sin salir de la app
+- [ ] Comprobar en el teléfono que Timbra distingue Poweramp encendido y apagado con Spotify sonando
+- [ ] Comprobar que "Apagar Poweramp" lo apaga y que vuelve a encenderse al exportar o volver a Inicio
+- [ ] Ajustar el umbral de ruido (`QUIET_ROOM_MAX_DBFS`) con el micrófono real
 - [ ] Comprobar que Poweramp vuelve a sus ajustes después del test
 - [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp (Ajustes → Calibrar)
 - [x] Vista previa con la curva completa del preset y forma elegible al calibrar

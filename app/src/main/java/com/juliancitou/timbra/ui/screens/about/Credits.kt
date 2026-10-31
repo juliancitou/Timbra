@@ -54,6 +54,12 @@ object Credits {
             "IEEE, 1967",
             "https://doi.org/10.1109/TAU.1967.1161901",
         ),
+        Credit(
+            "Poweramp API",
+            "Maksim Petrov",
+            "Licencia de Poweramp API",
+            "https://github.com/maxmpz/powerampapi",
+        ),
         Credit("Audio EQ Cookbook", "Robert Bristow-Johnson", "W3C", "https://www.w3.org/TR/audio-eq-cookbook/"),
         Credit(
             "ITU-R BS.1770",

@@ -53,7 +53,7 @@ Para quien quiera más precisión hay un **modo avanzado** que mide cómo escuch
 | Poweramp Equalizer | Disponible en Google Play. Es donde se importa el preset que genera Timbra |
 | Tiempo y silencio | Unos 5–8 minutos para el test (10–15 para el modo avanzado) en un lugar callado |
 
-La app **no pide permisos especiales** y **no usa internet**.
+La app **no usa internet**. Solo pide el micrófono si decides medir el ruido del lugar.
 
 ### Dispositivos probados
 
@@ -219,6 +219,10 @@ Tu oído es lo más importante:
 - Tus mediciones se guardan solo en el almacenamiento interno de la app.
 - Para ecualizar Spotify en vivo, la app pide el permiso `MODIFY_AUDIO_SETTINGS`, que Android concede
   al instalar. No copia ni graba su audio, y lo suelta al salir del test.
+- El micrófono es opcional: mide unos 2 segundos el nivel de ruido en "Antes de empezar". El audio no se
+  guarda ni sale del teléfono.
+- El botón "Apagar Poweramp" apaga Poweramp Equalizer con su API pública, y la app lo vuelve a encender
+  al terminar el test. Si la app se cierra de golpe, puede quedarse apagado.
 - Si eliges una canción tuya, solo se lee en memoria: no se copia, no se modifica ni sale del teléfono.
 - Los presets se guardan donde tú elijas con el selector de archivos del sistema.
 - Al desinstalar la app se borran todas sus mediciones.
@@ -282,6 +286,8 @@ La licencia de Cascadia Mono va incluida dentro de la app, en `assets/licenses/`
   tuya se adapta a la frecuencia de tu teléfono (<https://ccrma.stanford.edu/~jos/resample/>).
 - **Método de Welch** de Peter D. Welch (1967): cómo se mide el espectro para comparar el audio con
   y sin ecualizar (<https://doi.org/10.1109/TAU.1967.1161901>).
+- **Poweramp API** de Maksim Petrov (licencia propia para software que se comunica con Poweramp): los comandos para apagar y volver a encender Poweramp
+  Equalizer durante el test (<https://github.com/maxmpz/powerampapi>).
 - **ITU-R BS.1770**: la ponderación K con la que se iguala el volumen entre ecualizaciones.
 - **Paul Kellet**: el filtro que genera el ruido rosa (publicado en musicdsp.org).
 - **Manfred Schroeder** y **Freeverb** de Jezar at Dreampoint (dominio público): la estructura de

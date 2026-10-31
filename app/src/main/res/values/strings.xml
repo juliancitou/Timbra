@@ -316,6 +316,15 @@
     <string name="preparation_phone_equalizer">Ecualizador del teléfono en 0 y Dolby apagado</string>
     <string name="preparation_why_phone_equalizer">Timbra no puede ver ni cambiar el ecualizador del teléfono, y se suma a todo lo que escuchas. Revísalo tú.</string>
     <string name="preparation_open_sound_settings">Abrir ajustes de sonido</string>
+    <string name="preparation_poweramp_missing">Poweramp Equalizer no está instalado.</string>
+    <string name="preparation_poweramp_detected_off">Apagado.</string>
+    <string name="preparation_poweramp_detected_on">Está encendido y va a chocar con el test.</string>
+    <string name="preparation_poweramp_unknown">Reproduce algo en Spotify para comprobarlo, o apágalo desde aquí.</string>
+    <string name="preparation_poweramp_turn_off">Apagar Poweramp</string>
+    <string name="preparation_noise_measuring">Midiendo el ruido…</string>
+    <string name="preparation_noise_quiet">Se oye tranquilo.</string>
+    <string name="preparation_noise_loud">Se oye ruido. Si la música suena por la bocina, páusala y mide otra vez.</string>
+    <string name="preparation_noise_measure">Medir con el micrófono</string>
     <string name="finder_summary_doubt">%1$s: elegiste distinto al comprobar, así que dejé un punto medio.</string>
 
     <!-- Calibración -->

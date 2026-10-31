@@ -1,7 +1,11 @@
 package com.juliancitou.timbra.ui.screens.preparation
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -21,6 +26,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.audio.PowerampState
+import com.juliancitou.timbra.audio.QUIET_ROOM_MAX_DBFS
+import com.juliancitou.timbra.audio.measureAmbientNoiseDbfs
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.juliancitou.timbra.audio.DetectedOutput
 import com.juliancitou.timbra.audio.OutputDetector
 import com.juliancitou.timbra.export.BandLayout
@@ -130,10 +140,46 @@ fun PreparationScreen(
 
 /** Segundo paso: lo que hay que dejar listo antes de que suene algo. */
 @Composable
-fun ChecklistScreen(output: OutputKind, onContinue: () -> Unit, onBack: () -> Unit) {
+fun ChecklistScreen(
+    output: OutputKind,
+    poweramp: PowerampState,
+    onTurnOffPoweramp: () -> Unit,
+    onContinue: () -> Unit,
+    onBack: () -> Unit,
+) {
     val checklist = checklistFor(output)
     // Un bit por punto de la lista: sobrevive a rotaciones y se reinicia si cambia la salida.
     var checkedMask by rememberSaveable(output) { mutableIntStateOf(0) }
+    val context = LocalContext.current
+    var noiseDbfs by remember { mutableStateOf<Float?>(null) }
+    var measuring by remember { mutableStateOf(false) }
+    var measureRequests by remember { mutableIntStateOf(0) }
+    val microphone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) measureRequests++
+    }
+    val canUseMicrophone = {
+        context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    }
+    LaunchedEffect(measureRequests) {
+        if (!canUseMicrophone()) return@LaunchedEffect
+        measuring = true
+        noiseDbfs = withContext(Dispatchers.IO) { measureAmbientNoiseDbfs() }
+        measuring = false
+    }
+    fun markChecklist(labelRes: Int, checked: Boolean) {
+        val bit = 1 shl checklist.indexOf(labelRes)
+        checkedMask = if (checked) checkedMask or bit else checkedMask and bit.inv()
+    }
+    LaunchedEffect(poweramp) {
+        when (poweramp) {
+            PowerampState.Off, PowerampState.NotInstalled -> markChecklist(R.string.preparation_poweramp_off, true)
+            PowerampState.On -> markChecklist(R.string.preparation_poweramp_off, false)
+            PowerampState.Unknown -> Unit
+        }
+    }
+    LaunchedEffect(noiseDbfs) {
+        noiseDbfs?.let { markChecklist(R.string.preparation_quiet_place, it <= QUIET_ROOM_MAX_DBFS) }
+    }
 
     TerminalScreen(
         title = stringResource(R.string.checklist_title),
@@ -157,6 +203,20 @@ fun ChecklistScreen(output: OutputKind, onContinue: () -> Unit, onBack: () -> Un
                     onToggle = { checkedMask = checkedMask xor bit },
                     modifier = Modifier.staggeredEntrance(index),
                 )
+                when (labelRes) {
+                    R.string.preparation_poweramp_off -> PowerampStatus(poweramp, onTurnOffPoweramp)
+                    R.string.preparation_quiet_place -> NoiseStatus(
+                        noiseDbfs = noiseDbfs,
+                        measuring = measuring,
+                        onMeasure = {
+                            if (canUseMicrophone()) {
+                                measureRequests++
+                            } else {
+                                microphone.launch(Manifest.permission.RECORD_AUDIO)
+                            }
+                        },
+                    )
+                }
             }
         }
         TerminalSection(stringResource(R.string.preparation_section_why)) {
@@ -174,6 +234,44 @@ fun ChecklistScreen(output: OutputKind, onContinue: () -> Unit, onBack: () -> Un
                 modifier = Modifier.fillMaxWidth(),
             )
         }
+    }
+}
+
+@Composable
+private fun PowerampStatus(state: PowerampState, onTurnOff: () -> Unit) {
+    DetailText(
+        stringResource(
+            when (state) {
+                PowerampState.NotInstalled -> R.string.preparation_poweramp_missing
+                PowerampState.Off -> R.string.preparation_poweramp_detected_off
+                PowerampState.On -> R.string.preparation_poweramp_detected_on
+                PowerampState.Unknown -> R.string.preparation_poweramp_unknown
+            },
+        ),
+    )
+    if (state == PowerampState.On || state == PowerampState.Unknown) {
+        TerminalChip(
+            label = stringResource(R.string.preparation_poweramp_turn_off),
+            selected = false,
+            onClick = onTurnOff,
+        )
+    }
+}
+
+@Composable
+private fun NoiseStatus(noiseDbfs: Float?, measuring: Boolean, onMeasure: () -> Unit) {
+    when {
+        measuring -> DetailText(stringResource(R.string.preparation_noise_measuring))
+        noiseDbfs != null && noiseDbfs <= QUIET_ROOM_MAX_DBFS ->
+            DetailText(stringResource(R.string.preparation_noise_quiet))
+        noiseDbfs != null -> DetailText(stringResource(R.string.preparation_noise_loud))
+    }
+    if (!measuring && (noiseDbfs == null || noiseDbfs > QUIET_ROOM_MAX_DBFS)) {
+        TerminalChip(
+            label = stringResource(R.string.preparation_noise_measure),
+            selected = false,
+            onClick = onMeasure,
+        )
     }
 }
 

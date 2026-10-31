@@ -87,7 +87,7 @@ fun TimbraNavHost(
     // El test se comparte entre varias pantallas: su ViewModel vive con la actividad.
     val finder: EqualizerFinderViewModel = viewModel()
     val finderState by finder.uiState.collectAsStateWithLifecycle()
-    StopFinderSoundOutsideItsScreens(navController, onLeaveTest = finder::stopTestAudio, onStop = finder::stopSound)
+    StopFinderSoundOutsideItsScreens(navController, onLeaveTest = finder::stopTestAudio, onStop = finder::stopSound, onTestDone = finder::restorePoweramp)
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             NavHost(
@@ -133,8 +133,11 @@ fun TimbraNavHost(
                     )
                 }
                 screen<ChecklistRoute> {
+                    LaunchedEffect(Unit) { finder.checkPoweramp() }
                     ChecklistScreen(
                         output = finderState.finder.output,
+                        poweramp = finderState.poweramp,
+                        onTurnOffPoweramp = finder::turnOffPoweramp,
                         onContinue = { navController.navigate(ComfortLevelRoute) },
                         onBack = back,
                     )
@@ -266,11 +269,13 @@ private fun StopFinderSoundOutsideItsScreens(
     navController: NavHostController,
     onLeaveTest: () -> Unit,
     onStop: () -> Unit,
+    onTestDone: () -> Unit,
 ) {
     val entry by navController.currentBackStackEntryAsState()
     LaunchedEffect(entry?.destination) {
         val destination = entry?.destination ?: return@LaunchedEffect
         if (FinderSoundRoutes.none { destination.hasRoute(it) }) onLeaveTest()
+        if (destination.hasRoute(ExportRoute::class) || destination.hasRoute(HomeRoute::class)) onTestDone()
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {

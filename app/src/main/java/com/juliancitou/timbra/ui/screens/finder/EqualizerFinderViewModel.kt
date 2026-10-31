@@ -16,6 +16,8 @@ import com.juliancitou.timbra.audio.EqualizerSettings
 import com.juliancitou.timbra.audio.LoopSource
 import com.juliancitou.timbra.audio.LoudnessMatcher
 import com.juliancitou.timbra.audio.PinkNoise
+import com.juliancitou.timbra.audio.PowerampControl
+import com.juliancitou.timbra.audio.PowerampState
 import com.juliancitou.timbra.audio.PlaybackStatus
 import com.juliancitou.timbra.audio.PreparedSong
 import com.juliancitou.timbra.audio.PreviewBand
@@ -45,6 +47,7 @@ import com.juliancitou.timbra.measure.calibrationPreset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -87,6 +90,7 @@ data class FinderUiState(
     val spotify: SpotifyLink = SpotifyLink.Off,
     val bandShape: BandShape = BandShape.Direct,
     val sounding: SoundingCheck? = null,
+    val poweramp: PowerampState = PowerampState.Unknown,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
     val isPlaying: Boolean get() = status == PlaybackStatus.Playing
@@ -109,6 +113,7 @@ private const val CALIBRATION_NAME = "Calibracion"
 /** Con 2 minutos basta para el test, y una canción en estéreo no ocupa más de ~50 MB de memoria. */
 private const val MAX_SONG_SECONDS = 120
 private const val STOP_SHARING_AFTER_MS = 5_000L
+private const val POWERAMP_STOP_WAIT_MS = 1_000L
 
 /**
  * Estado y sonido del test "Encuentra tu ecualización", compartido por todas sus pantallas. Al
@@ -157,6 +162,8 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private val sessionEqualizer = SessionEqualizer()
     private var spotifySettings: EqualizerSettings = EqualizerSettings.Flat
     private var calibrating = false
+    private val powerampControl = PowerampControl(application)
+    private var powerampOffByTimbra = false
 
     /** Solo se tocan desde el hilo de síntesis. Medir toma cerca de un segundo: se guarda el resultado. */
     private var measuredFor: Any? = null
@@ -183,6 +190,48 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     fun setBandLayout(layout: BandLayout) {
         bandPreferences.save(layout)
         state.update { it.copy(finder = EqualizerFinder(it.finder.output, layout)) }
+    }
+
+    /** Sin Spotify abierto no hay sesión que revisar y el estado queda como desconocido. */
+    fun checkPoweramp() {
+        viewModelScope.launch(effectThread) {
+            // El efecto propio contaría como "otra app" controlando la sesión.
+            sessionEqualizer.release()
+            val found = readPowerampState()
+            state.update { it.copy(poweramp = found) }
+        }
+    }
+
+    /** Solo cuando el usuario lo pide. Al terminar el test se vuelve a encender con [restorePoweramp]. */
+    fun turnOffPoweramp() {
+        powerampControl.turnOff()
+        powerampOffByTimbra = true
+        state.update { it.copy(poweramp = PowerampState.Off) }
+        viewModelScope.launch(effectThread) {
+            delay(POWERAMP_STOP_WAIT_MS)
+            val found = readPowerampState()
+            if (found == PowerampState.On) powerampOffByTimbra = false
+            state.update { it.copy(poweramp = found) }
+        }
+    }
+
+    /** Deja Poweramp como estaba, y solo si fue Timbra quien lo apagó. */
+    fun restorePoweramp() {
+        if (!powerampOffByTimbra) return
+        powerampOffByTimbra = false
+        powerampControl.turnOn()
+        state.update { it.copy(poweramp = PowerampState.Unknown) }
+    }
+
+    private fun readPowerampState(): PowerampState {
+        if (!powerampControl.isInstalled) return PowerampState.NotInstalled
+        val sessionId = SpotifySession.id.value
+        val controlling = sessionId?.let(powerampControl::isControlling)
+        return when {
+            controlling == true -> PowerampState.On
+            controlling == false || powerampOffByTimbra -> PowerampState.Off
+            else -> PowerampState.Unknown
+        }
     }
 
     /** Prepara la música del género elegido para el nivel cómodo. */
@@ -338,6 +387,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         PowerampExporter.fileName(state.value.effectivePresetName(suggestedName))
 
     override fun onCleared() {
+        restorePoweramp()
         if (outputHolder.isInitialized()) output.release()
         sessionEqualizer.release()
         synthesis.close()

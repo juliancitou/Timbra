@@ -5,8 +5,12 @@
     <!-- Ecualizar en vivo la sesión de Spotify. Permiso normal: Android lo concede al instalar. -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
+    <!-- Medir el ruido del lugar en "Antes de empezar". Solo se usa el nivel; el audio no se guarda. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <queries>
         <package android:name="com.spotify.music" />
+        <package android:name="com.maxmpz.equalizer" />
     </queries>
 
     <application
