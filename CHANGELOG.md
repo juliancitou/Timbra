@@ -19,6 +19,19 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `da41740` · feat: comprobar Poweramp y ruido antes de empezar
+- **Poweramp:** su API pública puede encenderlo y apagarlo, pero no dice su estado. Para saberlo se intenta
+  tomar `DynamicsProcessing` en la sesión de Spotify con prioridad 0: Android lo rechaza si otra app lo
+  controla. Sin Spotify abierto queda como desconocido. Falta comprobar en el teléfono que apagarlo suelta
+  el efecto; si no lo suelta, aparecería como encendido.
+- **"Apagar Poweramp":** solo al tocarlo. Vuelve a encenderlo al llegar a Exportar o a Inicio, y solo si
+  Timbra lo apagó. Si la app se cierra de golpe, puede quedarse apagado.
+- **Ruido:** `RECORD_AUDIO` opcional, unos 2 segundos, solo el nivel. El umbral de −45 dBFS no está
+  calibrado con un micrófono real.
+- **No detectable, sigue a mano:** cancelación de ruido de los audífonos, ecualizador del teléfono, Dolby y
+  posición de la bocina. Ni el fabricante ni Android dan una forma pública de leerlos.
+- El nombre del dispositivo Bluetooth ya se detectaba; el sistema lo reporta como "HUAWEI FreeBuds Pro 4".
+
 ### 2026-10-31 · `7e5b38b` · feat: mostrar y comprobar la diferencia al ecualizar
 - **Graves en Spotify:** `DynamicsProcessing` usaba su bloque por defecto de 10 ms (512 muestras a
   48 kHz, ~94 Hz por punto de la FFT, sin interpolar). Casi todas las bandas graves caían en el mismo
