@@ -19,6 +19,27 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `e68a6be` · feat: calibrar con Poweramp y comprobar elecciones
+- En el teléfono se vio que Poweramp Equalizer también usa `DynamicsProcessing` (prioridad 1337), y
+  Android no deja leer sus bandas sin privilegios ni cambiar ajustes del sistema. Por eso se calibra
+  de oído: Ajustes → Calibrar compara el mismo preset en Poweramp y en Timbra.
+- Formas de vista previa: directa (una banda por banda del preset, la que se usa por defecto) y
+  angosta, media y ancha, con la curva de campanas en bandas de 1/8 de octava.
+- Solo se envían a `DynamicsProcessing` las bandas que cambian, para reducir llamadas entre procesos.
+- "Mantén para oír como estaba" en las rondas. Al final se repiten graves y voz sin marcar la opción
+  actual: queda el punto medio de las dos elecciones y, si difieren más de un paso, se avisa en el
+  resultado. Las rondas pasan de 12 a 14, y de 10 a 12 en bocina.
+- Preparación se divide en dos pantallas y Nivel cómodo muestra solo la fuente de música elegida.
+- Limitaciones: la calibración es subjetiva, y falta probar todo esto en el teléfono y con audífonos.
+- Riesgo: si Poweramp comparte el efecto con Timbra, sus ajustes podrían no volver solos después del
+  test; apagarlo y encenderlo debería restaurarlos. Falta comprobarlo.
+
+### 2026-10-31 · `a7e0082` · ui: restaurar botones ASCII y dar más espacio
+- Pedido del usuario: volver a los botones de marco ASCII y a las opciones entre corchetes. A lo que
+  se refería con más espacio era a ordenar los textos, no a cambiar los botones.
+- `Spacing.section` entre secciones, `Spacing.inSection` dentro de ellas y `TerminalSection` para que
+  la separación sea igual en toda la app.
+
 ### 2026-10-31 · `dd68a6d` · feat: ecualizar Spotify en vivo durante el test
 - Pedido del usuario: dejar Spotify en segundo plano y oír cada opción sobre su música. Spotify
   anuncia su sesión de audio al reproducir y pausar; se comprobó en el teléfono que lo hace, y Timbra

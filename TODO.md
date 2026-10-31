@@ -159,7 +159,11 @@ terminó en estilo terminal/ASCII).
 - [ ] Probar una canción real en el teléfono: MP3, FLAC y un archivo que no se pueda leer
 - [x] Ecualizar Spotify en vivo durante el test
 - [ ] Comprobar en el teléfono que Spotify conecta y que el cambio se oye, con Poweramp Equalizer apagado
-- [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp
+- [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp (Ajustes → Calibrar)
+- [x] Vista previa con la curva completa del preset y forma elegible al calibrar
+- [x] Mantener presionado para oír como estaba y comprobación final de graves y voz
+- [ ] Probar con FreeBuds y con audífonos de cable
+- [ ] Revisar en el teléfono las pantallas nuevas: Nivel cómodo, rondas, resultado y Calibrar
 
 ### Verificación
 - [ ] Importar en Poweramp y comparar con la vista previa
