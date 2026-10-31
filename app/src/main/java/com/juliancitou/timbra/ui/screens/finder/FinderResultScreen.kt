@@ -88,7 +88,7 @@ fun FinderResultScreen(
             value = state.presetName,
             onValueChange = onPresetNameChange,
             label = stringResource(R.string.finder_preset_label),
-            placeholder = state.headphonesName.ifBlank { stringResource(R.string.finder_default_preset_name) },
+            placeholder = suggestedPresetName(state),
         )
     }
 }

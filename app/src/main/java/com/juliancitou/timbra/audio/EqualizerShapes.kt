@@ -28,7 +28,10 @@ object EqualizerShapes {
     ): List<Double> {
         val sigma = widthOctaves / HALF_GAIN_WIDTH_TO_SIGMA
         val center = log2(centerHz)
-        return frequenciesHz.map { log2(it.toDouble()) }.map { gainDb * exp(-0.5 * ((it - center) / sigma).let { x -> x * x }) }
+        return frequenciesHz.map { frequencyHz ->
+            val distance = (log2(frequencyHz.toDouble()) - center) / sigma
+            gainDb * exp(-0.5 * distance * distance)
+        }
     }
 
     /** Estante bajo: [gainDb] en todo lo que queda bajo [cornerHz] (la mitad justo en [cornerHz]). */

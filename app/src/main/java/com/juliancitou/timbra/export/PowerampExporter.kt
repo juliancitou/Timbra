@@ -7,8 +7,9 @@ import java.util.Locale
 /**
  * Preset para Poweramp Equalizer en el formato que importa su modo gráfico: un arreglo con un
  * objeto, dos bandas de tono (grave tipo 0 en 90 Hz y aguda tipo 1 en 10 kHz) siempre en 0 dB y
- * luego las bandas gráficas (tipo 2) de la configuración elegida. El texto sale igual al de un preset que ya se sabe que
- * Poweramp importa bien (ver la prueba golden), así que no conviene cambiar espacios ni orden.
+ * luego las bandas gráficas (tipo 2) de la configuración elegida. El texto sale igual al de un
+ * preset que ya se sabe que Poweramp importa bien (ver la prueba golden), así que no conviene cambiar
+ * espacios ni orden.
  */
 object PowerampExporter {
     const val NAME_PREFIX = "Timbra - "

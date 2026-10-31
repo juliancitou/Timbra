@@ -47,8 +47,8 @@ private const val DRAGGING_THUMB_SCALE = 1.18f
 private val SliderHeight = 56.dp
 
 /**
- * Control de ganancia en dB, pensado para el pulgar. Avanza en pasos de [stepDb] con un "clic"
- * háptico en cada paso; el valor va con dígitos tabulares para que no "baile".
+ * Control pensado para el pulgar, en dB salvo que [formatValue] diga otra cosa. Avanza en pasos de
+ * [stepDb] con un "clic" háptico en cada paso; el valor va con dígitos tabulares para que no "baile".
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,11 +61,12 @@ fun TerminalSlider(
     stepDb: Float = 0.5f,
     size: TerminalSliderSize = TerminalSliderSize.Large,
     onValueChangeFinished: (() -> Unit)? = null,
+    formatValue: (Float) -> String = ::formatDecibels,
 ) {
     val haptics = LocalHapticFeedback.current
     val lastStep = remember { mutableFloatStateOf(valueDb) }
     val stepCount = ((valueRange.endInclusive - valueRange.start) / stepDb).roundToInt() - 1
-    val formattedValue = formatDecibels(valueDb)
+    val formattedValue = formatValue(valueDb)
     val colors = MaterialTheme.colorScheme
     val interactionSource = remember { MutableInteractionSource() }
     val dragging by interactionSource.collectIsDraggedAsState()

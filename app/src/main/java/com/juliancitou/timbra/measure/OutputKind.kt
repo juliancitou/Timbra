@@ -6,8 +6,8 @@ package com.juliancitou.timbra.measure
  * - [Bluetooth] parte de la tendencia de los HUAWEI FreeBuds Pro 4: subgrave reforzado, algo de
  *   "lodo" y un pico de sibilancia, con la voz un poco abajo.
  * - [Wired] parte de plano porque puede ser cualquier audífono.
- * - [Speaker] recorta graves que la bocina no reproduce (subirlos solo la satura), por eso nunca
- *   los sube, suaviza la zona chillona y omite la ronda de aire, que casi no se percibe en ella.
+ * - [Speaker] recorta graves que la bocina no reproduce (subirlos solo la satura), por eso su ronda
+ *   de graves nunca los sube, suaviza la zona chillona y omite la ronda de aire, que casi no se percibe en ella.
  */
 enum class OutputKind(
     private val startDb: Map<FinderDimension, Double> = emptyMap(),

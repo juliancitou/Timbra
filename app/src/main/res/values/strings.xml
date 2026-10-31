@@ -22,7 +22,6 @@
     <!-- Preparación -->
     <string name="preparation_title">Preparación</string>
     <string name="preparation_lead">Haz el test igual que como escuchas música. Marca cada punto cuando esté listo.</string>
-    <string name="preparation_headphones">Audífonos conectados</string>
     <string name="preparation_noise_cancelling">Cancelación de ruido en tu modo habitual</string>
     <string name="preparation_poweramp_off">Ecualizador de Poweramp apagado</string>
     <string name="preparation_quiet_place">Estoy en un lugar silencioso</string>
@@ -232,4 +231,35 @@
     <string name="settings_advanced_body">Medición banda por banda para encontrar picos exactos, como la "S". Llega en una versión futura; por ahora es una vista previa sin sonido.</string>
     <string name="action_advanced_preview">Ver vista previa</string>
     <string name="action_finish">Terminar</string>
+    <!-- Salidas y bandas -->
+    <string name="output_bluetooth">Bluetooth</string>
+    <string name="output_wired">Cable</string>
+    <string name="output_speaker">Bocina</string>
+    <string name="preparation_section_output">qué vas a ecualizar</string>
+    <string name="preparation_detected_bluetooth">Detecté audífonos Bluetooth conectados.</string>
+    <string name="preparation_detected_bluetooth_named">Detecté %1$s por Bluetooth.</string>
+    <string name="preparation_detected_wired">Detecté audífonos con cable conectados.</string>
+    <string name="preparation_detected_speaker">No detecté audífonos: sonará por la bocina.</string>
+    <string name="preparation_mismatch_bluetooth">Elegiste Bluetooth, pero no suena por ahí. Conéctalos antes de seguir.</string>
+    <string name="preparation_mismatch_wired">Elegiste cable, pero no suena por ahí. Conéctalos antes de seguir.</string>
+    <string name="preparation_mismatch_speaker">Elegiste la bocina, pero hay audífonos conectados. Desconéctalos antes de seguir.</string>
+    <string name="preparation_speaker_position">Teléfono a un brazo de distancia, a la altura de la cabeza</string>
+    <string name="preparation_speaker_uncovered">Bocina destapada, sin la mano ni la funda encima</string>
+    <string name="preparation_why_speaker">La bocina suena distinto según dónde esté el teléfono. Usa esta misma posición al escuchar.</string>
+    <string name="preparation_section_bands">bandas de poweramp</string>
+    <string name="preparation_bands_summary">Tu preset tendrá: %1$s.</string>
+    <string name="preparation_bands_hint">Déjalas igual que en Poweramp: Ajustes del ecualizador, "bandas personalizadas".</string>
+    <string name="preparation_bands_change">Cambiar</string>
+    <string name="preparation_bands_done">Listo</string>
+    <string name="preparation_bands_reset">Restablecer</string>
+    <string name="preparation_bands_count">bandas</string>
+    <string name="preparation_bands_first">primera frecuencia</string>
+    <string name="preparation_bands_last">última frecuencia</string>
+    <string name="bands_summary">%1$d bandas, de %2$s a %3$s</string>
+    <string name="export_section_assign">para que suene igual</string>
+    <string name="export_step_bands">En Poweramp usa estas bandas: %1$s.</string>
+    <string name="export_step_assign">Para usarlo solo en esta salida: abre ⋮, luego "Guardar/Asignar" y marca %1$s.</string>
+    <string name="export_assign_bluetooth">tus audífonos (deben estar conectados)</string>
+    <string name="export_assign_wired">los audífonos con cable (deben estar conectados)</string>
+    <string name="export_assign_speaker">la bocina</string>
 </resources>

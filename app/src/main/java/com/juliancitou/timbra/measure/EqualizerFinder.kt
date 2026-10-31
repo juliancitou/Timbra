@@ -109,6 +109,8 @@ data class EqualizerFinder(
     private fun curveFor(values: Map<FinderDimension, Double>): List<Double> {
         val frequencies = layout.frequenciesHz
         val zero = List(frequencies.size) { 0.0 }
-        return values.entries.fold(zero) { total, (dimension, value) -> sum(total, dimension.curve(value, frequencies)) }
+        return values.entries.fold(zero) { total, (dimension, value) ->
+            sum(total, dimension.curve(value, frequencies))
+        }
     }
 }

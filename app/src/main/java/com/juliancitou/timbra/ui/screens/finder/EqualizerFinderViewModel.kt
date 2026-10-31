@@ -13,8 +13,11 @@ import com.juliancitou.timbra.audio.SignalSource
 import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.music.MusicLoop
+import com.juliancitou.timbra.data.BandLayoutPreferences
+import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.measure.EqualizerFinder
+import com.juliancitou.timbra.measure.OutputKind
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,9 +41,8 @@ data class FinderUiState(
 ) {
     val isPlaying: Boolean get() = status == PlaybackStatus.Playing
 
-    /** Nombre del preset: el que escribió el usuario, o el de sus audífonos, o uno genérico. */
-    fun effectivePresetName(fallback: String): String =
-        presetName.ifBlank { headphonesName.ifBlank { fallback } }
+    /** Nombre del preset: el que escribió el usuario o, si no escribió ninguno, el sugerido. */
+    fun effectivePresetName(suggested: String): String = presetName.ifBlank { suggested }
 }
 
 private const val CENTER_OPTION = 2
@@ -68,7 +70,8 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         }
     }
     private val output by outputHolder
-    private val state = MutableStateFlow(FinderUiState())
+    private val bandPreferences = BandLayoutPreferences(application)
+    private val state = MutableStateFlow(FinderUiState(finder = EqualizerFinder(layout = bandPreferences.load())))
     private val playback = MutableStateFlow(PlaybackStatus.Stopped)
 
     private val musicLoops = mutableMapOf<Genre, MusicLoop>()
@@ -86,6 +89,16 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     fun setHeadphonesName(name: String) = state.update { it.copy(headphonesName = name) }
 
     fun setPresetName(name: String) = state.update { it.copy(presetName = name) }
+
+    /** Cambiar la salida reinicia el test, porque cada una parte de una curva y unas rondas distintas. */
+    fun setOutput(output: OutputKind) = state.update {
+        if (it.finder.output == output) it else it.copy(finder = EqualizerFinder(output, it.finder.layout))
+    }
+
+    fun setBandLayout(layout: BandLayout) {
+        bandPreferences.save(layout)
+        state.update { it.copy(finder = EqualizerFinder(it.finder.output, layout)) }
+    }
 
     /** Prepara la música del género elegido para el nivel cómodo. */
     fun prepareMusic() = refresh()
@@ -110,7 +123,12 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     /** Empieza el test desde la primera ronda, conservando el género y el nombre de los audífonos. */
     fun startTest() {
         state.update {
-            it.copy(finder = EqualizerFinder(), auditionIndex = CENTER_OPTION, bypass = false, presetName = "")
+            it.copy(
+                finder = EqualizerFinder(it.finder.output, it.finder.layout),
+                auditionIndex = CENTER_OPTION,
+                bypass = false,
+                presetName = "",
+            )
         }
         refresh()
     }
@@ -144,13 +162,13 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         refresh()
     }
 
-    fun presetJson(fallbackName: String): String {
+    fun presetJson(suggestedName: String): String {
         val current = state.value
-        return PowerampExporter.toJson(current.effectivePresetName(fallbackName), current.finder.result())
+        return PowerampExporter.toJson(current.effectivePresetName(suggestedName), current.finder.result())
     }
 
-    fun presetFileName(fallbackName: String): String =
-        PowerampExporter.fileName(state.value.effectivePresetName(fallbackName))
+    fun presetFileName(suggestedName: String): String =
+        PowerampExporter.fileName(state.value.effectivePresetName(suggestedName))
 
     override fun onCleared() {
         if (outputHolder.isInitialized()) output.release()

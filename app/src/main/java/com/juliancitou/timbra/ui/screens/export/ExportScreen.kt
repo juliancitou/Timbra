@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,7 +23,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.PowerampExporter
+import com.juliancitou.timbra.measure.OutputKind
+import com.juliancitou.timbra.ui.screens.preparation.bandSummary
 import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
@@ -47,6 +51,8 @@ private const val PRESET_MIME_TYPE = "application/json"
 fun ExportScreen(
     presetName: String,
     fileName: String,
+    output: OutputKind,
+    bandLayout: BandLayout,
     presetJson: () -> String,
     onGoHome: () -> Unit,
     onBack: () -> Unit,
@@ -117,7 +123,23 @@ fun ExportScreen(
                 ),
             )
         }
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
+            SectionLabel(stringResource(R.string.export_section_assign))
+            CodeLines(
+                listOf(
+                    stringResource(R.string.export_step_bands, bandSummary(bandLayout)),
+                    stringResource(R.string.export_step_assign, stringResource(output.assignTargetRes())),
+                ),
+            )
+        }
     }
+}
+
+@StringRes
+private fun OutputKind.assignTargetRes(): Int = when (this) {
+    OutputKind.Bluetooth -> R.string.export_assign_bluetooth
+    OutputKind.Wired -> R.string.export_assign_wired
+    OutputKind.Speaker -> R.string.export_assign_speaker
 }
 
 private fun writeTo(context: Context, uri: Uri, json: String): Boolean = runCatching {

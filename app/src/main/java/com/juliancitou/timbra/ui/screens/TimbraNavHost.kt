@@ -36,6 +36,7 @@ import com.juliancitou.timbra.ui.screens.export.ExportScreen
 import com.juliancitou.timbra.ui.screens.finder.EqualizerFinderViewModel
 import com.juliancitou.timbra.ui.screens.finder.FinderResultScreen
 import com.juliancitou.timbra.ui.screens.finder.FinderRoundScreen
+import com.juliancitou.timbra.ui.screens.finder.suggestedPresetName
 import com.juliancitou.timbra.ui.screens.history.HistoryScreen
 import com.juliancitou.timbra.ui.screens.home.HomeScreen
 import com.juliancitou.timbra.ui.screens.measurement.MeasurementScreen
@@ -118,6 +119,10 @@ fun TimbraNavHost(
                 }
                 screen<PreparationRoute> {
                     PreparationScreen(
+                        output = finderState.finder.output,
+                        onOutputChange = finder::setOutput,
+                        bandLayout = finderState.finder.layout,
+                        onBandLayoutChange = finder::setBandLayout,
                         headphonesName = finderState.headphonesName,
                         onHeadphonesNameChange = finder::setHeadphonesName,
                         onContinue = { navController.navigate(ComfortLevelRoute) },
@@ -179,11 +184,13 @@ fun TimbraNavHost(
                     TasteScreen(onFinish = { navController.popBackStack(HomeRoute, inclusive = false) }, onBack = back)
                 }
                 screen<ExportRoute> {
-                    val defaultName = stringResource(R.string.finder_default_preset_name)
+                    val suggestedName = suggestedPresetName(finderState)
                     ExportScreen(
-                        presetName = finderState.effectivePresetName(defaultName),
-                        fileName = finder.presetFileName(defaultName),
-                        presetJson = { finder.presetJson(defaultName) },
+                        presetName = finderState.effectivePresetName(suggestedName),
+                        fileName = finder.presetFileName(suggestedName),
+                        output = finderState.finder.output,
+                        bandLayout = finderState.finder.layout,
+                        presetJson = { finder.presetJson(suggestedName) },
                         onGoHome = { navController.popBackStack(HomeRoute, inclusive = false) },
                         onBack = back,
                     )

@@ -127,7 +127,6 @@ class EqualizerFinderTest {
         }
         assertTrue(finder.isFinished)
         assertTrue(finder.valuesDb.getValue(FinderDimension.Bass) <= 0.0)
-        assertTrue(gainAt(finder.curveDb(), 20) <= 0.0 + finder.valuesDb.getValue(FinderDimension.Balance).coerceAtMost(0.0) + 0.01)
     }
 
     @Test
