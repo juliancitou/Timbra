@@ -9,6 +9,7 @@ import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.presetFromCurve
 import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.POWERAMP_BAND_FREQUENCIES_HZ
+import kotlin.math.abs
 
 /** Opciones que se escuchan en cada ronda; la del centro es la elección actual. */
 const val OPTIONS_PER_ROUND = 5
@@ -98,6 +99,17 @@ data class EqualizerFinder(
 
     /** Curva completa si en la ronda actual se eligiera [candidateDb]; es lo que suena al tocar un nodo. */
     fun curveWithCandidateDb(candidateDb: Double): List<Double> = curveFor(valuesDb + (round.dimension to candidateDb))
+
+    /** Cuál de las [options] es la que hay ahora; no siempre es la del centro cerca de un límite. */
+    val currentOptionIndex: Int
+        get() = options().withIndex().minBy { (_, option) -> abs(option - currentValueDb) }.index
+
+    /**
+     * "No me gustó ninguno": la zona se queda como estaba y se pasa a la siguiente. Si es la pasada
+     * gruesa también salta su afinado, porque no tiene sentido afinar algo que no gustó.
+     */
+    fun keepCurrent(): EqualizerFinder =
+        copy(roundIndex = roundIndex + if (round.fine) 1 else 2, previous = this)
 
     /** El preset que se exportaría si en la ronda actual se eligiera [candidateDb]. */
     fun presetWithCandidate(candidateDb: Double): EqualizerSettings =

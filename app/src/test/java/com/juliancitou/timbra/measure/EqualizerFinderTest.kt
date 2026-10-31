@@ -151,4 +151,39 @@ class EqualizerFinderTest {
         assertEquals(layout.frequenciesHz, preset.bandFrequenciesHz)
         assertEquals(10, preset.bandGainsDb.size)
     }
+
+    @Test
+    fun noneInTheCoarsePassKeepsTheZoneAndSkipsItsFinePass() {
+        val start = EqualizerFinder()
+        val next = start.keepCurrent()
+        assertEquals(start.valuesDb, next.valuesDb)
+        assertEquals(FinderRound(FinderDimension.Bass, fine = false), next.round)
+        assertEquals(start, next.previous)
+    }
+
+    @Test
+    fun noneInTheFinePassKeepsWhatWasChosenInTheCoarsePass() {
+        val next = EqualizerFinder().choose(1.5).keepCurrent()
+        assertEquals(1.5, next.valuesDb.getValue(FinderDimension.Balance), 0.0)
+        assertEquals(FinderRound(FinderDimension.Bass, fine = false), next.round)
+    }
+
+    @Test
+    fun rejectingEveryRoundFinishesWithTheStartingCurve() {
+        OutputKind.entries.forEach { output ->
+            val start = EqualizerFinder(output = output)
+            var finder = start
+            while (!finder.isFinished) finder = finder.keepCurrent()
+            assertEquals(start.curveDb(), finder.curveDb())
+        }
+    }
+
+    @Test
+    fun currentOptionIsFoundEvenNearARangeEdge() {
+        val bassRound = OutputKind.Wired.rounds.indexOf(FinderRound(FinderDimension.Bass, fine = false))
+        val finder = EqualizerFinder(roundIndex = bassRound).let {
+            it.copy(valuesDb = it.valuesDb + (FinderDimension.Bass to 3.0))
+        }
+        assertEquals(3.0, finder.options()[finder.currentOptionIndex], 1e-9)
+    }
 }
