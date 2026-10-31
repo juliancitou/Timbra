@@ -13,7 +13,6 @@ import com.juliancitou.timbra.ui.theme.SETTINGS_TRANSFORM_KEY
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
-import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalIconButton
 import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.containerTransform
@@ -24,7 +23,6 @@ private const val HOW_IT_WORKS_STEPS = 3
 @Composable
 fun HomeScreen(
     onCreateEqualization: () -> Unit,
-    onOpenHistory: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     TerminalScreen(
@@ -46,12 +44,6 @@ fun HomeScreen(
                 onClick = onCreateEqualization,
                 modifier = Modifier.fillMaxWidth(),
             )
-            TerminalButton(
-                text = stringResource(R.string.action_my_measurements),
-                onClick = onOpenHistory,
-                style = TerminalButtonStyle.Secondary,
-                modifier = Modifier.fillMaxWidth(),
-            )
         },
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
@@ -59,7 +51,7 @@ fun HomeScreen(
             CodeLines(
                 listOf(
                     stringResource(R.string.home_step_listen),
-                    stringResource(R.string.home_step_match),
+                    stringResource(R.string.home_step_choose),
                     stringResource(R.string.home_step_export),
                 ),
             )

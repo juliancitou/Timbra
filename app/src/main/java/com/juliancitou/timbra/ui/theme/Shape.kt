@@ -6,6 +6,9 @@ import androidx.compose.ui.unit.dp
 
 /** Esquinas casi rectas, como ventanas y teclas de una terminal. */
 val PanelCornerRadius = 14.dp
+
+/** Casi recta: botones y opciones deben verse como una terminal, no como píldoras. */
+val ButtonCornerRadius = 2.dp
 val ControlCornerRadius = 8.dp
 val ChipCornerRadius = 6.dp
 

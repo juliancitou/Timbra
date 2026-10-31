@@ -236,7 +236,8 @@ fun CheckRow(label: String, checked: Boolean, onToggle: () -> Unit, modifier: Mo
             .toggleable(value = checked, role = Role.Checkbox) {
                 haptics.performHapticFeedback(if (it) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff)
                 onToggle()
-            },
+            }
+            .padding(vertical = Spacing.small),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {

@@ -25,6 +25,7 @@ import com.juliancitou.timbra.measure.OutputKind
 import com.juliancitou.timbra.ui.screens.finder.labelRes
 import com.juliancitou.timbra.ui.theme.CheckRow
 import com.juliancitou.timbra.ui.theme.DetailText
+import com.juliancitou.timbra.ui.theme.Hairline
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
@@ -113,6 +114,7 @@ fun PreparationScreen(
         Column {
             checklist.forEachIndexed { index, labelRes ->
                 val bit = 1 shl index
+                if (index > 0) Hairline()
                 CheckRow(
                     label = stringResource(labelRes),
                     checked = checkedMask and bit != 0,
