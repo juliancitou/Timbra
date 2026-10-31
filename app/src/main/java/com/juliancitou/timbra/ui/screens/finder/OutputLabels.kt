@@ -26,3 +26,11 @@ fun suggestedPresetName(state: FinderUiState): String {
     val name = state.headphonesName.trim().ifEmpty { stringResource(R.string.finder_default_preset_name) }
     return "$name ($label)"
 }
+
+/** Con Spotify no se sabe si está sonando: un mismo botón pausa o reanuda. */
+@StringRes
+fun FinderUiState.playbackLabelRes(): Int = when {
+    usesSpotify -> R.string.action_play_pause
+    isPlaying -> R.string.action_pause
+    else -> R.string.action_play
+}

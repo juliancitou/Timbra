@@ -30,7 +30,7 @@ Para quien quiera más precisión hay un **modo avanzado** que mide cómo escuch
 | Sí hace | No hace |
 |---|---|
 | Te deja elegir de oído, con esferas, cuánto grave, voz y brillo quieres | Medir el volumen real dentro de tu oído (para eso hace falta un micrófono de medición) |
-| Funciona con audífonos Bluetooth, de cable y con la bocina del teléfono | Ecualizar Spotify u otras apps por sí misma: eso lo hace Poweramp con el preset |
+| Funciona con audífonos Bluetooth, de cable y con la bocina del teléfono | Ecualizar Spotify u otras apps fuera del test: eso lo hace Poweramp con el preset |
 | En modo avanzado, encuentra picos angostos (sibilancia, resonancias) | Cambiar ajustes de tu teléfono, de tus audífonos o de Poweramp |
 | Genera un archivo `.json` con la misma cantidad de bandas que usas en Poweramp | Conectarse a internet ni pedir cuentas |
 
@@ -173,7 +173,8 @@ adb devices                    # muestra los teléfonos conectados
 1. **Prepara:** elige la salida (audífonos Bluetooth, de cable o la bocina del teléfono), cuántas
    bandas usas en Poweramp y **apaga el ecualizador de Poweramp** mientras haces el test.
 2. **Música y nivel cómodo:** elige un género de la app o una canción guardada en tu teléfono (se
-   usan sus primeros 2 minutos). Ajusta el volumen del teléfono hasta que se oiga
+   usan sus primeros 2 minutos). También puedes dejar Spotify sonando y oír cada opción sobre tu
+   música, en vivo (requiere apagar antes Poweramp Equalizer). Ajusta el volumen del teléfono hasta que se oiga
    claro pero cómodo, nunca fuerte.
 3. **Rondas de esferas:** cada ronda se enfoca en algo: balance general, graves, claridad, voces,
    la "S" y los platillos, y el aire de los agudos. Toca las esferas para escuchar cada opción;
@@ -209,6 +210,8 @@ Tu oído es lo más importante:
 
 - Sin internet, sin cuentas, sin anuncios y sin analítica.
 - Tus mediciones se guardan solo en el almacenamiento interno de la app.
+- Para ecualizar Spotify en vivo, la app pide el permiso `MODIFY_AUDIO_SETTINGS`, que Android concede
+  al instalar. No copia ni graba su audio, y lo suelta al salir del test.
 - Si eliges una canción tuya, solo se lee en memoria: no se copia, no se modifica ni sale del teléfono.
 - Los presets se guardan donde tú elijas con el selector de archivos del sistema.
 - Al desinstalar la app se borran todas sus mediciones.

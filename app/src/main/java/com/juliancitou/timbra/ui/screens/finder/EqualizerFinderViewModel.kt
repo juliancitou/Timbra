@@ -1,9 +1,12 @@
 package com.juliancitou.timbra.ui.screens.finder
 
 import android.app.Application
+import android.content.Intent
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Process
 import android.provider.OpenableColumns
+import android.view.KeyEvent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.juliancitou.timbra.R
@@ -11,9 +14,14 @@ import com.juliancitou.timbra.audio.AudioOutput
 import com.juliancitou.timbra.audio.EqualizerSettings
 import com.juliancitou.timbra.audio.LoopSource
 import com.juliancitou.timbra.audio.LoudnessMatcher
+import com.juliancitou.timbra.audio.PinkNoise
 import com.juliancitou.timbra.audio.PlaybackStatus
 import com.juliancitou.timbra.audio.PreparedSong
+import com.juliancitou.timbra.audio.SPOTIFY_PACKAGE
+import com.juliancitou.timbra.audio.SessionEqualizer
+import com.juliancitou.timbra.audio.SessionEqualizerResult
 import com.juliancitou.timbra.audio.SignalSource
+import com.juliancitou.timbra.audio.SpotifySession
 import com.juliancitou.timbra.audio.StereoLoopSource
 import com.juliancitou.timbra.audio.decodeAudioFile
 import com.juliancitou.timbra.audio.music.Genre
@@ -26,6 +34,8 @@ import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.measure.EqualizerFinder
 import com.juliancitou.timbra.measure.OutputKind
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,6 +45,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
+
+/** Estado de la ecualización en vivo de Spotify. [Off]: suena música de Timbra, no Spotify. */
+enum class SpotifyLink { Off, Waiting, Connected, Blocked, Failed }
 
 data class FinderUiState(
     val genre: Genre = Genre.Pop,
@@ -49,9 +62,11 @@ data class FinderUiState(
     val songName: String? = null,
     val loadingSong: Boolean = false,
     val songFailed: Boolean = false,
+    val spotify: SpotifyLink = SpotifyLink.Off,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
     val isPlaying: Boolean get() = status == PlaybackStatus.Playing
+    val usesSpotify: Boolean get() = spotify != SpotifyLink.Off
 
     /** Nombre del preset: el que escribió el usuario o, si no escribió ninguno, el sugerido. */
     fun effectivePresetName(suggested: String): String = presetName.ifBlank { suggested }
@@ -104,11 +119,22 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private var userSong: PreparedSong? = null
     private var userSongMatcher: LoudnessMatcher? = null
     private var playingSong: PreparedSong? = null
+    private var pinkNoiseMatcher: LoudnessMatcher? = null
+
+    /** Las llamadas al efecto van a otro proceso: una cola propia evita trabar pantalla y síntesis. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val effectThread = Dispatchers.Default.limitedParallelism(1)
+    private val sessionEqualizer = SessionEqualizer()
+    private var spotifySettings: EqualizerSettings = EqualizerSettings.Flat
 
     val uiState: StateFlow<FinderUiState> = combine(state, playback) { current, status ->
         current.copy(status = status)
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_SHARING_AFTER_MS), FinderUiState())
+
+    init {
+        viewModelScope.launch { SpotifySession.id.collect { syncSpotifyEqualizer() } }
+    }
 
     fun setHeadphonesName(name: String) = state.update { it.copy(headphonesName = name) }
 
@@ -129,6 +155,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
 
     fun selectGenre(genre: Genre) {
         if (state.value.loadingSong) return
+        leaveSpotify()
         state.update { it.copy(genre = genre, songName = null, songFailed = false) }
         refresh()
     }
@@ -136,6 +163,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     /** Lee la canción elegida con el selector del sistema. No empieza a sonar sola. */
     fun selectSong(uri: Uri) {
         stopSound()
+        leaveSpotify()
         state.update { it.copy(loadingSong = true, songFailed = false, preparing = true) }
         viewModelScope.launch(synthesis) {
             // También cubre quedarse sin memoria: el test puede seguir con la música de la app.
@@ -156,7 +184,9 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     }
 
     fun togglePlayback() {
-        if (playback.value == PlaybackStatus.Playing) {
+        if (state.value.usesSpotify) {
+            pressMediaPlayPause()
+        } else if (playback.value == PlaybackStatus.Playing) {
             output.stop()
         } else if (!state.value.preparing) {
             output.play()
@@ -165,6 +195,27 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
 
     fun stopSound() {
         if (outputHolder.isInitialized()) output.stop()
+    }
+
+    /** Al salir de las pantallas del test, Spotify vuelve a sonar sin ecualizar. */
+    fun stopTestAudio() {
+        stopSound()
+        viewModelScope.launch(effectThread) { sessionEqualizer.release() }
+    }
+
+    /** Spotify suena por su cuenta y sus cambios de ecualización se aplican en vivo. */
+    fun useSpotify() {
+        if (state.value.loadingSong) return
+        stopSound()
+        state.update { it.copy(spotify = SpotifyLink.Waiting, songName = null, songFailed = false) }
+        refresh()
+    }
+
+    fun openSpotify() {
+        val context = getApplication<Application>()
+        context.packageManager.getLaunchIntentForPackage(SPOTIFY_PACKAGE)?.let { intent ->
+            context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
     }
 
     /** Empieza el test desde la primera ronda, conservando el género y el nombre de los audífonos. */
@@ -178,7 +229,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     /** Escucha la opción [index] de la ronda actual. */
     fun audition(index: Int) {
         state.update { it.copy(auditionIndex = index) }
-        optionSettings.getOrNull(index)?.let { output.renderer.changeEqualization(it) }
+        optionSettings.getOrNull(index)?.let(::applyEqualization)
     }
 
     /** Se queda con la opción que se está escuchando y pasa a la siguiente ronda. */
@@ -222,6 +273,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
 
     override fun onCleared() {
         if (outputHolder.isInitialized()) output.release()
+        sessionEqualizer.release()
         synthesis.close()
     }
 
@@ -235,7 +287,11 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             val snapshot = state.value
             val song = userSong.takeIf { snapshot.songName != null }
             if (song == null) userSong = null
-            val matcher = if (song != null) playUserSong(song) else playAppMusic(snapshot)
+            val matcher = when {
+                snapshot.usesSpotify -> spotifyMatcher()
+                song != null -> playUserSong(song)
+                else -> playAppMusic(snapshot)
+            }
             optionSettings = optionsFor(snapshot.finder, matcher)
             val latest = state.value
             val settings = when {
@@ -243,12 +299,67 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
                 latest.finder.isFinished -> matcher.compensated(latest.finder.result())
                 else -> optionSettings.getOrNull(latest.auditionIndex) ?: EqualizerSettings.Flat
             }
-            output.renderer.changeEqualization(settings)
+            applyEqualization(settings)
             val unchanged = latest.finder == snapshot.finder && latest.genre == snapshot.genre &&
-                latest.songName == snapshot.songName
+                latest.songName == snapshot.songName && latest.spotify.usesSameMusicAs(snapshot.spotify)
             if (unchanged && !latest.loadingSong) {
                 state.update { it.copy(preparing = false) }
             }
+        }
+    }
+
+    private fun SpotifyLink.usesSameMusicAs(other: SpotifyLink) =
+        (this == SpotifyLink.Off) == (other == SpotifyLink.Off)
+
+    private fun applyEqualization(settings: EqualizerSettings) {
+        if (state.value.usesSpotify) {
+            viewModelScope.launch(effectThread) {
+                spotifySettings = settings
+                applySpotifyEqualization()
+            }
+        } else {
+            output.renderer.changeEqualization(settings)
+        }
+    }
+
+    private fun syncSpotifyEqualizer() {
+        if (state.value.usesSpotify) viewModelScope.launch(effectThread) { applySpotifyEqualization() }
+    }
+
+    /** Se reaplica cada vez que Spotify abre una sesión: al pausar y reanudar puede estrenar otra. */
+    private fun applySpotifyEqualization() {
+        if (!state.value.usesSpotify) return
+        val sessionId = SpotifySession.id.value
+        val link = if (sessionId == null) {
+            sessionEqualizer.release()
+            SpotifyLink.Waiting
+        } else {
+            when (sessionEqualizer.apply(sessionId, spotifySettings)) {
+                SessionEqualizerResult.Applied -> SpotifyLink.Connected
+                SessionEqualizerResult.Blocked -> SpotifyLink.Blocked
+                SessionEqualizerResult.Failed -> SpotifyLink.Failed
+            }
+        }
+        state.update { if (it.usesSpotify) it.copy(spotify = link) else it }
+    }
+
+    private fun leaveSpotify() {
+        state.update { it.copy(spotify = SpotifyLink.Off) }
+        viewModelScope.launch(effectThread) { sessionEqualizer.release() }
+    }
+
+    /** No se puede medir la música de otra app: el volumen entre opciones se iguala con ruido rosa. */
+    private fun spotifyMatcher(): LoudnessMatcher = pinkNoiseMatcher ?: run {
+        val noise = PinkNoise()
+        val rate = output.sampleRate
+        LoudnessMatcher(rate, DoubleArray(REFERENCE_SECONDS * rate) { noise.next() }).also { pinkNoiseMatcher = it }
+    }
+
+    /** Pausa o reanuda lo que esté sonando, como el botón de unos audífonos. */
+    private fun pressMediaPlayPause() {
+        val audioManager = getApplication<Application>().getSystemService(AudioManager::class.java)
+        listOf(KeyEvent.ACTION_DOWN, KeyEvent.ACTION_UP).forEach { action ->
+            audioManager.dispatchMediaKeyEvent(KeyEvent(action, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
         }
     }
 

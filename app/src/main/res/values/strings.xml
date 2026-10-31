@@ -276,4 +276,17 @@
     <string name="comfort_song_failed">No pude leer ese archivo. Prueba con otro, por ejemplo MP3 o FLAC.</string>
     <string name="comfort_song_selected">Tu canción: %1$s</string>
     <string name="comfort_song_fallback">tu canción</string>
+
+    <!-- Spotify en vivo -->
+    <string name="comfort_section_spotify">o usa spotify</string>
+    <string name="action_use_spotify">Ecualizar Spotify en vivo</string>
+    <string name="action_open_spotify">Abrir Spotify</string>
+    <string name="action_play_pause">Pausar / reanudar</string>
+    <string name="comfort_spotify_hint">Spotify sigue sonando y cada opción que toques se oye al instante. Apaga antes Poweramp Equalizer.</string>
+    <string name="comfort_spotify_step_play">Abre Spotify y pon una canción.</string>
+    <string name="comfort_spotify_step_return">Regresa aquí y espera a que diga conectado.</string>
+    <string name="comfort_spotify_step_retry">Si no conecta, pausa y reanuda en Spotify, o elige Timbra en su ajuste Ecualizador.</string>
+    <string name="comfort_spotify_connected">Conectado a Spotify. Ya puedes seguir.</string>
+    <string name="comfort_spotify_blocked">Otro ecualizador está controlando Spotify. Apaga Poweramp Equalizer e inténtalo de nuevo.</string>
+    <string name="comfort_spotify_failed">Android no dejó ecualizar Spotify. Prueba con una canción de tu teléfono.</string>
 </resources>

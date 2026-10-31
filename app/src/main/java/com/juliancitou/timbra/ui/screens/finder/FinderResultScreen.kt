@@ -53,7 +53,7 @@ fun FinderResultScreen(
             )
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
                 TerminalButton(
-                    text = stringResource(if (state.isPlaying) R.string.action_pause else R.string.action_play),
+                    text = stringResource(state.playbackLabelRes()),
                     onClick = onTogglePlayback,
                     style = TerminalButtonStyle.Secondary,
                     enabled = !state.preparing,

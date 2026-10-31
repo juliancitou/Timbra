@@ -83,7 +83,7 @@ fun TimbraNavHost(
     // El test se comparte entre varias pantallas: su ViewModel vive con la actividad.
     val finder: EqualizerFinderViewModel = viewModel()
     val finderState by finder.uiState.collectAsStateWithLifecycle()
-    StopFinderSoundOutsideItsScreens(navController, onStop = finder::stopSound)
+    StopFinderSoundOutsideItsScreens(navController, onLeaveTest = finder::stopTestAudio, onStop = finder::stopSound)
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             NavHost(
@@ -134,6 +134,8 @@ fun TimbraNavHost(
                         onPrepareMusic = finder::prepareMusic,
                         onSelectGenre = finder::selectGenre,
                         onSelectSong = finder::selectSong,
+                        onUseSpotify = finder::useSpotify,
+                        onOpenSpotify = finder::openSpotify,
                         onTogglePlayback = finder::togglePlayback,
                         onReady = {
                             finder.startTest()
@@ -159,6 +161,8 @@ fun TimbraNavHost(
                     }
                 }
                 screen<FinderResultRoute> {
+                    // Al volver de Exportar, Spotify ya se había soltado y hay que unirse otra vez.
+                    LaunchedEffect(Unit) { finder.prepareMusic() }
                     FinderResultScreen(
                         state = finderState,
                         onBypassChange = finder::setBypass,
@@ -233,11 +237,15 @@ private val FinderSoundRoutes = listOf(ComfortLevelRoute::class, FinderRoundRout
  * apaga la pantalla. Es la regla "nunca suena fuera de las pantallas del test".
  */
 @Composable
-private fun StopFinderSoundOutsideItsScreens(navController: NavHostController, onStop: () -> Unit) {
+private fun StopFinderSoundOutsideItsScreens(
+    navController: NavHostController,
+    onLeaveTest: () -> Unit,
+    onStop: () -> Unit,
+) {
     val entry by navController.currentBackStackEntryAsState()
     LaunchedEffect(entry?.destination) {
         val destination = entry?.destination ?: return@LaunchedEffect
-        if (FinderSoundRoutes.none { destination.hasRoute(it) }) onStop()
+        if (FinderSoundRoutes.none { destination.hasRoute(it) }) onLeaveTest()
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {

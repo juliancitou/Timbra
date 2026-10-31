@@ -17,7 +17,10 @@ import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.ui.screens.finder.FinderUiState
+import com.juliancitou.timbra.ui.screens.finder.SpotifyLink
+import com.juliancitou.timbra.ui.screens.finder.playbackLabelRes
 import com.juliancitou.timbra.ui.screens.label
+import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.PlayingIndicator
 import com.juliancitou.timbra.ui.theme.SectionLabel
@@ -36,6 +39,8 @@ fun ComfortLevelScreen(
     onPrepareMusic: () -> Unit,
     onSelectGenre: (Genre) -> Unit,
     onSelectSong: (Uri) -> Unit,
+    onUseSpotify: () -> Unit,
+    onOpenSpotify: () -> Unit,
     onTogglePlayback: () -> Unit,
     onReady: () -> Unit,
     onBack: () -> Unit,
@@ -52,7 +57,7 @@ fun ComfortLevelScreen(
         actions = {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
                 TerminalButton(
-                    text = stringResource(if (state.isPlaying) R.string.action_pause else R.string.action_play),
+                    text = stringResource(state.playbackLabelRes()),
                     onClick = onTogglePlayback,
                     style = TerminalButtonStyle.Secondary,
                     enabled = !state.preparing,
@@ -81,12 +86,13 @@ fun ComfortLevelScreen(
                 Genre.entries.forEach { genre ->
                     TerminalChip(
                         label = stringResource(genre.label()),
-                        selected = state.songName == null && state.genre == genre,
+                        selected = !state.usesSpotify && state.songName == null && state.genre == genre,
                         onClick = { onSelectGenre(genre) },
                     )
                 }
             }
         }
+        SpotifySection(state, onUseSpotify, onOpenSpotify)
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             SectionLabel(stringResource(R.string.comfort_section_song))
             TerminalButton(
@@ -119,6 +125,51 @@ fun ComfortLevelScreen(
         ) {
             SectionLabel(stringResource(R.string.comfort_section_safety))
             DetailText(stringResource(R.string.comfort_safety))
+        }
+    }
+}
+
+@Composable
+private fun SpotifySection(state: FinderUiState, onUseSpotify: () -> Unit, onOpenSpotify: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        SectionLabel(stringResource(R.string.comfort_section_spotify))
+        if (!state.usesSpotify) {
+            TerminalButton(
+                text = stringResource(R.string.action_use_spotify),
+                onClick = onUseSpotify,
+                style = TerminalButtonStyle.Secondary,
+                enabled = !state.loadingSong,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            DetailText(stringResource(R.string.comfort_spotify_hint))
+            return@Column
+        }
+        TerminalButton(
+            text = stringResource(R.string.action_open_spotify),
+            onClick = onOpenSpotify,
+            style = TerminalButtonStyle.Secondary,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        when (state.spotify) {
+            SpotifyLink.Connected -> DetailText(
+                stringResource(R.string.comfort_spotify_connected),
+                color = MaterialTheme.colorScheme.primary,
+            )
+            SpotifyLink.Blocked -> DetailText(
+                stringResource(R.string.comfort_spotify_blocked),
+                color = MaterialTheme.colorScheme.secondary,
+            )
+            SpotifyLink.Failed -> DetailText(
+                stringResource(R.string.comfort_spotify_failed),
+                color = MaterialTheme.colorScheme.secondary,
+            )
+            else -> CodeLines(
+                listOf(
+                    stringResource(R.string.comfort_spotify_step_play),
+                    stringResource(R.string.comfort_spotify_step_return),
+                    stringResource(R.string.comfort_spotify_step_retry),
+                ),
+            )
         }
     }
 }
