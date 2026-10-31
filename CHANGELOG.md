@@ -19,6 +19,17 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `cdb1252` · audio: hacer audibles los cambios entre opciones
+- Al calcular el preset ya redondeado, dos opciones vecinas de una ronda de afinado podían diferir 0.5 dB en
+  solo 2 a 5 bandas, y eso casi no se oye.
+- Pasos de la primera pasada: Balance 3 dB; Graves, Claridad, Voz y "S" 2 dB; Aire 2.5 dB. Afinar usa la mitad.
+- Rangos ampliados para que quepan cinco opciones: Balance ±6, Claridad −6 a +2, Voz −5 a +3, Aire −7 a +3.
+- Aire empieza en 9.5 kHz en vez de 11 kHz, porque casi no se oye arriba de 14 kHz.
+- En bocina, Graves actúa desde 300 Hz y Claridad en 500 Hz, porque la bocina casi no reproduce lo que está
+  más abajo. Son valores de referencia, no medidos en este teléfono.
+- Una prueba fija cuánto debe cambiar el preset entre opciones vecinas, en cada ronda y salida. No sustituye
+  la prueba de oído. El formato del preset no cambia.
+
 ### 2026-10-31 · `da41740` · feat: comprobar Poweramp y ruido antes de empezar
 - **Poweramp:** su API pública puede encenderlo y apagarlo, pero no dice su estado. Para saberlo se intenta
   tomar `DynamicsProcessing` en la sesión de Spotify con prioridad 0: Android lo rechaza si otra app lo
