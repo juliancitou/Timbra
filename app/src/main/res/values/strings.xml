@@ -6,17 +6,16 @@
     <string name="action_continue">Continuar</string>
 
     <!-- Inicio -->
-    <string name="home_lead">Crea una ecualización hecha para tus oídos y tus audífonos.</string>
+    <string name="home_lead">Crea una ecualización a tu gusto para Poweramp, sin saber nada de audio.</string>
     <string name="home_section_how">cómo funciona</string>
-    <string name="home_step_listen">Escucha dos sonidos: una referencia y una banda de prueba.</string>
-    <string name="home_step_match">Mueve el control hasta que suenen igual de fuertes. Son 25 bandas.</string>
-    <string name="home_step_export">Exporta el resultado y ábrelo en Poweramp.</string>
+    <string name="home_step_listen">Pon música de la app o una canción tuya.</string>
+    <string name="home_step_choose">En cada ronda, elige lo que más te guste de oído.</string>
+    <string name="home_step_export">Descarga el archivo e impórtalo en Poweramp.</string>
     <string name="home_section_tips">antes de empezar</string>
-    <string name="home_tip_time">Reserva de 10 a 15 minutos.</string>
-    <string name="home_tip_quiet">Busca un lugar silencioso y mide descansado.</string>
+    <string name="home_tip_time">Te tomará unos 5 minutos.</string>
+    <string name="home_tip_quiet">Busca un lugar silencioso.</string>
     <string name="home_tip_volume">Baja el volumen del teléfono: lo subirás poco a poco.</string>
     <string name="action_create_equalization">Crear mi ecualización</string>
-    <string name="action_my_measurements">Mis mediciones</string>
     <string name="action_settings">Ajustes</string>
 
     <!-- Preparación -->
@@ -30,7 +29,7 @@
 
     <!-- Nivel cómodo -->
     <string name="comfort_title">Nivel cómodo</string>
-    <string name="comfort_lead">Elige un género y pulsa Reproducir. Sube el volumen del teléfono poco a poco hasta que se oiga claro, pero nunca fuerte.</string>
+    <string name="comfort_lead">Elige qué escuchar y pulsa Reproducir. Sube el volumen del teléfono poco a poco hasta que se oiga claro, pero nunca fuerte.</string>
     <string name="comfort_section_safety">seguridad</string>
     <string name="comfort_safety">Si en algún momento te molesta, pausa. El sonido nunca supera un nivel seguro.</string>
     <string name="action_play">Reproducir</string>
@@ -75,13 +74,13 @@
 
     <!-- Exportar -->
     <string name="export_title">Exportar</string>
-    <string name="export_lead">Guarda el archivo en tu teléfono y luego impórtalo en Poweramp Equalizer.</string>
+    <string name="export_lead">Descarga el archivo en tu teléfono y luego impórtalo en Poweramp Equalizer.</string>
     <string name="export_section_name">nombre del preset</string>
     <string name="export_section_steps">cómo importarlo</string>
     <string name="export_step_open">Abre Poweramp Equalizer.</string>
     <string name="export_step_presets">Entra a la lista de presets y elige importar.</string>
-    <string name="export_step_select">Selecciona el archivo que guardaste.</string>
-    <string name="action_save_file">Guardar archivo</string>
+    <string name="export_step_select">Selecciona el archivo que descargaste.</string>
+    <string name="action_save_file">Descargar archivo</string>
     <string name="action_share">Compartir</string>
     <string name="action_go_home">Inicio</string>
 
@@ -174,10 +173,10 @@
     <string name="finder_progress_coarse">ronda %1$d de %2$d · primera pasada</string>
     <string name="finder_progress_fine">ronda %1$d de %2$d · afinar</string>
     <string name="finder_step_listen">Toca cada círculo para escuchar cómo cambia.</string>
-    <string name="finder_step_choose">Elige el que te suene mejor y pulsa "Elegir".</string>
+    <string name="finder_step_choose">Si uno te gusta, déjalo sonando y pulsa \"Elegir\".</string>
     <string name="finder_fine_hint">Ahora afina: las opciones están más cerca de lo que elegiste.</string>
     <string name="finder_preparing">Preparando opciones…</string>
-    <string name="finder_node_description">Opción %1$d de %2$d, %3$s</string>
+    <string name="finder_node_description">Opción %1$d de %2$d</string>
     <string name="action_choose">Elegir</string>
 
     <string name="finder_balance_title">Balance</string>
@@ -222,8 +221,8 @@
     <string name="action_restart_test">Repetir el test</string>
 
     <!-- Exportar -->
-    <string name="export_saved">Archivo guardado</string>
-    <string name="export_save_failed">No se pudo guardar el archivo</string>
+    <string name="export_saved">Archivo descargado</string>
+    <string name="export_save_failed">No se pudo descargar el archivo</string>
     <string name="export_share_chooser">Compartir preset</string>
 
     <!-- Modo avanzado (vista previa) -->
@@ -262,4 +261,19 @@
     <string name="export_assign_bluetooth">tus audífonos (deben estar conectados)</string>
     <string name="export_assign_wired">los audífonos con cable (deben estar conectados)</string>
     <string name="export_assign_speaker">la bocina</string>
+
+    <!-- Test: no me gustó ninguno, canción propia y resumen -->
+    <string name="action_none">No me gustó ninguno</string>
+    <string name="finder_step_none">Si ninguno te convence, se queda como estaba y seguimos.</string>
+    <string name="finder_node_current">actual</string>
+    <string name="finder_section_changes">qué cambió</string>
+    <string name="finder_summary_line">%1$s: %2$s</string>
+    <string name="finder_summary_same">sin cambios</string>
+    <string name="comfort_section_song">o usa tu música</string>
+    <string name="action_pick_song">Elegir una canción de mi teléfono</string>
+    <string name="comfort_song_hint">Debe ser un archivo guardado en tu teléfono; no funciona con Spotify. Se usan sus primeros 2 minutos y no sale de tu teléfono.</string>
+    <string name="comfort_song_loading">Preparando tu canción…</string>
+    <string name="comfort_song_failed">No pude leer ese archivo. Prueba con otro, por ejemplo MP3 o FLAC.</string>
+    <string name="comfort_song_selected">Tu canción: %1$s</string>
+    <string name="comfort_song_fallback">tu canción</string>
 </resources>

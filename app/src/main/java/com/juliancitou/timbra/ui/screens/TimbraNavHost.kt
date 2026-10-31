@@ -113,7 +113,6 @@ fun TimbraNavHost(
                 ) {
                     HomeScreen(
                         onCreateEqualization = { navController.navigate(PreparationRoute) },
-                        onOpenHistory = { navController.navigate(HistoryRoute) },
                         onOpenSettings = { navController.navigate(SettingsRoute) },
                     )
                 }
@@ -134,6 +133,7 @@ fun TimbraNavHost(
                         state = finderState,
                         onPrepareMusic = finder::prepareMusic,
                         onSelectGenre = finder::selectGenre,
+                        onSelectSong = finder::selectSong,
                         onTogglePlayback = finder::togglePlayback,
                         onReady = {
                             finder.startTest()
@@ -151,6 +151,7 @@ fun TimbraNavHost(
                             state = finderState,
                             onAudition = finder::audition,
                             onChoose = finder::chooseAudition,
+                            onKeepCurrent = finder::keepCurrent,
                             onTogglePlayback = finder::togglePlayback,
                             onPreviousRound = finder::previousRound,
                             onExit = back,

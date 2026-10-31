@@ -42,6 +42,12 @@ object Credits {
     )
 
     val references = listOf(
+        Credit(
+            "Digital Audio Resampling",
+            "Julius O. Smith III",
+            "Stanford CCRMA",
+            "https://ccrma.stanford.edu/~jos/resample/",
+        ),
         Credit("Audio EQ Cookbook", "Robert Bristow-Johnson", "W3C", "https://www.w3.org/TR/audio-eq-cookbook/"),
         Credit(
             "ITU-R BS.1770",

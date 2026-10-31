@@ -172,13 +172,15 @@ adb devices                    # muestra los teléfonos conectados
 
 1. **Prepara:** elige la salida (audífonos Bluetooth, de cable o la bocina del teléfono), cuántas
    bandas usas en Poweramp y **apaga el ecualizador de Poweramp** mientras haces el test.
-2. **Nivel cómodo:** suena la música del test. Ajusta el volumen del teléfono hasta que se oiga
+2. **Música y nivel cómodo:** elige un género de la app o una canción guardada en tu teléfono (se
+   usan sus primeros 2 minutos). Ajusta el volumen del teléfono hasta que se oiga
    claro pero cómodo, nunca fuerte.
 3. **Rondas de esferas:** cada ronda se enfoca en algo: balance general, graves, claridad, voces,
    la "S" y los platillos, y el aire de los agudos. Toca las esferas para escuchar cada opción;
-   todas suenan igual de fuertes, así que eliges solo por cómo suenan. Cuando una te guste, elígela.
+   todas suenan igual de fuertes, así que eliges solo por cómo suenan. Cuando una te guste, elígela;
+   si ninguna te convence, pulsa **No me gustó ninguno** y esa parte se queda como estaba.
 4. **Tu resultado:** escúchalo completo y compáralo con "sin ecualizar".
-5. **Exporta:** guarda o comparte el archivo `.json`.
+5. **Exporta:** descarga o comparte el archivo `.json`.
 6. **Importa en Poweramp Equalizer:** abre la lista de presets, usa la opción de importar y elige
    el archivo. Después **asígnalo a su salida** (⋮ → Guardar/Asignar), para que Poweramp lo use
    solo con esos audífonos o con la bocina. La app muestra los pasos exactos al exportar.
@@ -207,6 +209,7 @@ Tu oído es lo más importante:
 
 - Sin internet, sin cuentas, sin anuncios y sin analítica.
 - Tus mediciones se guardan solo en el almacenamiento interno de la app.
+- Si eliges una canción tuya, solo se lee en memoria: no se copia, no se modifica ni sale del teléfono.
 - Los presets se guardan donde tú elijas con el selector de archivos del sistema.
 - Al desinstalar la app se borran todas sus mediciones.
 
@@ -265,6 +268,8 @@ La licencia de Cascadia Mono va incluida dentro de la app, en `assets/licenses/`
 ### Conocimiento en el que se basa el audio
 
 - **Audio EQ Cookbook** de Robert Bristow-Johnson: fórmulas de los filtros del ecualizador.
+- **Digital Audio Resampling** de Julius O. Smith III: la interpolación sinc con la que una canción
+  tuya se adapta a la frecuencia de tu teléfono (<https://ccrma.stanford.edu/~jos/resample/>).
 - **ITU-R BS.1770**: la ponderación K con la que se iguala el volumen entre ecualizaciones.
 - **Paul Kellet**: el filtro que genera el ruido rosa (publicado en musicdsp.org).
 - **Manfred Schroeder** y **Freeverb** de Jezar at Dreampoint (dominio público): la estructura de

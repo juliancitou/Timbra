@@ -13,18 +13,15 @@ import com.juliancitou.timbra.R
 import com.juliancitou.timbra.measure.FinderDimension
 import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.DetailText
-import com.juliancitou.timbra.ui.theme.FrequencyChart
 import com.juliancitou.timbra.ui.theme.OptionNodes
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
-import com.juliancitou.timbra.ui.theme.TerminalPanel
 import com.juliancitou.timbra.ui.theme.TerminalScreen
-import com.juliancitou.timbra.ui.theme.formatDecibels
 
 /** Textos de cada zona: título, pregunta, qué cambia y qué significa cada extremo. */
-private data class DimensionTexts(
+internal data class DimensionTexts(
     @StringRes val title: Int,
     @StringRes val question: Int,
     @StringRes val hint: Int,
@@ -32,7 +29,7 @@ private data class DimensionTexts(
     @StringRes val upper: Int,
 )
 
-private fun FinderDimension.texts() = when (this) {
+internal fun FinderDimension.texts() = when (this) {
     FinderDimension.Balance -> DimensionTexts(
         R.string.finder_balance_title, R.string.finder_balance_question, R.string.finder_balance_hint,
         R.string.finder_balance_lower, R.string.finder_balance_upper,
@@ -60,15 +57,16 @@ private fun FinderDimension.texts() = when (this) {
 }
 
 /**
- * Una ronda del test: la pregunta, las instrucciones como código, los cinco nodos para escuchar,
- * la curva de la opción que suena y los botones para reproducir y elegir. Atrás vuelve a la ronda
- * anterior; en la primera, a la pantalla anterior.
+ * Una ronda del test: la pregunta, en qué fijarse, los cinco nodos para escuchar y los botones para
+ * reproducir, elegir o dejarlo como estaba. Atrás vuelve a la ronda anterior; en la primera, a la
+ * pantalla anterior. Los nodos no muestran dB: quien no sabe de audio elige de oído.
  */
 @Composable
 fun FinderRoundScreen(
     state: FinderUiState,
     onAudition: (Int) -> Unit,
     onChoose: () -> Unit,
+    onKeepCurrent: () -> Unit,
     onTogglePlayback: () -> Unit,
     onPreviousRound: () -> Boolean,
     onExit: () -> Unit,
@@ -77,6 +75,7 @@ fun FinderRoundScreen(
     val round = finder.round
     val texts = round.dimension.texts()
     val options = finder.options()
+    val currentIndex = finder.currentOptionIndex
     val goBack = { if (!onPreviousRound()) onExit() }
     BackHandler(onBack = goBack)
 
@@ -100,16 +99,33 @@ fun FinderRoundScreen(
                     modifier = Modifier.weight(1f),
                 )
             }
+            TerminalButton(
+                text = stringResource(R.string.action_none),
+                onClick = onKeepCurrent,
+                style = TerminalButtonStyle.Secondary,
+                enabled = !state.preparing,
+                modifier = Modifier.fillMaxWidth(),
+            )
         },
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             val progress = if (round.fine) R.string.finder_progress_fine else R.string.finder_progress_coarse
             SectionLabel(stringResource(progress, finder.roundIndex + 1, finder.rounds.size))
-            CodeLines(listOf(stringResource(R.string.finder_step_listen), stringResource(R.string.finder_step_choose)))
+            CodeLines(
+                listOf(
+                    stringResource(R.string.finder_step_listen),
+                    stringResource(R.string.finder_step_choose),
+                    stringResource(R.string.finder_step_none),
+                ),
+            )
         }
-        val labels = options.map { formatDecibels(it.toFloat()).removeSuffix(" dB") }
-        val descriptions = options.mapIndexed { index, option ->
-            stringResource(R.string.finder_node_description, index + 1, options.size, formatDecibels(option.toFloat()))
+        val currentLabel = stringResource(R.string.finder_node_current)
+        val labels = options.indices.map { index ->
+            if (index == currentIndex) currentLabel else ('A' + index).toString()
+        }
+        val descriptions = options.indices.map { index ->
+            val position = stringResource(R.string.finder_node_description, index + 1, options.size)
+            if (index == currentIndex) "$position, $currentLabel" else position
         }
         OptionNodes(
             values = labels,
@@ -131,12 +147,5 @@ fun FinderRoundScreen(
                 },
             ),
         )
-        TerminalPanel {
-            FrequencyChart(
-                gainsDb = finder.curveWithCandidateDb(options[state.auditionIndex]).map { it.toFloat() },
-                contentDescription = stringResource(R.string.finder_result_chart),
-                frequenciesHz = finder.layout.frequenciesHz,
-            )
-        }
     }
 }

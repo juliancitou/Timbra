@@ -1,18 +1,26 @@
 package com.juliancitou.timbra.ui.screens.finder
 
 import android.app.Application
+import android.net.Uri
 import android.os.Process
+import android.provider.OpenableColumns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.AudioOutput
 import com.juliancitou.timbra.audio.EqualizerSettings
 import com.juliancitou.timbra.audio.LoopSource
 import com.juliancitou.timbra.audio.LoudnessMatcher
 import com.juliancitou.timbra.audio.PlaybackStatus
+import com.juliancitou.timbra.audio.PreparedSong
 import com.juliancitou.timbra.audio.SignalSource
+import com.juliancitou.timbra.audio.StereoLoopSource
+import com.juliancitou.timbra.audio.decodeAudioFile
 import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.music.MusicLoop
+import com.juliancitou.timbra.audio.prepareSong
+import com.juliancitou.timbra.audio.resample
 import com.juliancitou.timbra.data.BandLayoutPreferences
 import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.PowerampExporter
@@ -37,16 +45,27 @@ data class FinderUiState(
     val bypass: Boolean = false,
     val headphonesName: String = "",
     val presetName: String = "",
+    /** Nombre de la canción del usuario que suena; `null` si suena la música de la app. */
+    val songName: String? = null,
+    val loadingSong: Boolean = false,
+    val songFailed: Boolean = false,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
     val isPlaying: Boolean get() = status == PlaybackStatus.Playing
 
     /** Nombre del preset: el que escribió el usuario o, si no escribió ninguno, el sugerido. */
     fun effectivePresetName(suggested: String): String = presetName.ifBlank { suggested }
+
+    /** Otro estado del test, escuchando de entrada lo que ya hay y no lo que esté en el centro. */
+    fun withFinder(next: EqualizerFinder): FinderUiState =
+        copy(finder = next, auditionIndex = if (next.isFinished) CENTER_OPTION else next.currentOptionIndex)
 }
 
 private const val CENTER_OPTION = 2
 private const val REFERENCE_SECONDS = 4
+
+/** Con 2 minutos basta para el test, y una canción en estéreo no ocupa más de ~50 MB de memoria. */
+private const val MAX_SONG_SECONDS = 120
 private const val STOP_SHARING_AFTER_MS = 5_000L
 
 /**
@@ -81,6 +100,11 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private var currentLoop: LoopSource? = null
     private var currentGenre: Genre? = null
 
+    /** Solo se tocan desde el hilo de síntesis. */
+    private var userSong: PreparedSong? = null
+    private var userSongMatcher: LoudnessMatcher? = null
+    private var playingSong: PreparedSong? = null
+
     val uiState: StateFlow<FinderUiState> = combine(state, playback) { current, status ->
         current.copy(status = status)
     }
@@ -104,8 +128,31 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     fun prepareMusic() = refresh()
 
     fun selectGenre(genre: Genre) {
-        state.update { it.copy(genre = genre) }
+        if (state.value.loadingSong) return
+        state.update { it.copy(genre = genre, songName = null, songFailed = false) }
         refresh()
+    }
+
+    /** Lee la canción elegida con el selector del sistema. No empieza a sonar sola. */
+    fun selectSong(uri: Uri) {
+        stopSound()
+        state.update { it.copy(loadingSong = true, songFailed = false, preparing = true) }
+        viewModelScope.launch(synthesis) {
+            // También cubre quedarse sin memoria: el test puede seguir con la música de la app.
+            val loaded = runCatching { loadSong(uri) }.getOrNull()
+            if (loaded != null) {
+                userSong = loaded
+                userSongMatcher = LoudnessMatcher(output.sampleRate, loaded.reference)
+            }
+            state.update {
+                it.copy(
+                    loadingSong = false,
+                    songFailed = loaded == null,
+                    songName = if (loaded != null) songDisplayName(uri) else it.songName,
+                )
+            }
+            refresh()
+        }
     }
 
     fun togglePlayback() {
@@ -123,12 +170,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     /** Empieza el test desde la primera ronda, conservando el género y el nombre de los audífonos. */
     fun startTest() {
         state.update {
-            it.copy(
-                finder = EqualizerFinder(it.finder.output, it.finder.layout),
-                auditionIndex = CENTER_OPTION,
-                bypass = false,
-                presetName = "",
-            )
+            it.withFinder(EqualizerFinder(it.finder.output, it.finder.layout)).copy(bypass = false, presetName = "")
         }
         refresh()
     }
@@ -144,14 +186,22 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         val current = state.value
         if (current.preparing || current.finder.isFinished) return
         val chosen = current.finder.options()[current.auditionIndex]
-        state.update { it.copy(finder = it.finder.choose(chosen), auditionIndex = CENTER_OPTION) }
+        state.update { it.withFinder(it.finder.choose(chosen)) }
+        refresh()
+    }
+
+    /** "No me gustó ninguno": deja la zona como estaba y pasa a la siguiente. */
+    fun keepCurrent() {
+        val current = state.value
+        if (current.preparing || current.finder.isFinished) return
+        state.update { it.withFinder(it.finder.keepCurrent()) }
         refresh()
     }
 
     /** Vuelve a la ronda anterior. Devuelve `false` si ya está en la primera. */
     fun previousRound(): Boolean {
         val previous = state.value.finder.previous ?: return false
-        state.update { it.copy(finder = previous, auditionIndex = CENTER_OPTION) }
+        state.update { it.withFinder(previous) }
         refresh()
         return true
     }
@@ -183,12 +233,10 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         state.update { it.copy(preparing = true) }
         viewModelScope.launch(synthesis) {
             val snapshot = state.value
-            val focus = if (snapshot.finder.isFinished) MusicFocus.Balanced else snapshot.finder.round.dimension.focus
-            val mix = mixFor(snapshot.genre, focus)
-            val matcher = matcherFor(snapshot.genre, focus, mix)
+            val song = userSong.takeIf { snapshot.songName != null }
+            if (song == null) userSong = null
+            val matcher = if (song != null) playUserSong(song) else playAppMusic(snapshot)
             optionSettings = optionsFor(snapshot.finder, matcher)
-            playLoop(mix, sameSong = currentGenre == snapshot.genre)
-            currentGenre = snapshot.genre
             val latest = state.value
             val settings = when {
                 latest.finder.isFinished && latest.bypass -> matcher.compensated(EqualizerSettings.Flat)
@@ -196,9 +244,55 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
                 else -> optionSettings.getOrNull(latest.auditionIndex) ?: EqualizerSettings.Flat
             }
             output.renderer.changeEqualization(settings)
-            if (latest.finder == snapshot.finder && latest.genre == snapshot.genre) {
+            val unchanged = latest.finder == snapshot.finder && latest.genre == snapshot.genre &&
+                latest.songName == snapshot.songName
+            if (unchanged && !latest.loadingSong) {
                 state.update { it.copy(preparing = false) }
             }
+        }
+    }
+
+    /** Una canción real no se reinicia entre rondas: solo cambia la ecualización. */
+    private fun playUserSong(song: PreparedSong): LoudnessMatcher {
+        if (playingSong !== song) {
+            output.renderer.changeSource(StereoLoopSource(song.left, song.right))
+            playingSong = song
+            currentLoop = null
+            currentGenre = null
+        }
+        return requireNotNull(userSongMatcher)
+    }
+
+    private fun playAppMusic(snapshot: FinderUiState): LoudnessMatcher {
+        val focus = if (snapshot.finder.isFinished) MusicFocus.Balanced else snapshot.finder.round.dimension.focus
+        val mix = mixFor(snapshot.genre, focus)
+        val matcher = matcherFor(snapshot.genre, focus, mix)
+        playLoop(mix, sameSong = currentGenre == snapshot.genre)
+        currentGenre = snapshot.genre
+        playingSong = null
+        return matcher
+    }
+
+    private fun loadSong(uri: Uri): PreparedSong {
+        val decoded = decodeAudioFile(getApplication(), uri, MAX_SONG_SECONDS)
+        val rate = output.sampleRate
+        return prepareSong(
+            resample(decoded.left, decoded.sampleRate, rate),
+            resample(decoded.right, decoded.sampleRate, rate),
+            rate,
+        )
+    }
+
+    /** El nombre del archivo sin su extensión; si el sistema no lo da, se usa uno genérico. */
+    private fun songDisplayName(uri: Uri): String {
+        val resolver = getApplication<Application>().contentResolver
+        val name = runCatching {
+            resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) cursor.getString(0) else null
+            }
+        }.getOrNull()
+        return name?.substringBeforeLast('.').orEmpty().ifBlank {
+            getApplication<Application>().getString(R.string.comfort_song_fallback)
         }
     }
 

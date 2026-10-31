@@ -1,10 +1,14 @@
 package com.juliancitou.timbra.ui.screens.comfort
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -23,17 +27,23 @@ import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalChip
 import com.juliancitou.timbra.ui.theme.TerminalScreen
 
+private const val AUDIO_MIME_TYPES = "audio/*"
+
 /** Elegir la música del test y llegar a un volumen cómodo antes de empezar las rondas. */
 @Composable
 fun ComfortLevelScreen(
     state: FinderUiState,
     onPrepareMusic: () -> Unit,
     onSelectGenre: (Genre) -> Unit,
+    onSelectSong: (Uri) -> Unit,
     onTogglePlayback: () -> Unit,
     onReady: () -> Unit,
     onBack: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onPrepareMusic() }
+    val pickSong = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) onSelectSong(uri)
+    }
 
     TerminalScreen(
         title = stringResource(R.string.comfort_title),
@@ -71,12 +81,37 @@ fun ComfortLevelScreen(
                 Genre.entries.forEach { genre ->
                     TerminalChip(
                         label = stringResource(genre.label()),
-                        selected = state.genre == genre,
+                        selected = state.songName == null && state.genre == genre,
                         onClick = { onSelectGenre(genre) },
                     )
                 }
             }
-            if (state.preparing) DetailText(stringResource(R.string.audio_status_preparing))
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            SectionLabel(stringResource(R.string.comfort_section_song))
+            TerminalButton(
+                text = stringResource(R.string.action_pick_song),
+                onClick = {
+                    if (state.isPlaying) onTogglePlayback()
+                    pickSong.launch(arrayOf(AUDIO_MIME_TYPES))
+                },
+                style = TerminalButtonStyle.Secondary,
+                enabled = !state.loadingSong,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            when {
+                state.loadingSong -> DetailText(stringResource(R.string.comfort_song_loading))
+                state.songFailed -> DetailText(
+                    stringResource(R.string.comfort_song_failed),
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+                state.songName != null -> DetailText(
+                    stringResource(R.string.comfort_song_selected, state.songName),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                else -> DetailText(stringResource(R.string.comfort_song_hint))
+            }
+            if (state.preparing && !state.loadingSong) DetailText(stringResource(R.string.audio_status_preparing))
         }
         Column(
             modifier = Modifier.fillMaxWidth(),

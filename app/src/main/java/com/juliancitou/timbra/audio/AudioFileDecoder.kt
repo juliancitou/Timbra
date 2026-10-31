@@ -58,7 +58,8 @@ private fun drain(extractor: MediaExtractor, codec: MediaCodec, format: MediaFor
             continue
         }
         idleAttempts = 0
-        val target = collector ?: FrameCollector.forOutput(codec.outputFormat, format, maxSeconds).also { collector = it }
+        val target = collector
+            ?: FrameCollector.forOutput(codec.outputFormat, format, maxSeconds).also { collector = it }
         if (info.size > 0) target.append(requireNotNull(codec.getOutputBuffer(index)), info)
         codec.releaseOutputBuffer(index, false)
         if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) break
@@ -131,7 +132,8 @@ private class FrameCollector(
                 AudioFormat.ENCODING_PCM_16BIT
             }
             val limit = maxSeconds.toLong() * MICROSECONDS_PER_SECOND
-            val duration = if (input.containsKey(MediaFormat.KEY_DURATION)) input.getLong(MediaFormat.KEY_DURATION) else limit
+            val hasDuration = input.containsKey(MediaFormat.KEY_DURATION)
+            val duration = if (hasDuration) input.getLong(MediaFormat.KEY_DURATION) else limit
             val capacity = minOf(duration, limit) * sampleRate / MICROSECONDS_PER_SECOND + sampleRate
             return FrameCollector(
                 output.getInteger(MediaFormat.KEY_CHANNEL_COUNT),

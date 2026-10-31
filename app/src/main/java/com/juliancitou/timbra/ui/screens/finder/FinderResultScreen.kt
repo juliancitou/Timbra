@@ -2,6 +2,7 @@ package com.juliancitou.timbra.ui.screens.finder
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.FrequencyChart
+import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
@@ -17,6 +20,9 @@ import com.juliancitou.timbra.ui.theme.TerminalChip
 import com.juliancitou.timbra.ui.theme.TerminalPanel
 import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.TerminalTextField
+
+/** Menos que esto, en dB, casi no se distingue de oído. */
+private const val NOTICEABLE_CHANGE_DB = 0.5
 
 /**
  * Resultado del test: la curva final, la comparación con y sin ecualizar (con el volumen igualado,
@@ -69,6 +75,7 @@ fun FinderResultScreen(
                 frequenciesHz = preset.bandFrequenciesHz,
             )
         }
+        ChangesSummary(state)
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(Spacing.small),
             verticalArrangement = Arrangement.spacedBy(Spacing.small),
@@ -90,5 +97,23 @@ fun FinderResultScreen(
             label = stringResource(R.string.finder_preset_label),
             placeholder = suggestedPresetName(state),
         )
+    }
+}
+
+/** Lo que cambió, en palabras: quien no sabe de audio no tiene por qué leer la gráfica. */
+@Composable
+private fun ChangesSummary(state: FinderUiState) {
+    val lines = state.finder.valuesDb.entries.sortedBy { it.key.ordinal }.map { (dimension, valueDb) ->
+        val texts = dimension.texts()
+        val change = when {
+            valueDb <= -NOTICEABLE_CHANGE_DB -> stringResource(texts.lower)
+            valueDb >= NOTICEABLE_CHANGE_DB -> stringResource(texts.upper)
+            else -> stringResource(R.string.finder_summary_same)
+        }
+        stringResource(R.string.finder_summary_line, stringResource(texts.title), change)
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        SectionLabel(stringResource(R.string.finder_section_changes))
+        CodeLines(lines)
     }
 }
