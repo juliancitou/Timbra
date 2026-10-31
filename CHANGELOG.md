@@ -19,6 +19,23 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `7e5b38b` · feat: mostrar y comprobar la diferencia al ecualizar
+- **Graves en Spotify:** `DynamicsProcessing` usaba su bloque por defecto de 10 ms (512 muestras a
+  48 kHz, ~94 Hz por punto de la FFT, sin interpolar). Casi todas las bandas graves caían en el mismo
+  punto. Ahora pide ~85 ms (4096 muestras, ~12 Hz por punto), a cambio de ~85 ms de retraso.
+- **"Sin ecualizar" con menos o más de 25 bandas:** usaba una lista fija de 25 y obligaba a recrear el
+  efecto en cada cambio. Ahora usa las bandas del preset.
+- **Al salir del test** el efecto se deja plano antes de soltarlo: Poweramp comparte ese mismo efecto y
+  podía quedarse con los últimos ajustes de Timbra. Falta comprobar en el teléfono que recupera los suyos.
+- **Resultado:** la gráfica suma en naranja lo que suena ahora, sobre el preset en ámbar. Con audio de la
+  app se procesa el mismo fragmento con y sin ecualizar por la cadena real y se mide cada banda con el
+  método de Welch, descontando el preamp. En Spotify no se pueden leer sus muestras sin más permisos: se
+  lee del efecto la ganancia de cada banda y se confirma que coincide, o se avisa en rojo. Eso prueba lo
+  que el efecto tiene aplicado, no lo que sale por los audífonos.
+- Resumen de bandas que cambian, el mayor cambio, aviso si es pequeño (menos de 1.5 dB) y lista por banda.
+- **Ecualizador del teléfono:** una app no puede leerlo ni cambiarlo. "Antes de empezar" pide dejarlo en
+  0 y abre los ajustes de sonido; no se comprueba que se haya hecho.
+
 ### 2026-10-31 · `e68a6be` · feat: calibrar con Poweramp y comprobar elecciones
 - En el teléfono se vio que Poweramp Equalizer también usa `DynamicsProcessing` (prioridad 1337), y
   Android no deja leer sus bandas sin privilegios ni cambiar ajustes del sistema. Por eso se calibra
