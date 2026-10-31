@@ -16,8 +16,10 @@ const val OPTIONS_PER_ROUND = 5
 
 /**
  * Una zona del sonido que el test ajusta, con su música resaltada, el paso entre opciones en la
- * pasada gruesa (dB) y el rango permitido. Los rangos son conservadores: subir más de +3 dB en
- * graves hace que el limitador de Poweramp "bombee" el volumen.
+ * pasada gruesa (dB) y el rango permitido. Subir más de +3 dB en graves hace que el limitador de
+ * Poweramp "bombee" el volumen. Los pasos son lo bastante grandes para oírse con música: 1 dB en la
+ * pasada de afinado es casi el mínimo que se distingue, y con 0.5 dB dos opciones sonaban igual. Cada
+ * rango debe caber en cuatro pasos gruesos, para que siempre haya cinco opciones distintas.
  */
 enum class FinderDimension(
     val focus: MusicFocus,
@@ -25,28 +27,34 @@ enum class FinderDimension(
     val rangeDb: ClosedFloatingPointRange<Double>,
 ) {
     /** Inclinación de toda la curva: negativo es más cálido, positivo más brillante. */
-    Balance(MusicFocus.Balanced, coarseStepDb = 1.5, rangeDb = -4.5..4.5),
-    Bass(MusicFocus.Bass, coarseStepDb = 1.5, rangeDb = -6.0..3.0),
+    Balance(MusicFocus.Balanced, coarseStepDb = 3.0, rangeDb = -6.0..6.0),
+    Bass(MusicFocus.Bass, coarseStepDb = 2.0, rangeDb = -6.0..3.0),
 
     /** El "lodo" entre 150 y 400 Hz: bajarlo limpia voces y piano. */
-    Clarity(MusicFocus.Clarity, coarseStepDb = 1.0, rangeDb = -5.0..2.0),
-    Voice(MusicFocus.Voice, coarseStepDb = 1.0, rangeDb = -3.0..3.0),
+    Clarity(MusicFocus.Clarity, coarseStepDb = 2.0, rangeDb = -6.0..2.0),
+    Voice(MusicFocus.Voice, coarseStepDb = 2.0, rangeDb = -5.0..3.0),
 
     /** La "S" y el "tss" de los platillos, entre 5 y 10 kHz. */
-    Sibilance(MusicFocus.Sibilance, coarseStepDb = 1.5, rangeDb = -8.0..2.0),
-    Air(MusicFocus.Air, coarseStepDb = 1.0, rangeDb = -5.0..3.0);
+    Sibilance(MusicFocus.Sibilance, coarseStepDb = 2.0, rangeDb = -8.0..2.0),
 
-    /** Curva de esta zona sobre [frequenciesHz] cuando vale [valueDb]. */
-    fun curve(valueDb: Double, frequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ): List<Double> = when (this) {
+    /** Casi no se oye arriba de 14 kHz, así que necesita más paso y empezar antes que el resto. */
+    Air(MusicFocus.Air, coarseStepDb = 2.5, rangeDb = -7.0..3.0);
+
+    /** Curva de esta zona sobre [frequenciesHz] cuando vale [valueDb], en la salida [output]. */
+    fun curve(
+        valueDb: Double,
+        frequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ,
+        output: OutputKind = OutputKind.Wired,
+    ): List<Double> = when (this) {
         Balance -> sum(
             lowShelf(400.0, -valueDb / 2, transitionOctaves = 2.0, frequenciesHz = frequenciesHz),
             highShelf(2500.0, valueDb / 2, transitionOctaves = 2.0, frequenciesHz = frequenciesHz),
         )
-        Bass -> lowShelf(120.0, valueDb, frequenciesHz = frequenciesHz)
-        Clarity -> bell(250.0, valueDb, widthOctaves = 1.5, frequenciesHz = frequenciesHz)
+        Bass -> lowShelf(output.bassCornerHz, valueDb, frequenciesHz = frequenciesHz)
+        Clarity -> bell(output.clarityCenterHz, valueDb, widthOctaves = 1.5, frequenciesHz = frequenciesHz)
         Voice -> bell(2000.0, valueDb, widthOctaves = 1.5, frequenciesHz = frequenciesHz)
         Sibilance -> bell(7000.0, valueDb, widthOctaves = 1.2, frequenciesHz = frequenciesHz)
-        Air -> highShelf(11_000.0, valueDb, frequenciesHz = frequenciesHz)
+        Air -> highShelf(9_500.0, valueDb, frequenciesHz = frequenciesHz)
     }
 }
 
@@ -142,7 +150,7 @@ data class EqualizerFinder(
         val frequencies = layout.frequenciesHz
         val zero = List(frequencies.size) { 0.0 }
         return values.entries.fold(zero) { total, (dimension, value) ->
-            sum(total, dimension.curve(value, frequencies))
+            sum(total, dimension.curve(value, frequencies, output))
         }
     }
 }

@@ -11,6 +11,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.abs
 
+private const val MIN_CHANGED_BANDS = 3
+
 class EqualizerFinderTest {
 
     private fun gainAt(curve: List<Double>, hz: Int) = curve[POWERAMP_BAND_FREQUENCIES_HZ.indexOf(hz)]
@@ -28,14 +30,14 @@ class EqualizerFinderTest {
     fun optionsAreCenteredOnTheCurrentChoice() {
         val options = EqualizerFinder().options()
         assertEquals(OPTIONS_PER_ROUND, options.size)
-        assertEquals(listOf(-3.0, -1.5, 0.0, 1.5, 3.0), options)
+        assertEquals(listOf(-6.0, -3.0, 0.0, 3.0, 6.0), options)
     }
 
     @Test
     fun fineRoundUsesHalfSteps() {
-        val afterCoarse = EqualizerFinder().choose(1.5)
+        val afterCoarse = EqualizerFinder().choose(3.0)
         assertTrue(afterCoarse.round.fine)
-        assertEquals(listOf(0.0, 0.75, 1.5, 2.25, 3.0), afterCoarse.options())
+        assertEquals(listOf(0.0, 1.5, 3.0, 4.5, 6.0), afterCoarse.options())
     }
 
     @Test
@@ -165,8 +167,8 @@ class EqualizerFinderTest {
 
     @Test
     fun noneInTheFinePassKeepsWhatWasChosenInTheCoarsePass() {
-        val next = EqualizerFinder().choose(1.5).keepCurrent()
-        assertEquals(1.5, next.valuesDb.getValue(FinderDimension.Balance), 0.0)
+        val next = EqualizerFinder().choose(3.0).keepCurrent()
+        assertEquals(3.0, next.valuesDb.getValue(FinderDimension.Balance), 0.0)
         assertEquals(FinderRound(FinderDimension.Bass, fine = false), next.round)
     }
 
@@ -218,6 +220,32 @@ class EqualizerFinderTest {
         val next = finder.choose(finder.currentValueDb)
         assertEquals(finder.valuesDb, next.valuesDb)
         assertTrue(next.doubts.isEmpty())
+    }
+
+    /** Lo que de verdad se exporta, ya redondeado: dos opciones vecinas no pueden sonar igual. */
+    @Test
+    fun neighbouringOptionsChangeEnoughToBeHeard() {
+        OutputKind.entries.forEach { output ->
+            var finder = EqualizerFinder(output = output)
+            repeat(output.rounds.size) {
+                val round = finder.round
+                val presets = finder.options().map { finder.presetWithCandidate(it).bandGainsDb }
+                presets.zipWithNext { lower, upper ->
+                    val changes = lower.zip(upper) { a, b -> abs(a - b) }
+                    val label = "$output $round"
+                    assertTrue(label, changes.max() >= if (round.fine && !round.recheck) 0.5f else 1f)
+                    assertTrue(label, changes.count { it > 0f } >= MIN_CHANGED_BANDS)
+                }
+                finder = finder.choose(finder.currentValueDb)
+            }
+        }
+    }
+
+    @Test
+    fun speakerBassActsWhereTheSpeakerCanPlayIt() {
+        val headphones = FinderDimension.Bass.curve(-4.0)
+        val speaker = FinderDimension.Bass.curve(-4.0, output = OutputKind.Speaker)
+        assertTrue(gainAt(speaker, 267) < gainAt(headphones, 267) - 1.5)
     }
 
     @Test

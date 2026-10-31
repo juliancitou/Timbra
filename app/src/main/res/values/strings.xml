@@ -174,7 +174,7 @@
     <string name="finder_progress_fine">ronda %1$d de %2$d · afinar</string>
     <string name="finder_step_listen">Toca cada círculo para escuchar cómo cambia.</string>
     <string name="finder_step_choose">Si uno te gusta, déjalo sonando y pulsa \"Elegir\".</string>
-    <string name="finder_fine_hint">Ahora afina: las opciones están más cerca de lo que elegiste.</string>
+    <string name="finder_fine_hint">Ahora afina: las opciones están cerca de lo que elegiste. Si no notas diferencia, quédate con la tuya.</string>
     <string name="finder_preparing">Preparando opciones…</string>
     <string name="finder_node_description">Opción %1$d de %2$d</string>
     <string name="action_choose">Elegir</string>

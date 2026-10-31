@@ -168,6 +168,8 @@ terminó en estilo terminal/ASCII).
 - [ ] Comprobar que "Apagar Poweramp" lo apaga y que vuelve a encenderse al exportar o volver a Inicio
 - [ ] Ajustar el umbral de ruido (`QUIET_ROOM_MAX_DBFS`) con el micrófono real
 - [ ] Comprobar que Poweramp vuelve a sus ajustes después del test
+- [x] Pasos más grandes entre opciones y graves de bocina donde sí se oyen
+- [ ] Comprobar en el teléfono que cada ronda se distingue, sobre todo Aire, Claridad y las de afinar
 - [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp (Ajustes → Calibrar)
 - [x] Vista previa con la curva completa del preset y forma elegible al calibrar
 - [x] Mantener presionado para oír como estaba y comprobación final de graves y voz

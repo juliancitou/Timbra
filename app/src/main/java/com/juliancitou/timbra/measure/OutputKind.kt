@@ -10,11 +10,15 @@ private val RECHECKED_ZONES = listOf(FinderDimension.Bass, FinderDimension.Voice
  * - [Wired] parte de plano porque puede ser cualquier audífono.
  * - [Speaker] recorta graves que la bocina no reproduce (subirlos solo la satura), por eso su ronda
  *   de graves nunca los sube, suaviza la zona chillona y omite la ronda de aire, que casi no se percibe en ella.
+ *   Una bocina de teléfono casi no da sonido bajo ~300 Hz: sus graves y su claridad actúan más arriba,
+ *   o esas rondas no se oirían.
  */
 enum class OutputKind(
     private val startDb: Map<FinderDimension, Double> = emptyMap(),
     private val rangesDb: Map<FinderDimension, ClosedFloatingPointRange<Double>> = emptyMap(),
     private val skipped: Set<FinderDimension> = emptySet(),
+    val bassCornerHz: Double = 120.0,
+    val clarityCenterHz: Double = 250.0,
 ) {
     Bluetooth(
         startDb = mapOf(
@@ -29,13 +33,14 @@ enum class OutputKind(
     Speaker(
         startDb = mapOf(FinderDimension.Bass to -4.0, FinderDimension.Voice to -1.0),
         rangesDb = mapOf(
-            FinderDimension.Balance to -4.5..3.0,
             FinderDimension.Bass to -8.0..0.0,
-            FinderDimension.Clarity to -4.0..2.0,
-            FinderDimension.Voice to -4.0..2.0,
-            FinderDimension.Sibilance to -6.0..1.0,
+            FinderDimension.Clarity to -6.0..2.0,
+            FinderDimension.Voice to -5.0..3.0,
+            FinderDimension.Sibilance to -7.0..1.0,
         ),
         skipped = setOf(FinderDimension.Air),
+        bassCornerHz = 300.0,
+        clarityCenterHz = 500.0,
     );
 
     /**
