@@ -28,7 +28,8 @@ fun decibelsToGain(decibels: Double): Double = 10.0.pow(decibels / 20)
  *    muestra (ataque instantáneo) y se recupera en 100 ms. Un recorte duro final garantiza el
  *    techo aunque fallara todo lo anterior.
  *
- * Las muestras no finitas (NaN, ∞) salen como silencio.
+ * Las muestras no finitas (NaN, ∞) salen como silencio. En estéreo los dos canales comparten la misma
+ * ganancia, para que limitar no mueva el sonido hacia un lado.
  */
 class SafetyLimiter(sampleRate: Int) {
     private val rmsCeiling = decibelsToGain(MAX_OUTPUT_RMS_DBFS)
@@ -45,24 +46,39 @@ class SafetyLimiter(sampleRate: Int) {
 
     fun process(sample: Double): Float {
         if (!sample.isFinite()) return 0f
+        val gain = updatedGain(sample * sample, abs(sample))
+        return (sample * gain).coerceIn(-peakCeiling, peakCeiling).toFloat()
+    }
 
-        meanSquare += (sample * sample - meanSquare) * rmsSmoothing
-        val rms = sqrt(meanSquare)
-        val targetLevelGain = if (rms > rmsCeiling) rmsCeiling / rms else 1.0
-        val levelCoefficient = if (targetLevelGain < levelGain) rmsAttack else rmsRelease
-        levelGain += (targetLevelGain - levelGain) * levelCoefficient
-
-        val leveled = sample * levelGain
-        peakGain += (1.0 - peakGain) * peakRelease
-        if (abs(leveled) * peakGain > peakCeiling) peakGain = peakCeiling / abs(leveled)
-
-        return (leveled * peakGain).coerceIn(-peakCeiling, peakCeiling).toFloat()
+    /** Escribe el cuadro limitado en [output], en [offset] (izquierdo) y `offset + 1` (derecho). */
+    fun processStereo(left: Double, right: Double, output: FloatArray, offset: Int) {
+        if (!left.isFinite() || !right.isFinite()) {
+            output[offset] = 0f
+            output[offset + 1] = 0f
+            return
+        }
+        val gain = updatedGain((left * left + right * right) / 2, maxOf(abs(left), abs(right)))
+        output[offset] = (left * gain).coerceIn(-peakCeiling, peakCeiling).toFloat()
+        output[offset + 1] = (right * gain).coerceIn(-peakCeiling, peakCeiling).toFloat()
     }
 
     fun reset() {
         meanSquare = 0.0
         levelGain = 1.0
         peakGain = 1.0
+    }
+
+    private fun updatedGain(power: Double, peak: Double): Double {
+        meanSquare += (power - meanSquare) * rmsSmoothing
+        val rms = sqrt(meanSquare)
+        val targetLevelGain = if (rms > rmsCeiling) rmsCeiling / rms else 1.0
+        val levelCoefficient = if (targetLevelGain < levelGain) rmsAttack else rmsRelease
+        levelGain += (targetLevelGain - levelGain) * levelCoefficient
+
+        val leveledPeak = peak * levelGain
+        peakGain += (1.0 - peakGain) * peakRelease
+        if (leveledPeak * peakGain > peakCeiling) peakGain = peakCeiling / leveledPeak
+        return levelGain * peakGain
     }
 
     /** Coeficiente de un suavizado exponencial con constante de tiempo [seconds]. */

@@ -7,7 +7,8 @@ const val AUTO_STOP_SECONDS = 20 * 60
 
 /**
  * Cadena completa de audio, en este orden fijo: fuente → ecualizador (con fundido al cambiar) →
- * entrada/salida de 50 ms → [SafetyLimiter]. Nada llega a la salida sin pasar por el limitador.
+ * entrada/salida de 50 ms → [SafetyLimiter]. Nada llega a la salida sin pasar por el limitador. Cada
+ * canal tiene su ecualizador, porque los filtros guardan memoria de sus muestras anteriores.
  *
  * Los controles ([play], [stop], [changeEqualization], [changeSource]) se pueden llamar desde
  * cualquier hilo: solo dejan una indicación. [render] corre solo en el hilo de audio, es el único
@@ -17,7 +18,8 @@ const val AUTO_STOP_SECONDS = 20 * 60
 class AudioRenderer(private val sampleRate: Int, initialSource: SignalSource) {
     private val limiter = SafetyLimiter(sampleRate)
     private val ramp = GainRamp(sampleRate)
-    private val equalizer = EqualizerCrossfader(sampleRate)
+    private val leftEqualizer = EqualizerCrossfader(sampleRate)
+    private val rightEqualizer = EqualizerCrossfader(sampleRate)
     private val autoStopSamples = AUTO_STOP_SECONDS.toLong() * sampleRate
 
     private var source = initialSource
@@ -58,7 +60,10 @@ class AudioRenderer(private val sampleRate: Int, initialSource: SignalSource) {
 
     /** Llena [buffer] con [frames] cuadros estéreo intercalados (izquierdo, derecho). */
     fun render(buffer: FloatArray, frames: Int) {
-        pendingEqualization.getAndSet(null)?.let { equalizer.change(it) }
+        pendingEqualization.getAndSet(null)?.let {
+            leftEqualizer.change(it)
+            rightEqualizer.change(it)
+        }
         if (restartRequested) {
             restartRequested = false
             audibleSamples = 0
@@ -68,9 +73,15 @@ class AudioRenderer(private val sampleRate: Int, initialSource: SignalSource) {
             if (swapping && ramp.isSilent) pendingSource.getAndSet(null)?.let { source = it }
             if (wantsSound && !swapping) ramp.fadeIn() else ramp.fadeOut()
 
-            val sample = limiter.process(equalizer.process(source.next()) * ramp.next())
-            buffer[2 * frame] = sample
-            buffer[2 * frame + 1] = sample
+            val leftInput = source.next()
+            val rightInput = source.rightOf(leftInput)
+            val gain = ramp.next()
+            limiter.processStereo(
+                leftEqualizer.process(leftInput) * gain,
+                rightEqualizer.process(rightInput) * gain,
+                buffer,
+                2 * frame,
+            )
 
             if (wantsSound && ++audibleSamples >= autoStopSamples) {
                 wantsSound = false

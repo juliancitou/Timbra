@@ -95,4 +95,21 @@ class AudioRendererTest {
         assertTrue("Debe pasar por silencio", transition.any { it == 0f })
         assertTrue("Debe sonar la fuente nueva", transition.takeLast(10).all { it < 0f })
     }
+
+    @Test
+    fun stereoSourceKeepsItsChannelsApart() {
+        val left = FloatArray(SONG_FRAMES) { 0.05f }
+        val right = FloatArray(SONG_FRAMES) { -0.05f }
+        val renderer = AudioRenderer(RENDER_RATE, StereoLoopSource(left, right))
+        renderer.play()
+        val buffer = FloatArray(SONG_FRAMES * 2)
+        renderer.render(buffer, SONG_FRAMES)
+        assertTrue(buffer[SONG_FRAMES * 2 - 2] > 0f)
+        assertTrue(buffer[SONG_FRAMES * 2 - 1] < 0f)
+    }
+
+    private companion object {
+        const val RENDER_RATE = 48_000
+        const val SONG_FRAMES = 9_600
+    }
 }

@@ -60,4 +60,30 @@ class SafetyLimiterTest {
         assertEquals(0f, limiter.process(Double.POSITIVE_INFINITY))
         assertEquals(0f, limiter.process(Double.NEGATIVE_INFINITY))
     }
+
+    @Test
+    fun stereoNeverExceedsTheCeilingOnEitherChannel() {
+        val limiter = SafetyLimiter(SAMPLE_RATE)
+        val frame = FloatArray(2)
+        repeat(SAMPLE_RATE) {
+            limiter.processStereo(5.0, -3.0, frame, 0)
+            assertTrue(abs(frame[0]) <= PEAK_CEILING && abs(frame[1]) <= PEAK_CEILING)
+        }
+    }
+
+    @Test
+    fun stereoKeepsTheBalanceBetweenChannelsWhileLimiting() {
+        val limiter = SafetyLimiter(SAMPLE_RATE)
+        val frame = FloatArray(2)
+        repeat(SAMPLE_RATE) { limiter.processStereo(0.8, 0.4, frame, 0) }
+        assertEquals(2.0, (frame[0] / frame[1]).toDouble(), 1e-3)
+    }
+
+    @Test
+    fun stereoSilencesInvalidSamples() {
+        val frame = floatArrayOf(1f, 1f)
+        SafetyLimiter(SAMPLE_RATE).processStereo(Double.NaN, 0.5, frame, 0)
+        assertEquals(0f, frame[0])
+        assertEquals(0f, frame[1])
+    }
 }

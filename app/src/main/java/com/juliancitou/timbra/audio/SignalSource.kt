@@ -4,9 +4,13 @@ import kotlin.math.PI
 import kotlin.math.sin
 import kotlin.random.Random
 
-/** Fuente de sonido mono: entrega una muestra (−1 a 1) cada vez que se le pide. */
+/** Fuente de sonido: entrega una muestra (−1 a 1) cada vez que se le pide. Es mono salvo que diga otra cosa. */
 fun interface SignalSource {
+    /** La muestra siguiente; en una fuente estéreo, la del canal izquierdo. */
     fun next(): Double
+
+    /** El canal derecho del cuadro que acaba de dar [next], que devolvió [left]. */
+    fun rightOf(left: Double): Double = left
 }
 
 /** Nivel del ruido rosa: deja margen para subir bandas antes de que actúe el limitador. */
@@ -56,6 +60,21 @@ class SineTone(
         if (phase >= 2 * PI) phase -= 2 * PI
         return sample
     }
+}
+
+/** Repite sin fin una canción en estéreo. */
+class StereoLoopSource(private val left: FloatArray, private val right: FloatArray) : SignalSource {
+    private var position = 0
+    private var lastRight = 0.0
+
+    override fun next(): Double {
+        val sample = left[position].toDouble()
+        lastRight = right[position].toDouble()
+        position = (position + 1) % left.size
+        return sample
+    }
+
+    override fun rightOf(left: Double): Double = lastRight
 }
 
 /** Repite [samples] sin fin, empezando en [startIndex] (para cambiar de mezcla sin volver al inicio). */
