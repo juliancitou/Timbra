@@ -159,6 +159,11 @@ terminó en estilo terminal/ASCII).
 - [ ] Probar una canción real en el teléfono: MP3, FLAC y un archivo que no se pueda leer
 - [x] Ecualizar Spotify en vivo durante el test
 - [ ] Comprobar en el teléfono que Spotify conecta y que el cambio se oye, con Poweramp Equalizer apagado
+- [x] Mostrar en el resultado lo que suena ahora: medido en el audio de la app o leído del efecto en Spotify
+- [x] Afinar los graves del efecto en Spotify (bloque de ~85 ms en vez de 10 ms)
+- [x] Recordar el ecualizador del teléfono y abrir los ajustes de sonido en "Antes de empezar"
+- [ ] Comprobar en el teléfono que "Sin ecualizar" y "Con ecualización" se oyen distintos y que el resultado confirma las bandas
+- [ ] Comprobar que Poweramp vuelve a sus ajustes después del test
 - [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp (Ajustes → Calibrar)
 - [x] Vista previa con la curva completa del preset y forma elegible al calibrar
 - [x] Mantener presionado para oír como estaba y comprobación final de graves y voz

@@ -48,6 +48,12 @@ object Credits {
             "Stanford CCRMA",
             "https://ccrma.stanford.edu/~jos/resample/",
         ),
+        Credit(
+            "The use of FFT for the estimation of power spectra",
+            "Peter D. Welch",
+            "IEEE, 1967",
+            "https://doi.org/10.1109/TAU.1967.1161901",
+        ),
         Credit("Audio EQ Cookbook", "Robert Bristow-Johnson", "W3C", "https://www.w3.org/TR/audio-eq-cookbook/"),
         Credit(
             "ITU-R BS.1770",

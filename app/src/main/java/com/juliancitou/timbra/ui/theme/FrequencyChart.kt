@@ -34,6 +34,8 @@ private val LabelGap = 6.dp
 private val CurveStrokeWidth = 3.dp
 private val PointRadius = 4.dp
 private val HighlightRadius = 9.dp
+private val OverlayStrokeWidth = 1.5.dp
+private val OverlayPointRadius = 2.5.dp
 
 private val GainGridStepsDb = listOf(-12f, -6f, 0f, 6f, 12f)
 private val FrequencyGridHz = listOf(20, 100, 1000, 10_000, 20_000)
@@ -53,6 +55,8 @@ fun FrequencyChart(
     maxDb: Float = 12f,
     estimatedBandIndices: Set<Int> = emptySet(),
     highlightedBandIndex: Int? = null,
+    /** Segunda serie, en naranja: lo que suena ahora. `null` en una banda la deja sin punto. */
+    overlayDb: List<Float?>? = null,
 ) {
     require(gainsDb.size == frequenciesHz.size) { "Cada frecuencia necesita una ganancia" }
     val shownGains = rememberMorphingGains(gainsDb)
@@ -92,6 +96,17 @@ fun FrequencyChart(
         }
         drawCurve(points, plot, chartColors.curve)
         drawPoints(points, estimatedBandIndices, highlightedBandIndex, plot, chartColors)
+        overlayDb?.takeIf { it.size == frequenciesHz.size }?.let { overlay ->
+            val overlayPoints = frequenciesHz.zip(overlay).mapNotNull { (hz, db) ->
+                db?.let {
+                    Offset(
+                        x = plot.left + plot.width * frequencyToFraction(hz.toFloat()),
+                        y = plot.top + plot.height * gainToFraction(it.coerceIn(minDb, maxDb), minDb, maxDb),
+                    )
+                }
+            }
+            drawOverlay(overlayPoints, chartColors.highlight)
+        }
     }
 }
 
@@ -209,6 +224,13 @@ private fun DrawScope.drawCurve(points: List<Offset>, plot: PlotArea, color: Col
         color = color,
         style = Stroke(width = CurveStrokeWidth.toPx(), cap = StrokeCap.Round),
     )
+}
+
+private fun DrawScope.drawOverlay(points: List<Offset>, color: Color) {
+    points.zipWithNext { start, end ->
+        drawLine(color = color, start = start, end = end, strokeWidth = OverlayStrokeWidth.toPx())
+    }
+    points.forEach { drawCircle(color = color, radius = OverlayPointRadius.toPx(), center = it) }
 }
 
 private fun DrawScope.drawPoints(

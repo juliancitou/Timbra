@@ -16,6 +16,14 @@ private const val LIMITER_THRESHOLD_DB = -1f
 private const val LIMITER_POST_GAIN_DB = 0f
 
 /**
+ * Duración del bloque de la FFT interna de `DynamicsProcessing`, en ms. Se redondea hacia arriba a
+ * potencia de 2: unas 4096 muestras a 48 kHz, ~12 Hz por punto. Con los 10 ms por defecto (512
+ * muestras, ~94 Hz por punto) casi todas las bandas graves caen en el mismo punto y dejan de oírse.
+ * El costo es ~85 ms de retraso, que no importa en música.
+ */
+private const val PROCESSING_FRAME_MS = 85f
+
+/**
  * Ecualiza la sesión de audio de otra app con `DynamicsProcessing`, en vivo y sin copiar su audio.
  * El volumen lo decide esa app y el teléfono, así que aquí no aplica el nivel máximo de
  * [SafetyLimiter]. La regla es otra: nunca sonar más fuerte que sin ecualizar. Por eso la ganancia
@@ -46,7 +54,32 @@ class SessionEqualizer {
         SessionEqualizerResult.Failed
     }
 
+    /** Lee del efecto lo que de verdad tiene aplicado. `null` si no hay efecto o no se puede leer. */
+    fun read(): EffectReading? = runCatching {
+        val current = effect ?: return null
+        EffectReading(
+            enabled = current.enabled,
+            hasControl = current.hasControl(),
+            bands = appliedBands.indices.map { index ->
+                val band = current.getPreEqBandByChannelIndex(0, index)
+                PreviewBand(band.cutoffFrequency, band.gain)
+            },
+        )
+    }.getOrNull()
+
+    /**
+     * Si otra app, como Poweramp, comparte el efecto, este sobrevive con los últimos ajustes. Se deja
+     * plano para que el sonido de Timbra no se quede pegado después de salir del test.
+     */
     fun release() {
+        runCatching {
+            effect?.let { current ->
+                current.setInputGainAllChannelsTo(0f)
+                appliedBands.forEachIndexed { index, band ->
+                    current.setPreEqBandAllChannelsTo(index, DynamicsProcessing.EqBand(true, band.upperEdgeHz, 0f))
+                }
+            }
+        }
         runCatching { effect?.release() }
         effect = null
         attachedSession = 0
@@ -66,7 +99,7 @@ class SessionEqualizer {
             false,
             0,
             true,
-        ).build()
+        ).setPreferredFrameDuration(PROCESSING_FRAME_MS).build()
         val created = DynamicsProcessing(EFFECT_PRIORITY, sessionId, config)
         created.setLimiterAllChannelsTo(
             DynamicsProcessing.Limiter(

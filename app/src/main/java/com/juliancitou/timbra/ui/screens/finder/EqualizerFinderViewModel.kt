@@ -18,13 +18,17 @@ import com.juliancitou.timbra.audio.LoudnessMatcher
 import com.juliancitou.timbra.audio.PinkNoise
 import com.juliancitou.timbra.audio.PlaybackStatus
 import com.juliancitou.timbra.audio.PreparedSong
+import com.juliancitou.timbra.audio.PreviewBand
 import com.juliancitou.timbra.audio.SPOTIFY_PACKAGE
 import com.juliancitou.timbra.audio.SessionEqualizer
 import com.juliancitou.timbra.audio.SessionEqualizerResult
 import com.juliancitou.timbra.audio.SignalSource
 import com.juliancitou.timbra.audio.SpotifySession
 import com.juliancitou.timbra.audio.StereoLoopSource
+import com.juliancitou.timbra.audio.confirmedBandCount
 import com.juliancitou.timbra.audio.decodeAudioFile
+import com.juliancitou.timbra.audio.gainsAtFrequencies
+import com.juliancitou.timbra.audio.measureEqualizerDifference
 import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.music.MusicLoop
@@ -53,6 +57,20 @@ import java.util.concurrent.Executors
 /** Estado de la ecualización en vivo de Spotify. [Off]: suena música de Timbra, no Spotify. */
 enum class SpotifyLink { Off, Waiting, Connected, Blocked, Failed }
 
+/** De dónde salió lo que se muestra como "lo que suena ahora". */
+sealed interface SoundingProof {
+    /** Comparando el audio de la app con y sin ecualizar. */
+    data object MeasuredInAudio : SoundingProof
+
+    /** Leído del efecto puesto sobre Spotify. */
+    data class ReadFromEffect(val confirmedBands: Int, val totalBands: Int, val active: Boolean) : SoundingProof {
+        val isConfirmed: Boolean get() = active && confirmedBands == totalBands
+    }
+}
+
+/** Cuánto cambia ahora cada banda del preset, en dB; `null` donde no se pudo medir. */
+data class SoundingCheck(val gainsDb: List<Float?>, val proof: SoundingProof)
+
 data class FinderUiState(
     val genre: Genre = Genre.Pop,
     val finder: EqualizerFinder = EqualizerFinder(),
@@ -68,6 +86,7 @@ data class FinderUiState(
     val songFailed: Boolean = false,
     val spotify: SpotifyLink = SpotifyLink.Off,
     val bandShape: BandShape = BandShape.Direct,
+    val sounding: SoundingCheck? = null,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
     val isPlaying: Boolean get() = status == PlaybackStatus.Playing
@@ -138,6 +157,10 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private val sessionEqualizer = SessionEqualizer()
     private var spotifySettings: EqualizerSettings = EqualizerSettings.Flat
     private var calibrating = false
+
+    /** Solo se tocan desde el hilo de síntesis. Medir toma cerca de un segundo: se guarda el resultado. */
+    private var measuredFor: Any? = null
+    private var measuredGains: List<Float?> = emptyList()
 
     val uiState: StateFlow<FinderUiState> = combine(state, playback) { current, status ->
         current.copy(status = status)
@@ -338,7 +361,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             optionSettings = optionsFor(snapshot, matcher)
             val latest = state.value
             val settings = when {
-                latest.finder.isFinished && latest.bypass -> matcher.compensated(EqualizerSettings.Flat)
+                latest.finder.isFinished && latest.bypass -> matcher.compensated(flatFor(latest.finder))
                 latest.finder.isFinished -> matcher.compensated(latest.finder.result().shapedAs(latest.bandShape))
                 else -> optionSettings.getOrNull(latest.auditionIndex) ?: EqualizerSettings.Flat
             }
@@ -348,7 +371,56 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             if (unchanged && !latest.loadingSong) {
                 state.update { it.copy(preparing = false) }
             }
+            updateMeasuredSounding(song)
         }
+    }
+
+    private fun flatFor(finder: EqualizerFinder): EqualizerSettings {
+        val preset = finder.result()
+        return preset.copy(bandGainsDb = preset.bandGainsDb.map { 0f }, preampDb = 0f)
+    }
+
+    /** Con audio propio se puede comparar de verdad: se procesa con y sin ecualizar y se mide la diferencia. */
+    private fun updateMeasuredSounding(song: PreparedSong?) {
+        val current = state.value
+        if (!current.finder.isFinished) {
+            state.update { it.copy(sounding = null) }
+            return
+        }
+        if (current.usesSpotify) return
+        val preset = current.finder.result().shapedAs(current.bandShape)
+        val key = listOf(preset, song ?: current.genre)
+        if (measuredFor != key) {
+            val samples = song?.reference ?: mixFor(current.genre, MusicFocus.Balanced)
+            val matcher = if (song != null) requireNotNull(userSongMatcher) else
+                matcherFor(current.genre, MusicFocus.Balanced, samples)
+            measuredGains = measureEqualizerDifference(
+                samples,
+                output.sampleRate,
+                matcher.compensated(flatFor(current.finder)),
+                matcher.compensated(preset),
+            )
+            measuredFor = key
+        }
+        state.update {
+            val gains = if (it.bypass) measuredGains.map { gain -> gain?.let { 0f } } else measuredGains
+            it.copy(sounding = SoundingCheck(gains, SoundingProof.MeasuredInAudio))
+        }
+    }
+
+    private fun readSpotifySounding(wanted: List<PreviewBand>): SoundingCheck? {
+        val current = state.value
+        if (!current.finder.isFinished) return null
+        val reading = sessionEqualizer.read() ?: return null
+        val frequencies = current.finder.result().bandFrequenciesHz
+        return SoundingCheck(
+            gainsDb = gainsAtFrequencies(reading.bands, frequencies),
+            proof = SoundingProof.ReadFromEffect(
+                confirmedBands = confirmedBandCount(reading, wanted),
+                totalBands = wanted.size,
+                active = reading.enabled && reading.hasControl,
+            ),
+        )
     }
 
     private fun SpotifyLink.usesSameMusicAs(other: SpotifyLink) =
@@ -373,6 +445,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private fun applySpotifyEqualization() {
         if (!state.value.usesSpotify) return
         val sessionId = SpotifySession.id.value
+        var sounding: SoundingCheck? = null
         val link = if (sessionId == null) {
             sessionEqualizer.release()
             SpotifyLink.Waiting
@@ -380,12 +453,15 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             val shape = state.value.bandShape
             val bands = previewBands(spotifySettings, shape, output.sampleRate)
             when (sessionEqualizer.apply(sessionId, spotifySettings.preampDb, bands)) {
-                SessionEqualizerResult.Applied -> SpotifyLink.Connected
+                SessionEqualizerResult.Applied -> {
+                    sounding = readSpotifySounding(bands)
+                    SpotifyLink.Connected
+                }
                 SessionEqualizerResult.Blocked -> SpotifyLink.Blocked
                 SessionEqualizerResult.Failed -> SpotifyLink.Failed
             }
         }
-        state.update { if (it.usesSpotify) it.copy(spotify = link) else it }
+        state.update { if (it.usesSpotify) it.copy(spotify = link, sounding = sounding) else it }
     }
 
     private fun leaveSpotify() {

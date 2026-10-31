@@ -280,6 +280,8 @@ La licencia de Cascadia Mono va incluida dentro de la app, en `assets/licenses/`
 - **Audio EQ Cookbook** de Robert Bristow-Johnson: fórmulas de los filtros del ecualizador.
 - **Digital Audio Resampling** de Julius O. Smith III: la interpolación sinc con la que una canción
   tuya se adapta a la frecuencia de tu teléfono (<https://ccrma.stanford.edu/~jos/resample/>).
+- **Método de Welch** de Peter D. Welch (1967): cómo se mide el espectro para comparar el audio con
+  y sin ecualizar (<https://doi.org/10.1109/TAU.1967.1161901>).
 - **ITU-R BS.1770**: la ponderación K con la que se iguala el volumen entre ecualizaciones.
 - **Paul Kellet**: el filtro que genera el ruido rosa (publicado en musicdsp.org).
 - **Manfred Schroeder** y **Freeverb** de Jezar at Dreampoint (dominio público): la estructura de

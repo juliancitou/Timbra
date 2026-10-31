@@ -5,10 +5,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.audio.equalizerDifference
 import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.FrequencyChart
@@ -20,6 +27,8 @@ import com.juliancitou.timbra.ui.theme.TerminalPanel
 import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.TerminalSection
 import com.juliancitou.timbra.ui.theme.TerminalTextField
+import com.juliancitou.timbra.ui.theme.formatDecibels
+import com.juliancitou.timbra.ui.theme.formatHertz
 
 /** Menos que esto, en dB, casi no se distingue de oído. */
 private const val NOTICEABLE_CHANGE_DB = 0.5
@@ -73,8 +82,10 @@ fun FinderResultScreen(
                 gainsDb = preset.bandGainsDb,
                 contentDescription = stringResource(R.string.finder_result_chart),
                 frequenciesHz = preset.bandFrequenciesHz,
+                overlayDb = state.sounding?.gainsDb,
             )
         }
+        DetailText(stringResource(R.string.finder_chart_legend))
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             verticalArrangement = Arrangement.spacedBy(Spacing.small),
@@ -90,6 +101,8 @@ fun FinderResultScreen(
                 onClick = { onBypassChange(true) },
             )
         }
+        SoundingStatus(state)
+        DifferenceSection(state)
         TerminalTextField(
             value = state.presetName,
             onValueChange = onPresetNameChange,
@@ -97,6 +110,68 @@ fun FinderResultScreen(
             placeholder = suggestedPresetName(state),
         )
         ChangesSummary(state)
+    }
+}
+
+/** Qué está sonando y cómo lo sabe la app: si no se pudo confirmar, se dice en rojo. */
+@Composable
+private fun SoundingStatus(state: FinderUiState) {
+    val current = stringResource(if (state.bypass) R.string.finder_compare_without else R.string.finder_compare_with)
+    val check = state.sounding
+    val proof = check?.proof
+    val detail = when {
+        check == null -> stringResource(R.string.finder_sounding_pending)
+        proof is SoundingProof.ReadFromEffect && proof.isConfirmed ->
+            stringResource(R.string.finder_sounding_confirmed, proof.confirmedBands, proof.totalBands)
+        proof is SoundingProof.ReadFromEffect ->
+            stringResource(R.string.finder_sounding_unconfirmed, proof.confirmedBands, proof.totalBands)
+        else -> stringResource(R.string.finder_sounding_measured)
+    }
+    val failed = proof is SoundingProof.ReadFromEffect && !proof.isConfirmed
+    TerminalSection(stringResource(R.string.finder_section_sounding)) {
+        CodeLines(listOf(current))
+        DetailText(detail, color = if (failed) MaterialTheme.colorScheme.error else Color.Unspecified)
+    }
+}
+
+/** La diferencia en números, con cada banda a la mano para quien quiera revisarla. */
+@Composable
+private fun DifferenceSection(state: FinderUiState) {
+    val preset = state.finder.result()
+    val difference = equalizerDifference(preset)
+    var showBands by rememberSaveable { mutableStateOf(false) }
+    TerminalSection(stringResource(R.string.finder_section_difference)) {
+        CodeLines(
+            listOf(
+                stringResource(R.string.finder_difference_bands, difference.changedBands, preset.bandGainsDb.size),
+                stringResource(
+                    R.string.finder_difference_strongest,
+                    formatDecibels(difference.strongestDb),
+                    formatHertz(difference.strongestHz),
+                ),
+            ),
+        )
+        if (difference.isSubtle) DetailText(stringResource(R.string.finder_difference_subtle))
+        TerminalChip(
+            label = stringResource(R.string.finder_difference_toggle),
+            selected = showBands,
+            onClick = { showBands = !showBands },
+        )
+        if (showBands) {
+            val overlay = state.sounding?.gainsDb
+            CodeLines(
+                preset.bandFrequenciesHz.indices.map { band ->
+                    val now = overlay?.getOrNull(band)?.let(::formatDecibels)
+                        ?: stringResource(R.string.finder_difference_unmeasured)
+                    stringResource(
+                        R.string.finder_difference_band,
+                        formatHertz(preset.bandFrequenciesHz[band]),
+                        formatDecibels(preset.bandGainsDb[band]),
+                        now,
+                    )
+                },
+            )
+        }
     }
 }
 

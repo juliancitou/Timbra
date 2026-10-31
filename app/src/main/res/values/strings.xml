@@ -300,6 +300,22 @@
     <string name="finder_hold_current">Mantén para oír como estaba</string>
     <string name="finder_progress_recheck">ronda %1$d de %2$d · comprobar</string>
     <string name="finder_recheck_hint">Elige otra vez, sin marcas. Así vemos si de verdad te gusta.</string>
+    <string name="finder_chart_legend">Ámbar: tu preset. Naranja: lo que suena ahora. La línea en 0 es sin ecualizar.</string>
+    <string name="finder_section_sounding">suena ahora</string>
+    <string name="finder_sounding_pending">Comprobando…</string>
+    <string name="finder_sounding_measured">Medido comparando el audio con y sin ecualizar.</string>
+    <string name="finder_sounding_confirmed">Spotify: el efecto tiene %1$d de %2$d bandas como se pidió.</string>
+    <string name="finder_sounding_unconfirmed">Spotify: solo %1$d de %2$d bandas están aplicadas o el efecto no está activo. Apaga otros ecualizadores y vuelve a intentar.</string>
+    <string name="finder_section_difference">qué tan distinto es</string>
+    <string name="finder_difference_bands">Cambian %1$d de %2$d bandas</string>
+    <string name="finder_difference_strongest">Mayor cambio: %1$s en %2$s</string>
+    <string name="finder_difference_subtle">Es un cambio pequeño: es normal que cueste oírlo.</string>
+    <string name="finder_difference_toggle">Ver banda por banda</string>
+    <string name="finder_difference_band">%1$s: %2$s · ahora %3$s</string>
+    <string name="finder_difference_unmeasured">sin música ahí</string>
+    <string name="preparation_phone_equalizer">Ecualizador del teléfono en 0 y Dolby apagado</string>
+    <string name="preparation_why_phone_equalizer">Timbra no puede ver ni cambiar el ecualizador del teléfono, y se suma a todo lo que escuchas. Revísalo tú.</string>
+    <string name="preparation_open_sound_settings">Abrir ajustes de sonido</string>
     <string name="finder_summary_doubt">%1$s: elegiste distinto al comprobar, así que dejé un punto medio.</string>
 
     <!-- Calibración -->

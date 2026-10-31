@@ -1,5 +1,7 @@
 package com.juliancitou.timbra.ui.screens.preparation
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.DetectedOutput
@@ -27,6 +30,7 @@ import com.juliancitou.timbra.ui.theme.CheckRow
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalChip
 import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.TerminalSection
@@ -43,13 +47,19 @@ private fun checklistFor(output: OutputKind): List<Int> = when (output) {
     OutputKind.Bluetooth -> listOf(
         R.string.preparation_noise_cancelling,
         R.string.preparation_poweramp_off,
+        R.string.preparation_phone_equalizer,
         R.string.preparation_quiet_place,
     )
-    OutputKind.Wired -> listOf(R.string.preparation_poweramp_off, R.string.preparation_quiet_place)
+    OutputKind.Wired -> listOf(
+        R.string.preparation_poweramp_off,
+        R.string.preparation_phone_equalizer,
+        R.string.preparation_quiet_place,
+    )
     OutputKind.Speaker -> listOf(
         R.string.preparation_speaker_position,
         R.string.preparation_speaker_uncovered,
         R.string.preparation_poweramp_off,
+        R.string.preparation_phone_equalizer,
         R.string.preparation_quiet_place,
     )
 }
@@ -154,6 +164,14 @@ fun ChecklistScreen(output: OutputKind, onContinue: () -> Unit, onBack: () -> Un
                 stringResource(
                     if (output == OutputKind.Speaker) R.string.preparation_why_speaker else R.string.preparation_why,
                 ),
+            )
+            DetailText(stringResource(R.string.preparation_why_phone_equalizer))
+            val context = LocalContext.current
+            TerminalButton(
+                text = stringResource(R.string.preparation_open_sound_settings),
+                onClick = { context.startActivity(Intent(Settings.ACTION_SOUND_SETTINGS)) },
+                style = TerminalButtonStyle.Secondary,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }

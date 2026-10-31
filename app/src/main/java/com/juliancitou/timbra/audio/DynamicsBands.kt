@@ -1,5 +1,6 @@
 package com.juliancitou.timbra.audio
 
+import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -42,6 +43,22 @@ fun previewBands(settings: EqualizerSettings, shape: BandShape, sampleRate: Int)
         PreviewBand(edge, equalizer.magnitudeDb(center).toFloat())
     }
 }
+
+/** Lo que el efecto dice tener aplicado, leído de él mismo y no de lo que Timbra le pidió. */
+data class EffectReading(val enabled: Boolean, val hasControl: Boolean, val bands: List<PreviewBand>)
+
+private const val READ_TOLERANCE_DB = 0.1f
+
+/** Cuántas bandas de [wanted] tiene el efecto con la ganancia pedida. */
+fun confirmedBandCount(reading: EffectReading, wanted: List<PreviewBand>): Int =
+    wanted.indices.count { index ->
+        val read = reading.bands.getOrNull(index)
+        read != null && abs(read.gainDb - wanted[index].gainDb) <= READ_TOLERANCE_DB
+    }
+
+/** La ganancia que aplican [bands] en cada frecuencia de [frequenciesHz]. */
+fun gainsAtFrequencies(bands: List<PreviewBand>, frequenciesHz: List<Int>): List<Float> =
+    frequenciesHz.map { hz -> (bands.firstOrNull { hz <= it.upperEdgeHz } ?: bands.last()).gainDb }
 
 /**
  * `DynamicsProcessing` define cada banda por dónde termina y aplica su ganancia hasta ahí, no por su
