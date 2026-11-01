@@ -19,6 +19,16 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `657bc0a` · fix: mostrar cuánto corta Poweramp y no recomendar pipeline
+- Mediciones con micrófono en la bocina del POCO X8 Pro Max, con un preset de cortes de −8 dB y ruido rosa:
+  - Timbra: cortes de cerca de −7 dB, como se esperaba.
+  - Poweramp en "Por defecto": sin cortes arriba de 1.7 kHz y de cerca de −2 dB debajo.
+  - Poweramp en AIDL 1: los cinco cortes en su frecuencia, pero de cerca de −2 dB, con un ancho parecido al de Timbra.
+  - Apagar DVC o pasar a Cascada no recupera la profundidad. Falta saber si ocurre también con Spotify.
+- Se quitó el consejo de usar "Por defecto" en Modo Pipeline: en este teléfono empeora el resultado. Ya no se avisa
+  sobre ese ajuste.
+- La medición ya no dice que Poweramp no aplicó el preset cuando corta poco: muestra cuánto corta cada uno.
+
 ### 2026-10-31 · `9baa356` · fix: medir Poweramp con el micrófono
 - En el teléfono del usuario, `Visualizer(0)` no notó ni el ecualizador de Timbra, así que se quitó.
 - Ahora se graba el micrófono: silencio, ruido rosa solo, con Timbra y con Poweramp. Solo se compara la diferencia
