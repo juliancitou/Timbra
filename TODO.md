@@ -180,8 +180,9 @@ terminó en estilo terminal/ASCII).
 - [x] Medir con el micrófono la curva real de Poweramp (Ajustes → Calibrar); el visualizador global no ve los efectos
 - [x] Medir con el micrófono en bocina: Timbra corta −7 dB y Poweramp cerca de −2 dB con la señal de prueba
 - [x] Medir Poweramp con Spotify en bocina: también corta menos y además sube los agudos
-- [ ] Medir lo mismo con los FreeBuds, con un auricular pegado al micrófono
-- [ ] Guardar la medición como corrección por salida y aplicarla a la vista previa o al preset exportado
+- [x] Medir con los FreeBuds: arriba de 2 kHz, Poweramp aplica menos de la mitad; abajo no hay señal suficiente
+- [ ] Medir en bocina un preset plano y uno de corte ancho, para separar la subida de agudos de la falta de profundidad
+- [ ] Aplicar esa respuesta a la vista previa, para escuchar en el test lo que dará Poweramp
 - [x] Comprobado con sesiones en silencio: el comando de apagar suelta el efecto de Poweramp y el de encender lo recupera
 - [x] Abrir el preset en Poweramp desde Exportar y detectar cuando ya se importó
 - [x] Prueba a ciegas final: elegir entre Timbra y sin ecualizar sin saber cuál es
