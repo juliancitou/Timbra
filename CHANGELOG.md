@@ -19,6 +19,16 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `fb629c6` · feat: copiar bandas y ajustes de Poweramp
+- La llamada `preference` de la API de Poweramp Equalizer entrega sus ajustes sin pedir permisos (comprobado
+  con build 1033). La propia API la marca como experimental: si faltan las claves, Timbra sigue como antes.
+- Preparación y Calibrar copian las bandas personalizadas y la superposición. Con bandas fijas no se copian,
+  porque sus frecuencias no están confirmadas, y se siguen eligiendo a mano.
+- Exportar muestra solo lo que hay que cambiar; el tono y el compresor no se pueden leer y siempre se recuerdan.
+- "Antes de empezar" da Poweramp por apagado si `peq_enable` está en falso.
+- Solo lee: no escribe nada en Poweramp. Que `dsp_border_gain` sea "Ecualizador suave" y `peq_enable` sea
+  "Habilitar procesamiento de audio" se dedujo por el nombre y los valores; falta confirmarlo.
+
 ### 2026-10-31 · `21d9f64` · audio: escuchar con la curva Envolvente de Poweramp
 - Poweramp tiene "Superposición de bandas": en Envolvente la curva pasa por el valor de cada banda y en
   Cascada las bandas se suman. Timbra sumaba, así que con música de la app o una canción propia una zona
