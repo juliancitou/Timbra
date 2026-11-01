@@ -19,6 +19,15 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `2f3cbed` · fix: comprobar el medidor antes de comparar Poweramp
+- Las primeras mediciones dieron una línea casi plana y una "diferencia de 8.4 dB" engañosa: comparaban con la curva
+  esperada sin saber si el medidor había visto algún efecto.
+- Ahora suena ruido solo, luego con el ecualizador de Timbra y luego con el de Poweramp, y se comparan las dos
+  mediciones. Si no se ve el recorte del ecualizador de Timbra, se avisa que el medidor no sirve en ese teléfono.
+- Comprobado en el teléfono con sesiones en silencio: Poweramp se une a la sesión que Timbra le anuncia; el comando de
+  apagar quita su efecto, el de encender lo recupera y al cerrar la sesión la suelta.
+- La medición ya no apaga Poweramp, pero sí lo enciende si estaba apagado.
+
 ### 2026-10-31 · `3d18eb7` · feat: agregar prueba a ciegas y medición de Poweramp
 - Prueba a ciegas desde el resultado: 5 intentos con dos opciones sin nombre. Con tan pocos intentos es una señal,
   no una prueba estadística.
