@@ -17,6 +17,7 @@ import com.juliancitou.timbra.audio.LoopSource
 import com.juliancitou.timbra.audio.LoudnessMatcher
 import com.juliancitou.timbra.audio.PinkNoise
 import com.juliancitou.timbra.audio.PowerampControl
+import com.juliancitou.timbra.audio.PowerampSettings
 import com.juliancitou.timbra.audio.PowerampState
 import com.juliancitou.timbra.audio.PlaybackStatus
 import com.juliancitou.timbra.audio.PreparedSong
@@ -91,6 +92,7 @@ data class FinderUiState(
     val bandOverlap: BandOverlap = BandOverlap.Envelope,
     val sounding: SoundingCheck? = null,
     val poweramp: PowerampState = PowerampState.Unknown,
+    val powerampSettings: PowerampSettings? = null,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
     val isPlaying: Boolean get() = status == PlaybackStatus.Playing
@@ -192,6 +194,29 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         state.update { it.copy(finder = EqualizerFinder(it.finder.output, layout)) }
     }
 
+    /**
+     * Copia de Poweramp las bandas y la superposición, para que el test suene como el preset. Reinicia el
+     * test si cambian las bandas: se llama solo antes de empezar, no a mitad de las rondas.
+     */
+    fun syncWithPoweramp() {
+        viewModelScope.launch(effectThread) {
+            val settings = powerampControl.readSettings()
+            state.update { it.copy(powerampSettings = settings) }
+            if (settings == null) return@launch
+            overlapPreferences.save(settings.overlap)
+            state.update { it.copy(bandOverlap = settings.overlap) }
+            settings.layout?.takeIf { it != state.value.finder.layout }?.let(::setBandLayout)
+        }
+    }
+
+    /** Vuelve a leer los ajustes sin tocar el test, por si se cambiaron en Poweramp. */
+    fun refreshPowerampSettings() {
+        viewModelScope.launch(effectThread) {
+            val settings = powerampControl.readSettings()
+            state.update { it.copy(powerampSettings = settings) }
+        }
+    }
+
     /** Sin Spotify abierto no hay sesión que revisar y el estado queda como desconocido. */
     fun checkPoweramp() {
         viewModelScope.launch(effectThread) {
@@ -225,6 +250,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
 
     private fun readPowerampState(): PowerampState {
         if (!powerampControl.isInstalled) return PowerampState.NotInstalled
+        if (powerampControl.readSettings()?.audioProcessingOn == false) return PowerampState.Off
         val sessionId = SpotifySession.id.value
         val controlling = sessionId?.let(powerampControl::isControlling)
         return when {

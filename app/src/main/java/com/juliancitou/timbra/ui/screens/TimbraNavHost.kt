@@ -121,10 +121,12 @@ fun TimbraNavHost(
                     )
                 }
                 screen<PreparationRoute> {
+                    LaunchedEffect(Unit) { finder.syncWithPoweramp() }
                     PreparationScreen(
                         output = finderState.finder.output,
                         onOutputChange = finder::setOutput,
                         bandLayout = finderState.finder.layout,
+                        bandsFromPoweramp = finderState.powerampSettings?.layout == finderState.finder.layout,
                         onBandLayoutChange = finder::setBandLayout,
                         headphonesName = finderState.headphonesName,
                         onHeadphonesNameChange = finder::setHeadphonesName,
@@ -143,6 +145,7 @@ fun TimbraNavHost(
                     )
                 }
                 screen<CalibrationRoute> {
+                    LaunchedEffect(Unit) { finder.syncWithPoweramp() }
                     CalibrationScreen(
                         state = finderState,
                         presetJson = finder::calibrationJson,
@@ -216,11 +219,13 @@ fun TimbraNavHost(
                 }
                 screen<ExportRoute> {
                     val suggestedName = suggestedPresetName(finderState)
+                    LaunchedEffect(Unit) { finder.refreshPowerampSettings() }
                     ExportScreen(
                         presetName = finderState.effectivePresetName(suggestedName),
                         fileName = finder.presetFileName(suggestedName),
                         output = finderState.finder.output,
                         bandLayout = finderState.finder.layout,
+                        powerampSettings = finderState.powerampSettings,
                         presetJson = { finder.presetJson(suggestedName) },
                         onGoHome = { navController.popBackStack(HomeRoute, inclusive = false) },
                         onBack = back,

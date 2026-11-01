@@ -22,6 +22,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.audio.PowerampIssue
+import com.juliancitou.timbra.audio.PowerampSettings
 import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.measure.OutputKind
@@ -52,6 +54,7 @@ fun ExportScreen(
     fileName: String,
     output: OutputKind,
     bandLayout: BandLayout,
+    powerampSettings: PowerampSettings?,
     presetJson: () -> String,
     onGoHome: () -> Unit,
     onBack: () -> Unit,
@@ -113,13 +116,7 @@ fun ExportScreen(
         }
         TerminalSection(stringResource(R.string.export_section_poweramp)) {
             CodeLines(
-                listOf(
-                    stringResource(R.string.export_setting_overlap),
-                    stringResource(R.string.export_setting_smooth),
-                    stringResource(R.string.export_setting_preamp),
-                    stringResource(R.string.export_setting_clean),
-                    stringResource(R.string.export_setting_pipeline),
-                ),
+                powerampAdvice(powerampSettings).map { stringResource(it) },
             )
         }
         TerminalSection(stringResource(R.string.export_section_steps)) {
@@ -140,6 +137,27 @@ fun ExportScreen(
             )
         }
     }
+}
+
+/** Solo lo que hay que cambiar si se pudo leer Poweramp; la lista completa si no. El tono y el compresor no se pueden leer. */
+private fun powerampAdvice(settings: PowerampSettings?): List<Int> {
+    if (settings == null) {
+        return listOf(
+            R.string.export_setting_overlap,
+            R.string.export_setting_smooth,
+            R.string.export_setting_preamp,
+            R.string.export_setting_clean,
+            R.string.export_setting_pipeline,
+        )
+    }
+    val fixes = settings.issues.map {
+        when (it) {
+            PowerampIssue.SmoothGains -> R.string.export_setting_smooth
+            PowerampIssue.NoDvcReduction -> R.string.export_setting_preamp
+            PowerampIssue.Pipeline -> R.string.export_setting_pipeline
+        }
+    }
+    return fixes.ifEmpty { listOf(R.string.export_settings_good) } + R.string.export_setting_clean
 }
 
 @StringRes

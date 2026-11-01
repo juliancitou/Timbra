@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.media.audiofx.DynamicsProcessing
+import android.net.Uri
 
 enum class PowerampState { NotInstalled, Off, On, Unknown }
 
@@ -15,6 +16,8 @@ private const val EXTRA_PACKAGE = "pak"
 private const val COMMAND_STOP_SERVICE = 100
 private const val COMMAND_START_SERVICE = 101
 private const val STEREO_CHANNELS = 2
+private const val SETTINGS_URI = "content://com.maxmpz.equalizer.data"
+private const val CALL_PREFERENCE = "preference"
 
 /** Menor que la de Poweramp (1337): si el efecto ya tiene dueño, esta prioridad no se lo quita. */
 private const val PROBE_PRIORITY = 0
@@ -28,6 +31,13 @@ private const val PROBE_PRIORITY = 0
 class PowerampControl(private val context: Context) {
     val isInstalled: Boolean
         get() = context.packageManager.getLaunchIntentForPackage(POWERAMP_EQ_PACKAGE) != null
+
+    /** Solo lee, y no pide permisos. `null` si no está instalado o no entregó lo necesario. */
+    fun readSettings(): PowerampSettings? = runCatching {
+        val bundle = context.contentResolver.call(Uri.parse(SETTINGS_URI), CALL_PREFERENCE, null, null) ?: return null
+        @Suppress("DEPRECATION")
+        powerampSettingsFrom(bundle.keySet().associateWith { bundle.get(it) })
+    }.getOrNull()
 
     fun turnOff() = send(COMMAND_STOP_SERVICE)
 

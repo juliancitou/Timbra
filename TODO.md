@@ -173,7 +173,8 @@ terminó en estilo terminal/ASCII).
 - [x] Vista previa en modo Envolvente, como Poweramp, y elegible en Calibrar
 - [x] Ajustes recomendados de Poweramp en Exportar
 - [ ] Comprobar de oído que Timbra y Poweramp suenan igual con los ajustes recomendados
-- [ ] Probar si `preference` de la API de Poweramp sirve desde Timbra para revisar sus ajustes
+- [x] Leer los ajustes de Poweramp desde Timbra y copiar bandas y superposición
+- [ ] Confirmar qué interruptor representan `dsp_border_gain` y `peq_enable` cambiándolos en Poweramp
 - [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp (Ajustes → Calibrar)
 - [x] Vista previa con la curva completa del preset y forma elegible al calibrar
 - [x] Mantener presionado para oír como estaba y comprobación final de graves y voz

@@ -84,6 +84,7 @@ fun PreparationScreen(
     output: OutputKind,
     onOutputChange: (OutputKind) -> Unit,
     bandLayout: BandLayout,
+    bandsFromPoweramp: Boolean,
     onBandLayoutChange: (BandLayout) -> Unit,
     headphonesName: String,
     onHeadphonesNameChange: (String) -> Unit,
@@ -134,7 +135,7 @@ fun PreparationScreen(
                 placeholder = stringResource(R.string.preparation_headphones_placeholder),
             )
         }
-        BandsSection(bandLayout, onBandLayoutChange)
+        BandsSection(bandLayout, bandsFromPoweramp, onBandLayoutChange)
     }
 }
 
@@ -325,10 +326,14 @@ fun bandSummary(layout: BandLayout): String = stringResource(
 )
 
 @Composable
-private fun BandsSection(layout: BandLayout, onChange: (BandLayout) -> Unit) {
+private fun BandsSection(layout: BandLayout, fromPoweramp: Boolean, onChange: (BandLayout) -> Unit) {
     var editing by rememberSaveable { mutableStateOf(false) }
     TerminalSection(stringResource(R.string.preparation_section_bands)) {
         DetailText(stringResource(R.string.preparation_bands_summary, bandSummary(layout)))
+        if (fromPoweramp) {
+            DetailText(stringResource(R.string.preparation_bands_copied))
+            return@TerminalSection
+        }
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             verticalArrangement = Arrangement.spacedBy(Spacing.small),

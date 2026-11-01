@@ -77,10 +77,11 @@
     <string name="export_lead">Descarga el archivo en tu teléfono y luego impórtalo en Poweramp Equalizer.</string>
     <string name="export_section_name">nombre del preset</string>
     <string name="export_section_poweramp">ajustes de Poweramp</string>
+    <string name="export_settings_good">Revisé tus ajustes y están bien.</string>
     <string name="export_setting_overlap">Superposición de bandas: "Envolvente"</string>
     <string name="export_setting_smooth">Ecualizador suave: apagado. Con el volumen alto cambiaría tu preset.</string>
     <string name="export_setting_preamp">Sin DVC, reducción de preamp: 0 dB. Baja antes el volumen: sonará más fuerte.</string>
-    <string name="export_setting_clean">Tono en 0 y compresor apagado.</string>
+    <string name="export_setting_clean">En su pantalla principal: tono en 0 y compresor apagado.</string>
     <string name="export_setting_pipeline">Modo Pipeline: "Por defecto", salvo que falle el sonido.</string>
     <string name="export_section_steps">cómo importarlo</string>
     <string name="export_step_open">Abre Poweramp Equalizer.</string>
@@ -254,6 +255,7 @@
     <string name="preparation_section_bands">bandas de poweramp</string>
     <string name="preparation_bands_summary">%1$s.</string>
     <string name="preparation_bands_hint">Deja las mismas que en Poweramp, en \"bandas personalizadas\".</string>
+    <string name="preparation_bands_copied">Copiadas de tu Poweramp.</string>
     <string name="preparation_bands_change">Cambiar</string>
     <string name="preparation_bands_done">Listo</string>
     <string name="preparation_bands_reset">Restablecer</string>
