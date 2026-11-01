@@ -360,13 +360,13 @@
     <string name="blind_score">Elegiste tu ecualización %1$d de %2$d veces.</string>
     <string name="blind_caveat">Con tan pocos intentos es una señal, no una prueba exacta.</string>
     <string name="calibration_section_measure">medir con datos</string>
-    <string name="calibration_measure_hint">Con el preset de prueba activo en Poweramp, suena ruido unos 20 segundos. Pon el volumen bajo. Poweramp se apaga y queda encendido al final.</string>
+    <string name="calibration_measure_hint">Activa el preset de prueba en Poweramp y pon el volumen bajo. Suena ruido unos 30 segundos.</string>
     <string name="calibration_measure_start">Medir Poweramp</string>
     <string name="calibration_measure_running">Midiendo…</string>
-    <string name="calibration_measure_no_capture">Android no dejó medir la salida en este teléfono. Usa la comparación de oído.</string>
-    <string name="calibration_measure_no_effect">Poweramp no cambió la señal de prueba. Revisa que el preset de prueba esté activo.</string>
-    <string name="calibration_measure_chart">Lo que hizo Poweramp comparado con lo que espera Timbra.</string>
-    <string name="calibration_measure_legend">Ámbar: lo medido en Poweramp. Naranja: lo que espera Timbra.</string>
+    <string name="calibration_measure_no_capture">El medidor de Android no alcanza a ver los ecualizadores en este teléfono. Usa la comparación de oído.</string>
+    <string name="calibration_measure_no_effect">El medidor funciona, pero Poweramp no aplicó el preset. Revisa que el de prueba esté activo.</string>
+    <string name="calibration_measure_chart">Lo que hace Poweramp comparado con lo que hace Timbra.</string>
+    <string name="calibration_measure_legend">Ámbar: Poweramp. Naranja: Timbra. Las dos medidas igual.</string>
     <string name="calibration_measure_result">Mayor diferencia: %1$s en %2$s. Es una medición tosca: menos de 2 dB no es concluyente.</string>
     <string name="finder_summary_doubt">%1$s: elegiste distinto al comprobar, así que dejé un punto medio.</string>
 

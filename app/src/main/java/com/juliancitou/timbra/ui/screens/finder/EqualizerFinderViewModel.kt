@@ -14,10 +14,11 @@ import com.juliancitou.timbra.audio.AudioOutput
 import com.juliancitou.timbra.audio.AutoEqProfile
 import com.juliancitou.timbra.audio.BandOverlap
 import com.juliancitou.timbra.audio.EqualizerSettings
-import com.juliancitou.timbra.audio.GraphicEqualizer
 import com.juliancitou.timbra.audio.LoopSource
 import com.juliancitou.timbra.audio.LoudnessMatcher
 import com.juliancitou.timbra.audio.MeasuredSpectrum
+import com.juliancitou.timbra.audio.alignedToItsMedian
+import com.juliancitou.timbra.audio.cutDepthDb
 import com.juliancitou.timbra.audio.OutputMeter
 import com.juliancitou.timbra.audio.PinkNoise
 import com.juliancitou.timbra.audio.PowerampControl
@@ -54,6 +55,7 @@ import com.juliancitou.timbra.measure.EqualizerFinder
 import com.juliancitou.timbra.measure.OutputKind
 import com.juliancitou.timbra.measure.calibrationPreset
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -64,6 +66,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 import kotlin.math.abs
 import kotlin.random.Random
@@ -74,15 +77,15 @@ enum class SpotifyLink { Off, Waiting, Connected, Blocked, Failed }
 /** Cada modo cambia cómo suenan los audífonos, así que el preset es válido solo para el modo en que se hizo. */
 enum class NoiseMode { Cancelling, Aware, Off }
 
-/** La comparación entre lo que hace Poweramp de verdad y lo que Timbra espera que haga. */
+/** Lo que hacen Poweramp y Timbra con el mismo preset de prueba, medido en la salida del teléfono. */
 sealed interface PowerampMeasure {
     data object Idle : PowerampMeasure
     data object Running : PowerampMeasure
 
-    /** Android no dejó oír la salida del teléfono. */
+    /** El medidor de Android no vio ni el ecualizador de Timbra, así que no sirve en este teléfono. */
     data object CouldNotCapture : PowerampMeasure
 
-    /** Se oyó la señal, pero encender Poweramp no la cambió. */
+    /** El medidor funciona, pero Poweramp no aplicó el preset de prueba. */
     data object NoEffect : PowerampMeasure
 
     data class Done(
@@ -162,8 +165,8 @@ private const val MEASURE_NOISE_SECONDS = 8
 private const val MEASURE_SETTLE_MS = 3_000L
 private const val MEASURE_CAPTURE_MS = 6_000L
 
-/** El preset de prueba llega a −8 dB: si la medición casi no se mueve, Poweramp no actuó sobre la señal. */
-private const val MEASURE_MIN_RANGE_DB = 2f
+/** El preset de prueba corta −8 dB: si esas bandas casi no bajan respecto a las demás, ese ecualizador no se vio. */
+private const val MEASURE_MIN_CUT_DB = 3f
 
 /**
  * Estado y sonido del test "Encuentra tu ecualización", compartido por todas sus pantallas. Al
@@ -448,9 +451,10 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     }
 
     /**
-     * Mide con datos si Poweramp hace lo que Timbra espera: suena ruido rosa, con Poweramp encendido y luego
-     * apagado, y la diferencia es lo que hizo su ecualizador. Debe tener activo el preset de prueba. Solo se
-     * compara la forma: el nivel general lo cambian el preamp y el DVC. Poweramp queda encendido al terminar.
+     * Compara con datos a Poweramp y a Timbra, con el mismo instrumento y el mismo preset de prueba: suena ruido
+     * rosa solo, luego con el ecualizador de Timbra y luego con el de Poweramp. Medir primero a Timbra, cuya curva
+     * se conoce, dice si el medidor alcanza a ver los efectos: sin eso, una línea plana no significaría nada.
+     * Debe estar activo el preset de prueba en Poweramp, que suelta la sesión al terminar.
      */
     fun measurePoweramp() {
         if (state.value.powerampMeasure == PowerampMeasure.Running) return
@@ -464,21 +468,31 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
                 LoopSource(DoubleArray(MEASURE_NOISE_SECONDS * output.sampleRate) { noise.next() }),
             )
             val session = output.sessionId
-            powerampControl.announceSession(session, open = true)
-            powerampControl.turnOn()
+            val preset = calibrationSettings()
+            val meter = OutputMeter()
             output.play()
             val result = try {
                 delay(MEASURE_SETTLE_MS)
-                val meter = OutputMeter()
-                val on = meter.capture(MEASURE_CAPTURE_MS)
-                powerampControl.turnOff()
+                val alone = meter.capture(MEASURE_CAPTURE_MS)
+                withContext(effectThread) {
+                    sessionEqualizer.apply(session, 0f, previewBands(preset, state.value.bandOverlap, output.sampleRate))
+                }
                 delay(MEASURE_SETTLE_MS)
-                val off = meter.capture(MEASURE_CAPTURE_MS)
-                if (on == null || off == null) PowerampMeasure.CouldNotCapture else compareWithExpected(on, off)
+                val withTimbra = meter.capture(MEASURE_CAPTURE_MS)
+                withContext(effectThread) { sessionEqualizer.release() }
+                powerampControl.turnOn()
+                powerampControl.announceSession(session, open = true)
+                delay(MEASURE_SETTLE_MS)
+                val withPoweramp = meter.capture(MEASURE_CAPTURE_MS)
+                if (alone == null || withTimbra == null || withPoweramp == null) {
+                    PowerampMeasure.CouldNotCapture
+                } else {
+                    compareMeasurements(preset, alone, withTimbra, withPoweramp)
+                }
             } finally {
                 output.stop()
                 powerampControl.announceSession(session, open = false)
-                powerampControl.turnOn()
+                withContext(NonCancellable + effectThread) { sessionEqualizer.release() }
                 currentLoop = null
                 currentGenre = null
                 playingSong = null
@@ -487,25 +501,29 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    private fun compareWithExpected(on: MeasuredSpectrum, off: MeasuredSpectrum): PowerampMeasure {
-        val preset = calibrationSettings()
-        val model = GraphicEqualizer(output.sampleRate, preset.copy(preampDb = 0f))
-        val bands = spectrumDifferenceDb(off, on, preset.bandFrequenciesHz)
-            .zip(preset.bandFrequenciesHz)
-            .mapNotNull { (measured, hz) -> measured?.let { hz to it } }
+    private fun compareMeasurements(
+        preset: EqualizerSettings,
+        alone: MeasuredSpectrum,
+        withTimbra: MeasuredSpectrum,
+        withPoweramp: MeasuredSpectrum,
+    ): PowerampMeasure {
+        val frequencies = preset.bandFrequenciesHz
+        val timbra = spectrumDifferenceDb(alone, withTimbra, frequencies)
+        val poweramp = spectrumDifferenceDb(alone, withPoweramp, frequencies)
+        val bands = frequencies.indices.filter { timbra[it] != null && poweramp[it] != null }
         if (bands.isEmpty()) return PowerampMeasure.CouldNotCapture
-        val expected = bands.map { (hz, _) -> model.magnitudeDb(hz.toDouble()).toFloat() }
-        val rawErrors = bands.zip(expected) { (_, measured), wanted -> measured - wanted }
-        val level = rawErrors.sorted()[rawErrors.size / 2]
-        val measured = bands.map { (_, value) -> value - level }
-        if (measured.max() - measured.min() < MEASURE_MIN_RANGE_DB) return PowerampMeasure.NoEffect
-        val worst = measured.indices.maxBy { abs(measured[it] - expected[it]) }
+        val cuts = bands.map { preset.bandGainsDb[it] < 0f }
+        val timbraDb = bands.map { requireNotNull(timbra[it]) }.alignedToItsMedian()
+        val powerampDb = bands.map { requireNotNull(poweramp[it]) }.alignedToItsMedian()
+        if (cutDepthDb(timbraDb, cuts) < MEASURE_MIN_CUT_DB) return PowerampMeasure.CouldNotCapture
+        if (cutDepthDb(powerampDb, cuts) < MEASURE_MIN_CUT_DB) return PowerampMeasure.NoEffect
+        val worst = bands.indices.maxBy { abs(powerampDb[it] - timbraDb[it]) }
         return PowerampMeasure.Done(
-            frequenciesHz = bands.map { it.first },
-            measuredDb = measured,
-            expectedDb = expected,
-            largestErrorDb = abs(measured[worst] - expected[worst]),
-            largestErrorHz = bands[worst].first,
+            frequenciesHz = bands.map { frequencies[it] },
+            measuredDb = powerampDb,
+            expectedDb = timbraDb,
+            largestErrorDb = abs(powerampDb[worst] - timbraDb[worst]),
+            largestErrorHz = frequencies[bands[worst]],
         )
     }
 

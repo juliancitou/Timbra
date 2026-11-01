@@ -178,7 +178,8 @@ terminó en estilo terminal/ASCII).
 - [x] Avisos de ajustes de Poweramp también en "Antes de empezar"
 - [ ] Revisar en el teléfono la gráfica de líneas, el modo A y el final del resultado
 - [x] Medir con el visualizador global la curva real de Poweramp (Ajustes → Calibrar)
-- [ ] Comprobar en el teléfono que la medición funciona y anotar la diferencia que da
+- [ ] Medir otra vez con la comprobación del medidor y anotar el resultado
+- [x] Comprobado con sesiones en silencio: el comando de apagar suelta el efecto de Poweramp y el de encender lo recupera
 - [x] Abrir el preset en Poweramp desde Exportar y detectar cuando ya se importó
 - [x] Prueba a ciegas final: elegir entre Timbra y sin ecualizar sin saber cuál es
 - [x] Probar el preset con otra música desde el resultado

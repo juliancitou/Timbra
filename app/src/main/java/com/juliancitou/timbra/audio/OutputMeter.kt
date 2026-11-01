@@ -60,6 +60,20 @@ fun addFftPower(fft: ByteArray, power: DoubleArray) {
     }
 }
 
+/** Sube o baja toda la curva para comparar solo su forma: el nivel general lo cambian el preamp y el DVC. */
+fun List<Float>.alignedToItsMedian(): List<Float> {
+    val median = sorted()[size / 2]
+    return map { it - median }
+}
+
+/** Cuánto más bajas están las bandas que el preset corta, en promedio, que las que deja igual. */
+fun cutDepthDb(curveDb: List<Float>, isCut: List<Boolean>): Float {
+    val cut = curveDb.filterIndexed { band, _ -> isCut[band] }
+    val kept = curveDb.filterIndexed { band, _ -> !isCut[band] }
+    if (cut.isEmpty() || kept.isEmpty()) return 0f
+    return kept.average().toFloat() - cut.average().toFloat()
+}
+
 /** Cuánto cambió [after] respecto a [before] alrededor de cada banda, en dB. `null` debajo de lo que se puede medir. */
 fun spectrumDifferenceDb(before: MeasuredSpectrum, after: MeasuredSpectrum, centersHz: List<Int>): List<Float?> =
     centersHz.indices.map { band ->
