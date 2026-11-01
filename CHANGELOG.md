@@ -19,6 +19,13 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `800c02a` · feat: regresar a la ronda anterior con un botón
+- Las rondas tienen un botón "Regresar", bloqueado en la primera. Restaura el estado guardado antes de responder esa ronda,
+  así que el ajuste no se suma al anterior. También deshace "No me gustó ninguno".
+- La flecha y el botón atrás del sistema salen a Nivel cómodo. Al tocar "Listo" se sigue en la misma ronda; volver hasta
+  Preparación empieza de nuevo.
+- El usuario confirmó de oído que Timbra y Poweramp suenan igual al importar. Falta ver en el teléfono el botón nuevo.
+
 ### 2026-11-01 · `61bd810` · feat: detectar Spotify y usar el preset en Poweramp
 - HyperOS no deja a Timbra arrancar sola para oír el aviso de sesión de Spotify. Al elegir Spotify con música sonando,
   Timbra pausa ~0.9 s y reanuda con las teclas multimedia, y Spotify vuelve a avisar. Comprobado en el teléfono: con
