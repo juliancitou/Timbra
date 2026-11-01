@@ -19,6 +19,13 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `9baa356` · fix: medir Poweramp con el micrófono
+- En el teléfono del usuario, `Visualizer(0)` no notó ni el ecualizador de Timbra, así que se quitó.
+- Ahora se graba el micrófono: silencio, ruido rosa solo, con Timbra y con Poweramp. Solo se compara la diferencia
+  entre grabaciones, con lo que se cancelan el micrófono y la bocina. Las bandas que superan al ruido del cuarto por
+  menos de 12 dB se descartan. Falta comprobar en el teléfono que funciona.
+- El audio queda solo en memoria. Con audífonos, un auricular debe ir pegado al micrófono: es menos preciso.
+
 ### 2026-10-31 · `2f3cbed` · fix: comprobar el medidor antes de comparar Poweramp
 - Las primeras mediciones dieron una línea casi plana y una "diferencia de 8.4 dB" engañosa: comparaban con la curva
   esperada sin saber si el medidor había visto algún efecto.
