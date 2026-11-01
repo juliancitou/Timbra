@@ -82,7 +82,6 @@
     <string name="export_setting_smooth">Ecualizador suave: apagado. Con el volumen alto cambiaría tu preset.</string>
     <string name="export_setting_preamp">Sin DVC, reducción de preamp: 0 dB. Baja antes el volumen: sonará más fuerte.</string>
     <string name="export_setting_clean">En su pantalla principal: tono en 0 y compresor apagado.</string>
-    <string name="export_setting_pipeline">Modo Pipeline: \"Por defecto\", salvo que falle el sonido.</string>
     <string name="export_section_steps">si lo descargas</string>
     <string name="export_step_open">Abre Poweramp Equalizer.</string>
     <string name="export_step_presets">Entra a la lista de presets y elige importar.</string>
@@ -365,10 +364,10 @@
     <string name="calibration_measure_running">Midiendo…</string>
     <string name="calibration_measure_no_capture">No se pudo medir: ni siquiera se notó el ecualizador de Timbra. Revisa que el micrófono no esté tapado, o usa la comparación de oído.</string>
     <string name="calibration_measure_too_quiet">Hay demasiado ruido o suena muy bajo. Sube un poco el volumen o busca un lugar más callado.</string>
-    <string name="calibration_measure_no_effect">La medición funciona, pero Poweramp no aplicó el preset. Revisa que el de prueba esté activo.</string>
+    <string name="calibration_measure_no_effect">La medición funciona, pero no se notó Poweramp. Revisa que el preset de prueba esté activo.</string>
     <string name="calibration_measure_chart">Lo que hace Poweramp comparado con lo que hace Timbra.</string>
     <string name="calibration_measure_legend">Ámbar: Poweramp. Naranja: Timbra. Las dos medidas igual.</string>
-    <string name="calibration_measure_result">Mayor diferencia: %1$s en %2$s. Es una medición casera: menos de 2 dB no es concluyente.</string>
+    <string name="calibration_measure_result">Cortes de −8 dB: Timbra %1$s, Poweramp %2$s. Es una medición casera: menos de 2 dB de diferencia no es concluyente.</string>
     <string name="finder_summary_doubt">%1$s: elegiste distinto al comprobar, así que dejé un punto medio.</string>
 
     <!-- Calibración -->

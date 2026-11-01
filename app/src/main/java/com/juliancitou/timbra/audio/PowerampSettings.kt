@@ -10,10 +10,9 @@ private const val KEY_LAST_HZ = "equ_custom_bands_last_fr"
 private const val KEY_OVERLAP = "equ_overlap"
 private const val KEY_SMOOTH_GAINS = "dsp_border_gain"
 private const val KEY_NO_DVC_REDUCTION_MB = "no_dvc_gain_mb"
-private const val KEY_PIPELINE = "peq_new_pipeline_model"
 private const val CASCADE_OVERLAP = 1
 
-enum class PowerampIssue { SmoothGains, NoDvcReduction, Pipeline }
+enum class PowerampIssue { SmoothGains, NoDvcReduction }
 
 /**
  * Lo que Timbra necesita de los ajustes de Poweramp Equalizer. Salen de la llamada "preference" de su API,
@@ -38,7 +37,6 @@ fun powerampSettingsFrom(values: Map<String, Any?>): PowerampSettings? {
         issues = buildSet {
             if (values[KEY_SMOOTH_GAINS] == true) add(PowerampIssue.SmoothGains)
             if ((values[KEY_NO_DVC_REDUCTION_MB] as? Int ?: 0) != 0) add(PowerampIssue.NoDvcReduction)
-            if ((values[KEY_PIPELINE] as? Int ?: 0) != 0) add(PowerampIssue.Pipeline)
         },
     )
 }

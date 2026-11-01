@@ -67,7 +67,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
-import kotlin.math.abs
 import kotlin.random.Random
 
 /** Estado de la ecualización en vivo de Spotify. [Off]: suena música de Timbra, no Spotify. */
@@ -94,8 +93,8 @@ sealed interface PowerampMeasure {
         val frequenciesHz: List<Int>,
         val measuredDb: List<Float>,
         val expectedDb: List<Float>,
-        val largestErrorDb: Float,
-        val largestErrorHz: Int,
+        val timbraCutDb: Float,
+        val powerampCutDb: Float,
     ) : PowerampMeasure
 }
 
@@ -171,8 +170,11 @@ private const val MEASURE_CAPTURE_SECONDS = 6
 private const val MEASURE_MIN_OVER_ROOM_DB = 12f
 private const val MEASURE_MIN_CUT_BANDS = 2
 
-/** El preset de prueba corta −8 dB: si esas bandas casi no bajan respecto a las demás, ese ecualizador no se vio. */
-private const val MEASURE_MIN_CUT_DB = 3f
+/** El preset de prueba corta −8 dB: si esas bandas casi no bajan con Timbra, la medición no es válida. */
+private const val MEASURE_MIN_TIMBRA_CUT_DB = 3f
+
+/** Poweramp puede cortar mucho menos de lo que muestra: en el teléfono del usuario, cerca de −2 dB. Eso es un resultado. */
+private const val MEASURE_MIN_POWERAMP_CUT_DB = 0.5f
 
 /**
  * Estado y sonido del test "Encuentra tu ecualización", compartido por todas sus pantallas. Al
@@ -530,15 +532,16 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         if (cuts.count { it } < MEASURE_MIN_CUT_BANDS) return PowerampMeasure.TooQuiet
         val timbraDb = bands.map { requireNotNull(timbra[it]) }.alignedToItsMedian()
         val powerampDb = bands.map { requireNotNull(poweramp[it]) }.alignedToItsMedian()
-        if (cutDepthDb(timbraDb, cuts) < MEASURE_MIN_CUT_DB) return PowerampMeasure.CouldNotCapture
-        if (cutDepthDb(powerampDb, cuts) < MEASURE_MIN_CUT_DB) return PowerampMeasure.NoEffect
-        val worst = bands.indices.maxBy { abs(powerampDb[it] - timbraDb[it]) }
+        val timbraCut = cutDepthDb(timbraDb, cuts)
+        val powerampCut = cutDepthDb(powerampDb, cuts)
+        if (timbraCut < MEASURE_MIN_TIMBRA_CUT_DB) return PowerampMeasure.CouldNotCapture
+        if (powerampCut < MEASURE_MIN_POWERAMP_CUT_DB) return PowerampMeasure.NoEffect
         return PowerampMeasure.Done(
             frequenciesHz = bands.map { frequencies[it] },
             measuredDb = powerampDb,
             expectedDb = timbraDb,
-            largestErrorDb = abs(powerampDb[worst] - timbraDb[worst]),
-            largestErrorHz = frequencies[bands[worst]],
+            timbraCutDb = -timbraCut,
+            powerampCutDb = -powerampCut,
         )
     }
 

@@ -19,7 +19,6 @@ class PowerampSettingsTest {
         "equ_overlap" to 0,
         "dsp_border_gain" to false,
         "no_dvc_gain_mb" to 0,
-        "peq_new_pipeline_model" to 0,
     )
 
     @Test
@@ -46,7 +45,6 @@ class PowerampSettingsTest {
         val values = realValues + mapOf(
             "dsp_border_gain" to true,
             "no_dvc_gain_mb" to -800,
-            "peq_new_pipeline_model" to 1,
             "equ_overlap" to 1,
             "peq_enable" to false,
         )

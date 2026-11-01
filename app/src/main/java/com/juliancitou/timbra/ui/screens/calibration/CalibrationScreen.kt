@@ -17,7 +17,6 @@ import com.juliancitou.timbra.R
 import com.juliancitou.timbra.ui.screens.finder.PowerampMeasure
 import com.juliancitou.timbra.ui.theme.FrequencyChart
 import com.juliancitou.timbra.ui.theme.formatDecibels
-import com.juliancitou.timbra.ui.theme.formatHertz
 import com.juliancitou.timbra.audio.BandOverlap
 import com.juliancitou.timbra.ui.screens.export.writeTo
 import com.juliancitou.timbra.ui.screens.finder.FinderUiState
@@ -55,8 +54,8 @@ private fun MeasureSection(measure: PowerampMeasure, onMeasure: () -> Unit) {
                 DetailText(
                     stringResource(
                         R.string.calibration_measure_result,
-                        formatDecibels(measure.largestErrorDb),
-                        formatHertz(measure.largestErrorHz),
+                        formatDecibels(measure.timbraCutDb),
+                        formatDecibels(measure.powerampCutDb),
                     ),
                 )
             }
