@@ -29,6 +29,7 @@ import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.measure.OutputKind
 import com.juliancitou.timbra.ui.screens.preparation.bandSummary
 import com.juliancitou.timbra.ui.theme.CodeLines
+import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
@@ -56,7 +57,10 @@ fun ExportScreen(
     bandLayout: BandLayout,
     powerampSettings: PowerampSettings?,
     presetImported: Boolean,
+    presetInUse: Boolean,
+    presetInUseFailed: Boolean,
     onImportPreset: (json: String) -> Boolean,
+    onUsePreset: () -> Unit,
     presetJson: () -> String,
     onGoHome: () -> Unit,
     onBack: () -> Unit,
@@ -75,10 +79,22 @@ fun ExportScreen(
         lead = stringResource(R.string.export_lead),
         onBack = onBack,
         actions = {
-            if (presetImported) {
+            if (presetInUse) {
                 TerminalButton(
                     text = stringResource(R.string.action_go_home),
                     onClick = onGoHome,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            } else if (presetImported) {
+                TerminalButton(
+                    text = stringResource(R.string.action_use_in_poweramp),
+                    onClick = onUsePreset,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                TerminalButton(
+                    text = stringResource(R.string.action_go_home),
+                    onClick = onGoHome,
+                    style = TerminalButtonStyle.Secondary,
                     modifier = Modifier.fillMaxWidth(),
                 )
             } else {
@@ -122,7 +138,16 @@ fun ExportScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        if (presetImported) {
+        if (presetInUse) {
+            TerminalChip(label = stringResource(R.string.export_in_use), selected = true)
+            DetailText(stringResource(R.string.export_in_use_detail, stringResource(output.assignTargetRes())))
+        } else if (presetInUseFailed) {
+            TerminalChip(
+                label = stringResource(R.string.export_use_failed),
+                selected = false,
+                tone = TerminalChipTone.Warning,
+            )
+        } else if (presetImported) {
             TerminalChip(label = stringResource(R.string.export_imported), selected = true)
         } else if (importFailed) {
             TerminalChip(

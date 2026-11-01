@@ -342,6 +342,10 @@
     <string name="preparation_start_plain_hint">Parte solo de lo que elijas en las rondas.</string>
     <string name="finder_includes_measurement">Incluye la medición de AutoEq: %1$s.</string>
     <string name="action_import_poweramp">Importar en Poweramp</string>
+    <string name="action_use_in_poweramp">Usar en Poweramp</string>
+    <string name="export_in_use">Activo en Poweramp</string>
+    <string name="export_in_use_detail">Quedó asignado a %1$s y Poweramp está encendido.</string>
+    <string name="export_use_failed">No se pudo asignar: hazlo en Poweramp</string>
     <string name="export_imported">Ya está en Poweramp</string>
     <string name="export_import_failed">No se pudo abrir Poweramp: descarga el archivo</string>
     <string name="finder_section_check">comprueba</string>

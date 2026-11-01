@@ -146,6 +146,9 @@ data class FinderUiState(
     val useAutoEq: Boolean = true,
     /** Si el preset con este nombre ya está en Poweramp. */
     val presetImported: Boolean = false,
+    /** Si Timbra ya lo asignó a la salida en uso y lo dejó activo en Poweramp. */
+    val presetInUse: Boolean = false,
+    val presetInUseFailed: Boolean = false,
     val blindTest: BlindTest? = null,
     /** La opción que se está escuchando en la prueba a ciegas; ninguna hasta tocar una. */
     val blindOption: Int? = null,
@@ -175,6 +178,10 @@ private const val MEASURE_PRESET_NAME = "Medicion"
 private const val MAX_SONG_SECONDS = 120
 private const val STOP_SHARING_AFTER_MS = 5_000L
 private const val POWERAMP_STOP_WAIT_MS = 1_000L
+
+/** Con 350 ms la música no volvió en el teléfono del usuario; con 900 ms, sí. */
+private const val SESSION_NUDGE_PAUSE_MS = 900L
+private const val SESSION_NUDGE_CHECK_MS = 2_500L
 
 /**
  * Nivel de las opciones respecto al sonido original. Igualar el volumen hacia arriba las dejaría sin margen: con música
@@ -244,6 +251,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private val sessionEqualizer = SessionEqualizer()
     private var spotifySettings: EqualizerSettings = EqualizerSettings.Flat
     private var calibrating = false
+    private var importRequested = false
     private val powerampControl = PowerampControl(application)
     private var powerampOffByTimbra = false
 
@@ -280,12 +288,26 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    /** Actualiza si el preset [fullName] ya está en Poweramp, por ejemplo al volver de importarlo. */
+    /** Al volver de importar: si llegó el preset que se pidió, se asigna y se activa sin más pasos. */
     fun checkPresetImported(fullName: String) {
         viewModelScope.launch(effectThread) {
             val imported = powerampControl.hasPreset(fullName)
             state.update { it.copy(presetImported = imported) }
+            if (imported && importRequested) {
+                importRequested = false
+                usePresetNow(fullName)
+            }
         }
+    }
+
+    fun usePreset(fullName: String) {
+        viewModelScope.launch(effectThread) { usePresetNow(fullName) }
+    }
+
+    private fun usePresetNow(fullName: String) {
+        val current = state.value
+        val done = powerampControl.usePreset(fullName, current.finder.output, current.headphonesName.trim())
+        state.update { it.copy(presetInUse = done, presetInUseFailed = !done) }
     }
 
     fun setPresetName(name: String) = state.update { it.copy(presetName = name) }
@@ -430,6 +452,22 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         stopSound()
         state.update { it.copy(spotify = SpotifyLink.Waiting, songName = null, songFailed = false) }
         refresh()
+        viewModelScope.launch { findPlayingSpotify() }
+    }
+
+    /**
+     * Spotify solo avisa su sesión al empezar a sonar, y HyperOS no despierta a Timbra para oírlo si estaba cerrada.
+     * Si ya hay música, una pausa breve hace que vuelva a avisar. Se usa el reproductor en curso: si fuera otra app,
+     * solo se pausa un momento, en vez de arrancar Spotify encima. Sin música no se hace nada: nunca suena sola.
+     */
+    private suspend fun findPlayingSpotify() {
+        val audioManager = getApplication<Application>().getSystemService(AudioManager::class.java)
+        if (SpotifySession.id.value != null || !audioManager.isMusicActive) return
+        pressMediaKey(KeyEvent.KEYCODE_MEDIA_PAUSE)
+        delay(SESSION_NUDGE_PAUSE_MS)
+        pressMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY)
+        delay(SESSION_NUDGE_CHECK_MS)
+        if (!audioManager.isMusicActive) pressMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY)
     }
 
     /** Spotify suena con el preset de calibración, para compararlo con el mismo preset en Poweramp. */
@@ -451,7 +489,11 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         PowerampExporter.toJson(MEASURE_PRESET_NAME, calibrationPreset(state.value.finder.layout)),
     )
 
-    fun importPreset(fullName: String, json: String): Boolean = powerampControl.importPreset(fullName, json)
+    fun importPreset(fullName: String, json: String): Boolean {
+        val opened = powerampControl.importPreset(fullName, json)
+        importRequested = opened
+        return opened
+    }
 
     /** Vuelve a escuchar el preset completo, como si Poweramp lo aplicara entero. */
     fun resetPreviewStrength() = usePreviewStrength(FULL_PREVIEW_STRENGTH)
@@ -602,7 +644,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     /** Empieza el test desde la primera ronda, conservando el género y el nombre de los audífonos. */
     fun startTest() {
         state.update {
-            it.withFinder(startingFinder(it)).copy(bypass = false, presetName = "")
+            it.withFinder(startingFinder(it)).copy(bypass = false, presetName = "", presetInUse = false, presetInUseFailed = false)
         }
         refresh()
     }
@@ -807,10 +849,12 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     }
 
     /** Pausa o reanuda lo que esté sonando, como el botón de unos audífonos. */
-    private fun pressMediaPlayPause() {
+    private fun pressMediaPlayPause() = pressMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+
+    private fun pressMediaKey(code: Int) {
         val audioManager = getApplication<Application>().getSystemService(AudioManager::class.java)
         listOf(KeyEvent.ACTION_DOWN, KeyEvent.ACTION_UP).forEach { action ->
-            audioManager.dispatchMediaKeyEvent(KeyEvent(action, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
+            audioManager.dispatchMediaKeyEvent(KeyEvent(action, code))
         }
     }
 

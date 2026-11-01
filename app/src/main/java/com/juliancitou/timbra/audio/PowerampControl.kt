@@ -1,11 +1,13 @@
 package com.juliancitou.timbra.audio
 
 import android.content.ComponentName
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.media.audiofx.AudioEffect
 import android.media.audiofx.DynamicsProcessing
 import android.net.Uri
+import com.juliancitou.timbra.measure.OutputKind
 
 enum class PowerampState { NotInstalled, Off, On, Unknown }
 
@@ -23,6 +25,12 @@ private const val ACTION_IMPORT_PRESETS = "com.maxmpz.equalizer.IMPORT_PRESETS"
 private const val EXTRA_NAMES = "names"
 private const val EXTRA_PRESETS = "presets"
 private const val COLUMN_ID = "_id"
+private const val COLUMN_BIND_BLUETOOTH = "bind_to_bt"
+private const val COLUMN_BIND_WIRED = "bind_to_wired"
+private const val COLUMN_BIND_SPEAKER = "bind_to_speaker"
+private const val COLUMN_BOUND_DEVICE = "meta_bound_device_name"
+private const val COLUMN_UNBIND_DEVICES = "__unbind_from_all_devices"
+private const val ACTION_RELOAD_DATA = "com.maxmpz.audioplayer.ACTION_RELOAD_DATA"
 private const val STEREO_CHANNELS = 2
 private const val SETTINGS_URI = "content://com.maxmpz.equalizer.data"
 private const val CALL_PREFERENCE = "preference"
@@ -117,16 +125,55 @@ class PowerampControl(private val context: Context) {
         true
     }.getOrDefault(false)
 
+    /**
+     * Hace del preset [name] el de la salida [output], lo activa y enciende Poweramp. Cada salida usa un solo preset, así
+     * que se le quita a los demás. Lo asignado a un dispositivo manda sobre la salida, por eso con Bluetooth también se
+     * le quitan los audífonos [deviceName] al preset que los tuviera. Asignar a ese dispositivo pediría su
+     * dirección, que Android oculta sin otro permiso. `false` si el preset no existe.
+     */
+    fun usePreset(name: String, output: OutputKind, deviceName: String): Boolean = runCatching {
+        val id = newestPresetId(name) ?: return false
+        val column = when (output) {
+            OutputKind.Bluetooth -> COLUMN_BIND_BLUETOOTH
+            OutputKind.Wired -> COLUMN_BIND_WIRED
+            OutputKind.Speaker -> COLUMN_BIND_SPEAKER
+        }
+        presetIds("$column = 1").filter { it != id }.forEach { updatePreset(it, column, 0) }
+        if (output == OutputKind.Bluetooth && deviceName.isNotBlank()) {
+            presetIds("$COLUMN_BOUND_DEVICE LIKE ?", "%$deviceName%")
+                .filter { it != id }
+                .forEach { updatePreset(it, COLUMN_UNBIND_DEVICES, 1) }
+        }
+        updatePreset(id, column, 1)
+        context.sendBroadcast(
+            Intent(ACTION_RELOAD_DATA)
+                .setComponent(ComponentName(POWERAMP_EQ_PACKAGE, API_RECEIVER))
+                .putExtra(EXTRA_PACKAGE, context.packageName),
+        )
+        turnOn()
+        activate(id)
+        true
+    }.getOrDefault(false)
+
+    private fun presetIds(selection: String, vararg arguments: String): List<Long> =
+        context.contentResolver.query(Uri.parse(PRESETS_URI), arrayOf(COLUMN_ID), selection, arguments, null)?.use { cursor ->
+            buildList { while (cursor.moveToNext()) add(cursor.getLong(0)) }
+        }.orEmpty()
+
+    /** Poweramp agrega " (2)" al importar otro con el mismo nombre: el más nuevo es el que acaba de llegar. */
+    private fun newestPresetId(name: String): Long? =
+        presetIds("$COLUMN_NAME = ? OR $COLUMN_NAME LIKE ?", name, "$name (%").maxOrNull()
+
+    private fun updatePreset(id: Long, column: String, value: Int) {
+        val values = ContentValues().apply { put(column, value) }
+        context.contentResolver.update(Uri.parse("$PRESETS_URI/$id"), values, null, null)
+    }
+
+    private fun activate(id: Long) = context.sendBroadcast(apiIntent(COMMAND_SET_PRESET).putExtra(EXTRA_ID, id))
+
     /** Deja activo el preset con [name]. `false` si no existe. Poweramp no dice cuál estaba antes. */
     fun activatePreset(name: String): Boolean = runCatching {
-        val id = context.contentResolver.query(
-            Uri.parse(PRESETS_URI),
-            arrayOf(COLUMN_ID),
-            "$COLUMN_NAME = ?",
-            arrayOf(name),
-            null,
-        )?.use { if (it.moveToFirst()) it.getLong(0) else null } ?: return false
-        apiIntent(COMMAND_SET_PRESET).putExtra(EXTRA_ID, id).let(context::sendBroadcast)
+        activate(presetIds("$COLUMN_NAME = ?", name).firstOrNull() ?: return false)
         true
     }.getOrDefault(false)
 
