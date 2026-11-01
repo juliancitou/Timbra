@@ -19,6 +19,13 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `c089222` · fix: oír el test al nivel de Poweramp
+- El usuario oía Timbra mucho más fuerte que Poweramp. Igualar el volumen subía las opciones hasta el nivel del sonido
+  original, sin margen; con música masterizada podía actuar el limitador de `SessionEqualizer`.
+- Las opciones de cada ronda suenan 6 dB bajo el original, lo que baja el preamp de un preset típico. En el resultado, B
+  usa el preamp real del preset y A baja hasta sonar igual de fuerte. Se quita la opción C, que ya no hace falta.
+- Falta confirmar de oído si esto también mejora los graves y los agudos que el usuario notó distintos.
+
 ### 2026-11-01 · `ff8ef3c` · fix: no aplicar sola la fuerza medida de Poweramp
 - La vista previa vuelve al 100 % por defecto. La fuerza medida se ofrece como opción en Calibrar: al 45 %, el usuario
   oyó en Timbra más agudos que en Poweramp, y la medición no cubre un corte de 5 a 20 kHz como el de su preset.
