@@ -188,6 +188,7 @@ terminó en estilo terminal/ASCII).
 - [x] Al importar: asignar a la salida en uso, activar y encender Poweramp
 - [x] Botón Regresar en las rondas, bloqueado en la primera; la flecha sale a Nivel cómodo sin perder el progreso
 - [x] El usuario confirmó que Timbra y Poweramp suenan igual al importar
+- [x] Botones en fila del mismo tamaño
 - [ ] Probar en el teléfono ambos cambios en la app real, también con Cable
 - [ ] El usuario oye mejor definidos los graves en Poweramp y más fuertes los agudos en Timbra: revisar tras este cambio
 - [x] La vista previa vuelve al 100 % por defecto; la fuerza medida es opcional

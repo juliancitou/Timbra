@@ -1,6 +1,7 @@
 package com.juliancitou.timbra.ui.screens.finder
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import com.juliancitou.timbra.ui.theme.DisplayZone
 import com.juliancitou.timbra.ui.theme.EqualizerDisplay
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonRow
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalChip
 import com.juliancitou.timbra.ui.theme.TerminalPanel
@@ -72,19 +74,19 @@ fun FinderResultScreen(
                 onClick = onExport,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            TerminalButtonRow {
                 TerminalButton(
                     text = stringResource(state.playbackLabelRes()),
                     onClick = onTogglePlayback,
                     style = TerminalButtonStyle.Secondary,
                     enabled = !state.preparing,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
                 TerminalButton(
                     text = stringResource(R.string.action_restart_test),
                     onClick = onRestart,
                     style = TerminalButtonStyle.Secondary,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
             }
         },

@@ -3,6 +3,7 @@ package com.juliancitou.timbra.ui.screens.calibration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import kotlin.math.roundToInt
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonRow
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalChip
 import com.juliancitou.timbra.ui.theme.TerminalScreen
@@ -122,18 +124,18 @@ fun CalibrationScreen(
         lead = stringResource(R.string.calibration_lead),
         onBack = onBack,
         actions = {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
+            TerminalButtonRow {
                 TerminalButton(
                     text = stringResource(R.string.calibration_import),
                     onClick = { onImportPreset() },
                     style = TerminalButtonStyle.Secondary,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
                 TerminalButton(
                     text = stringResource(R.string.action_open_spotify),
                     onClick = onOpenSpotify,
                     style = TerminalButtonStyle.Secondary,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
             }
             TerminalButton(

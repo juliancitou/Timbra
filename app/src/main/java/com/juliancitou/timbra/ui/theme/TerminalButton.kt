@@ -1,5 +1,11 @@
 package com.juliancitou.timbra.ui.theme
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -84,7 +90,7 @@ fun TerminalButton(
                 haptics.performHapticFeedback(HapticFeedbackType.Confirm)
                 onClick()
             }
-            .padding(horizontal = Spacing.large, vertical = 14.dp),
+            .padding(horizontal = Spacing.small, vertical = 14.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -94,4 +100,17 @@ fun TerminalButton(
             textAlign = TextAlign.Center,
         )
     }
+}
+
+/**
+ * Botones en fila, todos del mismo alto aunque el texto de alguno ocupe dos renglones. Cada uno debe llevar
+ * `Modifier.weight(1f).fillMaxHeight()`.
+ */
+@Composable
+fun TerminalButtonRow(content: @Composable RowScope.() -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.inSection),
+        content = content,
+    )
 }

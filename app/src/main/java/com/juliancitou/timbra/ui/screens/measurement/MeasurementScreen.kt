@@ -1,6 +1,7 @@
 package com.juliancitou.timbra.ui.screens.measurement
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import com.juliancitou.timbra.ui.theme.MotionDuration
 import com.juliancitou.timbra.ui.theme.SectionLabel
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonRow
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.TerminalSlider
@@ -62,18 +64,18 @@ fun MeasurementScreen(onFinished: () -> Unit, onBack: () -> Unit) {
         lead = stringResource(R.string.measurement_lead),
         onBack = onBack,
         actions = {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            TerminalButtonRow {
                 TerminalButton(
                     text = stringResource(R.string.action_repeat),
                     onClick = { gainDb = 0f },
                     style = TerminalButtonStyle.Secondary,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
                 TerminalButton(
                     text = stringResource(R.string.action_skip),
                     onClick = ::nextBand,
                     style = TerminalButtonStyle.Secondary,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
             }
             TerminalButton(

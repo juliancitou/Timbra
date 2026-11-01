@@ -86,7 +86,7 @@
     <string name="export_step_open">Abre Poweramp Equalizer.</string>
     <string name="export_step_presets">Entra a la lista de presets y elige importar.</string>
     <string name="export_step_select">Selecciona el archivo que descargaste.</string>
-    <string name="action_save_file">Descargar archivo</string>
+    <string name="action_save_file">Descargar</string>
     <string name="action_share">Compartir</string>
     <string name="action_go_home">Inicio</string>
 
@@ -271,8 +271,8 @@
     <string name="export_assign_speaker">la bocina</string>
 
     <!-- Test: no me gustó ninguno, canción propia y resumen -->
-    <string name="action_none">No me gustó ninguno</string>
-    <string name="finder_step_none">Si ninguno convence, se queda como estaba.</string>
+    <string name="action_none">Ninguno</string>
+    <string name="finder_step_none">Si no te convence ninguno, pulsa \"Ninguno\" y se queda como estaba.</string>
     <string name="finder_node_current">actual</string>
     <string name="comfort_section_song">tu canción</string>
     <string name="action_pick_song">Elegir canción</string>
@@ -285,7 +285,7 @@
     <!-- Spotify en vivo -->
     <string name="comfort_section_spotify">spotify</string>
     <string name="action_open_spotify">Abrir Spotify</string>
-    <string name="action_play_pause">Pausar / reanudar</string>
+    <string name="action_play_pause">Pausar / seguir</string>
     <string name="comfort_spotify_step_play">Abre Spotify y pon una canción.</string>
     <string name="comfort_spotify_step_return">Regresa aquí y espera a que diga conectado.</string>
     <string name="comfort_spotify_step_retry">Si no conecta, pausa y reanuda en Spotify.</string>

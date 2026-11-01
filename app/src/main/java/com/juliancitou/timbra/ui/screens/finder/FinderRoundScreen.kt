@@ -2,6 +2,7 @@ package com.juliancitou.timbra.ui.screens.finder
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.OptionNodes
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
+import com.juliancitou.timbra.ui.theme.TerminalButtonRow
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
 import com.juliancitou.timbra.ui.theme.TerminalHoldChip
 import com.juliancitou.timbra.ui.theme.TerminalScreen
@@ -86,35 +88,35 @@ fun FinderRoundScreen(
         lead = stringResource(texts.question),
         onBack = onExit,
         actions = {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
+            TerminalButtonRow {
                 TerminalButton(
                     text = stringResource(state.playbackLabelRes()),
                     onClick = onTogglePlayback,
                     style = TerminalButtonStyle.Secondary,
                     enabled = !state.preparing,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
                 TerminalButton(
                     text = stringResource(R.string.action_choose),
                     onClick = onChoose,
                     enabled = !state.preparing,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
+            TerminalButtonRow {
                 TerminalButton(
                     text = stringResource(R.string.action_previous_round),
                     onClick = onPreviousRound,
                     style = TerminalButtonStyle.Secondary,
                     enabled = !state.preparing && finder.previous != null,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
                 TerminalButton(
                     text = stringResource(R.string.action_none),
                     onClick = onKeepCurrent,
                     style = TerminalButtonStyle.Secondary,
                     enabled = !state.preparing,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
             }
         },
