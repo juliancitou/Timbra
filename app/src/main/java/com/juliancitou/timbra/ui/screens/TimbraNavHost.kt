@@ -162,6 +162,7 @@ fun TimbraNavHost(
                         state = finderState,
                         onImportPreset = finder::importMeasurePreset,
                         onResetStrength = finder::resetPreviewStrength,
+                        onUseStrength = finder::usePreviewStrength,
                         onStart = finder::startCalibration,
                         onSelectOverlap = finder::setBandOverlap,
                         onMeasurePoweramp = finder::measurePoweramp,

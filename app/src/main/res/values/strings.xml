@@ -371,7 +371,9 @@
     <string name="calibration_measure_legend">Ámbar: Poweramp. Naranja: Timbra. Las dos medidas igual.</string>
     <string name="calibration_measure_result">Cortes de −6 dB: Timbra %1$s, Poweramp %2$s.</string>
     <string name="calibration_measure_no_preset">Primero toca Importar y acepta en Poweramp.</string>
-    <string name="calibration_strength">Tu Poweramp aplica cerca del %1$d %% de cada preset. La vista previa ya suena con esa fuerza.</string>
+    <string name="calibration_strength">La vista previa suena al %1$d %% de cada preset.</string>
+    <string name="calibration_measure_caveat">Es orientativo: compara de oído antes de usar esa fuerza.</string>
+    <string name="calibration_strength_use">Oír al %1$d %%</string>
     <string name="calibration_strength_reset">Oír el preset completo</string>
     <string name="finder_summary_doubt">%1$s: elegiste distinto al comprobar, así que dejé un punto medio.</string>
 

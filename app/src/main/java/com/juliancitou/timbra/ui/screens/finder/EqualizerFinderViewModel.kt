@@ -70,6 +70,9 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 import kotlin.random.Random
 
+private const val MIN_PREVIEW_STRENGTH = 0.2
+private const val FULL_PREVIEW_STRENGTH = 1.0
+
 /** Estado de la ecualización en vivo de Spotify. [Off]: suena música de Timbra, no Spotify. */
 enum class SpotifyLink { Off, Waiting, Connected, Blocked, Failed }
 
@@ -99,7 +102,11 @@ sealed interface PowerampMeasure {
         val expectedDb: List<Float>,
         val timbraCutDb: Float,
         val powerampCutDb: Float,
-    ) : PowerampMeasure
+    ) : PowerampMeasure {
+        /** Qué fracción del corte de Timbra entregó Poweramp. */
+        val strength: Double
+            get() = (powerampCutDb / timbraCutDb).toDouble().coerceIn(MIN_PREVIEW_STRENGTH, FULL_PREVIEW_STRENGTH)
+    }
 }
 
 /** De dónde salió lo que se muestra como "lo que suena ahora". */
@@ -145,7 +152,7 @@ data class FinderUiState(
     /** La opción que se está escuchando en la prueba a ciegas; ninguna hasta tocar una. */
     val blindOption: Int? = null,
     val powerampMeasure: PowerampMeasure = PowerampMeasure.Idle,
-    /** Qué fracción del preset aplica este Poweramp, medida. La vista previa suena con esa fuerza. */
+    /** Fracción del preset con la que suena la vista previa; la elige el usuario tras medir. */
     val previewStrength: Double = 1.0,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
@@ -165,8 +172,6 @@ data class FinderUiState(
 private const val CENTER_OPTION = 2
 private const val REFERENCE_SECONDS = 4
 private const val MEASURE_PRESET_NAME = "Medicion"
-private const val MIN_PREVIEW_STRENGTH = 0.2
-private const val FULL_PREVIEW_STRENGTH = 1.0
 
 /** Con 2 minutos basta para el test, y una canción en estéreo no ocupa más de ~50 MB de memoria. */
 private const val MAX_SONG_SECONDS = 120
@@ -444,9 +449,13 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     fun importPreset(fullName: String, json: String): Boolean = powerampControl.importPreset(fullName, json)
 
     /** Vuelve a escuchar el preset completo, como si Poweramp lo aplicara entero. */
-    fun resetPreviewStrength() = savePreviewStrength(FULL_PREVIEW_STRENGTH)
+    fun resetPreviewStrength() = usePreviewStrength(FULL_PREVIEW_STRENGTH)
 
-    private fun savePreviewStrength(strength: Double) {
+    /**
+     * No se aplica sola al medir: la medición usa cortes que terminan en 10 kHz, y con un corte hasta 20 kHz el
+     * usuario oyó en Timbra más agudos que en Poweramp. Es una opción que se compara de oído.
+     */
+    fun usePreviewStrength(strength: Double) {
         strengthPreferences.save(strength)
         state.update { it.copy(previewStrength = strength) }
     }
@@ -528,12 +537,6 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
                 currentLoop = null
                 currentGenre = null
                 playingSong = null
-            }
-            if (result is PowerampMeasure.Done) {
-                savePreviewStrength(
-                    (result.powerampCutDb / result.timbraCutDb).toDouble()
-                        .coerceIn(MIN_PREVIEW_STRENGTH, FULL_PREVIEW_STRENGTH),
-                )
             }
             state.update { it.copy(powerampMeasure = result) }
         }

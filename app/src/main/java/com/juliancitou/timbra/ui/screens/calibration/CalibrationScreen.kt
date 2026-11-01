@@ -36,6 +36,7 @@ private fun MeasureSection(
     measure: PowerampMeasure,
     previewStrength: Double,
     onResetStrength: () -> Unit,
+    onUseStrength: (Double) -> Unit,
     onMeasure: () -> Unit,
 ) {
     TerminalSection(stringResource(R.string.calibration_section_measure)) {
@@ -61,6 +62,12 @@ private fun MeasureSection(
                         formatDecibels(measure.timbraCutDb),
                         formatDecibels(measure.powerampCutDb),
                     ),
+                )
+                DetailText(stringResource(R.string.calibration_measure_caveat))
+                TerminalChip(
+                    label = stringResource(R.string.calibration_strength_use, (measure.strength * 100).roundToInt()),
+                    selected = previewStrength == measure.strength,
+                    onClick = { onUseStrength(measure.strength) },
                 )
             }
         }
@@ -98,6 +105,7 @@ fun CalibrationScreen(
     state: FinderUiState,
     onImportPreset: () -> Boolean,
     onResetStrength: () -> Unit,
+    onUseStrength: (Double) -> Unit,
     onStart: () -> Unit,
     onSelectOverlap: (BandOverlap) -> Unit,
     onMeasurePoweramp: () -> Unit,
@@ -145,7 +153,7 @@ fun CalibrationScreen(
                 ),
             )
         }
-        MeasureSection(state.powerampMeasure, state.previewStrength, onResetStrength) {
+        MeasureSection(state.powerampMeasure, state.previewStrength, onResetStrength, onUseStrength) {
             if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 onMeasurePoweramp()
             } else {

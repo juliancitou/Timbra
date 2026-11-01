@@ -184,9 +184,8 @@ terminó en estilo terminal/ASCII).
 - [x] Medir en bocina un preset plano y uno de corte ancho: Poweramp aplica ~45 % y sube ~1.4 dB arriba de 5 kHz
 - [x] Vista previa con la fuerza medida de Poweramp (Ajustes → Calibrar) e importación con su API oficial
 - [x] Opción para oír el resultado con el volumen de Poweramp, sin igualar
-- [ ] El usuario oye los agudos más fuertes en Timbra que en Poweramp, con la vista previa al 45 %: revisar si esa fuerza vale para cortes anchos de agudos
-- [ ] Medir el preset real "Timbra - HUAWEI FreeBuds Pro 4 (Bluetooth)" en Poweramp y en Timbra
-- [ ] Decidir si la vista previa vuelve al 100 % por defecto
+- [x] La vista previa vuelve al 100 % por defecto; la fuerza medida es opcional
+- [ ] Medir el preset real "Timbra - HUAWEI FreeBuds Pro 4 (Bluetooth)": a veces apagar Poweramp no suelta su efecto y no queda una referencia limpia
 - [ ] Repetir el test con la nueva vista previa y comparar de oído con Poweramp
 - [ ] Decidir si también se compensa la subida de agudos
 - [ ] Revisar si a Poweramp le falta profundidad en otros teléfonos o versiones
