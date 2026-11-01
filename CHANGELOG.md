@@ -19,6 +19,13 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `7462b14` · feat: oír el resultado con el volumen de Poweramp
+- El usuario oye los agudos más fuertes y molestos en Timbra que en Poweramp. Su preset quedó en −8 dB, el mínimo, en todas
+  las bandas de 5.2 a 20 kHz, y con preamp de −6 dB: la vista previa al 45 % cortaba menos, e igualar el volumen la hacía
+  sonar más fuerte que Poweramp.
+- El resultado agrega "C · Volumen de Poweramp", con el preamp del preset y sin igualar el volumen.
+- Queda abierto si el 45 % medido vale para cortes anchos de agudos. El oído del usuario indica que puede ser demasiado bajo.
+
 ### 2026-11-01 · `4fec879` · feat: escuchar la vista previa con la fuerza de Poweramp
 - Con Spotify y el micrófono, en la bocina: un preset plano baja el nivel y sube ~1.4 dB arriba de 5 kHz; uno de
   mesetas de −6 dB da unos −2.5 dB relativos en Poweramp y −5.6 dB en Timbra. Poweramp aplica ~45 %.
