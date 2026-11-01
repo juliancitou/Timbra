@@ -169,6 +169,7 @@ fun PreparationScreen(
 fun ChecklistScreen(
     output: OutputKind,
     poweramp: PowerampState,
+    powerampOffByTimbra: Boolean,
     powerampIssues: Set<PowerampIssue>,
     onTurnOffPoweramp: () -> Unit,
     onContinue: () -> Unit,
@@ -231,7 +232,7 @@ fun ChecklistScreen(
                     modifier = Modifier.staggeredEntrance(index),
                 )
                 when (labelRes) {
-                    R.string.preparation_poweramp_off -> PowerampStatus(poweramp, onTurnOffPoweramp)
+                    R.string.preparation_poweramp_off -> PowerampStatus(poweramp, powerampOffByTimbra, onTurnOffPoweramp)
                     R.string.preparation_quiet_place -> NoiseStatus(
                         noiseDbfs = noiseDbfs,
                         measuring = measuring,
@@ -318,7 +319,7 @@ private fun AutoEqSection(profile: AutoEqProfile, use: Boolean, onChange: (Boole
 }
 
 @Composable
-private fun PowerampStatus(state: PowerampState, onTurnOff: () -> Unit) {
+private fun PowerampStatus(state: PowerampState, offByTimbra: Boolean, onTurnOff: () -> Unit) {
     DetailText(
         stringResource(
             when (state) {
@@ -329,6 +330,9 @@ private fun PowerampStatus(state: PowerampState, onTurnOff: () -> Unit) {
             },
         ),
     )
+    if (state == PowerampState.Off && offByTimbra) {
+        DetailText(stringResource(R.string.preparation_poweramp_returns))
+    }
     if (state == PowerampState.On || state == PowerampState.Unknown) {
         TerminalChip(
             label = stringResource(R.string.preparation_poweramp_turn_off),

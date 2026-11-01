@@ -81,6 +81,7 @@
     <string name="export_setting_overlap">Superposición de bandas: \"Envolvente\"</string>
     <string name="export_setting_smooth">Ecualizador suave: apagado. Con el volumen alto cambiaría tu preset.</string>
     <string name="export_setting_preamp">Sin DVC, reducción de preamp: 0 dB. Baja antes el volumen: sonará más fuerte.</string>
+    <string name="export_setting_bands">Poweramp usa otras bandas: cámbialas en \"bandas personalizadas\" para que suene igual.</string>
     <string name="export_setting_clean">En su pantalla principal: tono en 0 y compresor apagado.</string>
     <string name="export_section_steps">si lo descargas</string>
     <string name="export_step_open">Abre Poweramp Equalizer.</string>
@@ -326,6 +327,7 @@
     <string name="preparation_poweramp_detected_off">Apagado.</string>
     <string name="preparation_poweramp_detected_on">Está encendido y va a chocar con el test.</string>
     <string name="preparation_poweramp_unknown">Reproduce algo en Spotify para comprobarlo, o apágalo desde aquí.</string>
+    <string name="preparation_poweramp_returns">Se enciende al terminar. Si cierras Timbra desde recientes, puede quedarse apagado hasta que la abras.</string>
     <string name="preparation_poweramp_turn_off">Apagar Poweramp</string>
     <string name="preparation_noise_measuring">Midiendo el ruido…</string>
     <string name="preparation_noise_quiet">Se oye tranquilo.</string>

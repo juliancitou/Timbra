@@ -163,6 +163,7 @@ fun TimbraNavHost(
                     ChecklistScreen(
                         output = finderState.finder.output,
                         poweramp = finderState.poweramp,
+                        powerampOffByTimbra = finderState.powerampOffByTimbra,
                         powerampIssues = finderState.powerampSettings?.issues.orEmpty(),
                         onTurnOffPoweramp = finder::turnOffPoweramp,
                         onContinue = { navController.navigate(ComfortLevelRoute) },

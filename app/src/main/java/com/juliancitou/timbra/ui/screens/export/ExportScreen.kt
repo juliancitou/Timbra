@@ -169,7 +169,7 @@ fun ExportScreen(
         }
         TerminalSection(stringResource(R.string.export_section_poweramp)) {
             CodeLines(
-                powerampAdvice(powerampSettings).map { stringResource(it) },
+                powerampAdvice(powerampSettings, bandLayout).map { stringResource(it) },
             )
         }
         TerminalSection(stringResource(R.string.export_section_steps)) {
@@ -199,7 +199,7 @@ internal fun PowerampIssue.adviceRes(): Int = when (this) {
 }
 
 /** Solo lo que hay que cambiar si se pudo leer Poweramp; la lista completa si no. El tono y el compresor no se pueden leer. */
-private fun powerampAdvice(settings: PowerampSettings?): List<Int> {
+private fun powerampAdvice(settings: PowerampSettings?, bandLayout: BandLayout): List<Int> {
     if (settings == null) {
         return listOf(
             R.string.export_setting_overlap,
@@ -208,7 +208,8 @@ private fun powerampAdvice(settings: PowerampSettings?): List<Int> {
             R.string.export_setting_clean,
         )
     }
-    val fixes = settings.issues.map { it.adviceRes() }
+    val bands = if (settings.layout == bandLayout) emptyList() else listOf(R.string.export_setting_bands)
+    val fixes = bands + settings.issues.map { it.adviceRes() }
     return fixes.ifEmpty { listOf(R.string.export_settings_good) } + R.string.export_setting_clean
 }
 
