@@ -176,7 +176,13 @@ terminó en estilo terminal/ASCII).
 - [x] Leer los ajustes de Poweramp desde Timbra y copiar bandas y superposición
 - [x] Pantalla de ecualizador por celdas y resumen de lo que se añadió o quitó
 - [x] Avisos de ajustes de Poweramp también en "Antes de empezar"
-- [ ] Revisar en el teléfono la pantalla corregida, el modo A y el final del resultado
+- [ ] Revisar en el teléfono la gráfica de líneas, el modo A y el final del resultado
+- [ ] Medir con el visualizador global la curva real de Poweramp y compararla con la de Timbra (requiere prueba)
+- [ ] Importar el preset desde Timbra con `IMPORT_PRESETS` de la API de Poweramp, sin salir de la app
+- [ ] Prueba a ciegas final: elegir entre Timbra y sin ecualizar sin saber cuál es
+- [ ] Probar el preset con más de una canción y por modo de cancelación de ruido
+- [ ] Punto de partida con la medición AutoEq de los audífonos, si existe para ese modelo
+- [ ] Filtros angostos con modo paramétrico para resonancias (cambia el contrato del JSON)
 - [ ] Confirmar qué interruptor representan `dsp_border_gain` y `peq_enable` cambiándolos en Poweramp
 - [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp (Ajustes → Calibrar)
 - [x] Vista previa con la curva completa del preset y forma elegible al calibrar

@@ -185,26 +185,26 @@ private fun DrawScope.drawGrid(
     }
 }
 
-/**
- * Curva suave que pasa por todos los puntos (Catmull-Rom convertida a Bézier cúbica). Debajo
- * lleva un relleno que se desvanece hacia la base de la gráfica.
- */
+/** Curva suave que pasa por todos los puntos (Catmull-Rom convertida a Bézier cúbica). */
+internal fun smoothCurvePath(points: List<Offset>): Path = Path().apply {
+    moveTo(points.first().x, points.first().y)
+    for (i in 0 until points.lastIndex) {
+        val previous = points[(i - 1).coerceAtLeast(0)]
+        val start = points[i]
+        val end = points[i + 1]
+        val next = points[(i + 2).coerceAtMost(points.lastIndex)]
+        cubicTo(
+            start.x + (end.x - previous.x) / 6f, start.y + (end.y - previous.y) / 6f,
+            end.x - (next.x - start.x) / 6f, end.y - (next.y - start.y) / 6f,
+            end.x, end.y,
+        )
+    }
+}
+
+/** La curva, con un relleno debajo que se desvanece hacia la base de la gráfica. */
 private fun DrawScope.drawCurve(points: List<Offset>, plot: PlotArea, color: Color) {
     if (points.size < 2) return
-    val curve = Path().apply {
-        moveTo(points.first().x, points.first().y)
-        for (i in 0 until points.lastIndex) {
-            val previous = points[(i - 1).coerceAtLeast(0)]
-            val start = points[i]
-            val end = points[i + 1]
-            val next = points[(i + 2).coerceAtMost(points.lastIndex)]
-            cubicTo(
-                start.x + (end.x - previous.x) / 6f, start.y + (end.y - previous.y) / 6f,
-                end.x - (next.x - start.x) / 6f, end.y - (next.y - start.y) / 6f,
-                end.x, end.y,
-            )
-        }
-    }
+    val curve = smoothCurvePath(points)
     val fill = Path().apply {
         addPath(curve)
         lineTo(points.last().x, plot.bottom)

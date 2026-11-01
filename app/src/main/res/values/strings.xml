@@ -313,7 +313,7 @@
     <string name="finder_display_off">A: SIN ECUALIZAR</string>
     <string name="finder_display_readout">%1$s  preset %2$s  ahora %3$s dB</string>
     <string name="finder_display_readout_unmeasured">%1$s  preset %2$s dB  sin música ahí</string>
-    <string name="finder_display_legend">Columnas: lo que está activo. Marca blanca: tu preset. Toca una banda.</string>
+    <string name="finder_display_legend">Línea en 0: sonido original. Ámbar: lo activo. Punteada: tu preset. Toca una banda.</string>
     <string name="finder_section_added">se añadió</string>
     <string name="finder_section_removed">se quitó</string>
     <string name="finder_section_unchanged">quedó igual</string>
