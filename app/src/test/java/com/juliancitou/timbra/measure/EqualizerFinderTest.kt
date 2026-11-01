@@ -63,6 +63,23 @@ class EqualizerFinderTest {
     }
 
     @Test
+    fun goingBackUndoesTheAnswersWithoutMixingThem() {
+        val first = EqualizerFinder()
+        val second = first.choose(3.0)
+        val third = second.choose(4.5)
+        val fourth = third.keepCurrent()
+        assertEquals(third, fourth.previous)
+        assertEquals(second.curveDb(), requireNotNull(third.previous).curveDb())
+        assertEquals(first.curveDb(), requireNotNull(second.previous).curveDb())
+        assertTrue(first.curveDb().all { it == 0.0 })
+    }
+
+    @Test
+    fun theFirstRoundHasNothingToGoBackTo() {
+        assertNull(EqualizerFinder().previous)
+    }
+
+    @Test
     fun finishesAfterTheLastRound() {
         var finder = EqualizerFinder()
         repeat(OutputKind.Wired.rounds.size) {

@@ -59,8 +59,9 @@ internal fun FinderDimension.texts() = when (this) {
 
 /**
  * Una ronda del test: la pregunta, en qué fijarse, los cinco nodos para escuchar y los botones para
- * reproducir, elegir o dejarlo como estaba. Atrás vuelve a la ronda anterior; en la primera, a la
- * pantalla anterior. Los nodos no muestran dB: quien no sabe de audio elige de oído.
+ * reproducir, elegir o dejarlo como estaba. La flecha sale a la pantalla anterior; "Regresar" vuelve a la
+ * ronda anterior tal como estaba antes de responderla. Los nodos no muestran dB: quien no sabe de audio
+ * elige de oído.
  */
 @Composable
 fun FinderRoundScreen(
@@ -70,7 +71,7 @@ fun FinderRoundScreen(
     onKeepCurrent: () -> Unit,
     onHoldCurrent: (Boolean) -> Unit,
     onTogglePlayback: () -> Unit,
-    onPreviousRound: () -> Boolean,
+    onPreviousRound: () -> Unit,
     onExit: () -> Unit,
 ) {
     val finder = state.finder
@@ -78,13 +79,12 @@ fun FinderRoundScreen(
     val texts = round.dimension.texts()
     val options = finder.options()
     val currentIndex = finder.currentOptionIndex
-    val goBack = { if (!onPreviousRound()) onExit() }
-    BackHandler(onBack = goBack)
+    BackHandler(onBack = onExit)
 
     TerminalScreen(
         title = stringResource(texts.title),
         lead = stringResource(texts.question),
-        onBack = goBack,
+        onBack = onExit,
         actions = {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
                 TerminalButton(
@@ -101,13 +101,22 @@ fun FinderRoundScreen(
                     modifier = Modifier.weight(1f),
                 )
             }
-            TerminalButton(
-                text = stringResource(R.string.action_none),
-                onClick = onKeepCurrent,
-                style = TerminalButtonStyle.Secondary,
-                enabled = !state.preparing,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
+                TerminalButton(
+                    text = stringResource(R.string.action_previous_round),
+                    onClick = onPreviousRound,
+                    style = TerminalButtonStyle.Secondary,
+                    enabled = !state.preparing && finder.previous != null,
+                    modifier = Modifier.weight(1f),
+                )
+                TerminalButton(
+                    text = stringResource(R.string.action_none),
+                    onClick = onKeepCurrent,
+                    style = TerminalButtonStyle.Secondary,
+                    enabled = !state.preparing,
+                    modifier = Modifier.weight(1f),
+                )
+            }
         },
     ) {
         val progress = when {

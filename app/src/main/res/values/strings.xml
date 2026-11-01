@@ -184,6 +184,7 @@
     <string name="finder_preparing">Preparando opciones…</string>
     <string name="finder_node_description">Opción %1$d de %2$d</string>
     <string name="action_choose">Elegir</string>
+    <string name="action_previous_round">Regresar</string>
 
     <string name="finder_balance_title">Balance</string>
     <string name="finder_balance_question">¿Lo prefieres más cálido o más brillante?</string>

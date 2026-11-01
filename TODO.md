@@ -186,6 +186,8 @@ terminó en estilo terminal/ASCII).
 - [x] Todo el test suena al nivel de Poweramp, sin subir el volumen; se quita la opción C
 - [x] Detectar Spotify ya sonando al elegirlo en Nivel cómodo, con una pausa de ~1 s
 - [x] Al importar: asignar a la salida en uso, activar y encender Poweramp
+- [x] Botón Regresar en las rondas, bloqueado en la primera; la flecha sale a Nivel cómodo sin perder el progreso
+- [x] El usuario confirmó que Timbra y Poweramp suenan igual al importar
 - [ ] Probar en el teléfono ambos cambios en la app real, también con Cable
 - [ ] El usuario oye mejor definidos los graves en Poweramp y más fuertes los agudos en Timbra: revisar tras este cambio
 - [x] La vista previa vuelve al 100 % por defecto; la fuerza medida es opcional

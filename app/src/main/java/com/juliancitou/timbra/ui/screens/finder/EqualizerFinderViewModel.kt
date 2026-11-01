@@ -252,6 +252,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private var spotifySettings: EqualizerSettings = EqualizerSettings.Flat
     private var calibrating = false
     private var importRequested = false
+    private var resumeRounds = false
     private val powerampControl = PowerampControl(application)
     private var powerampOffByTimbra = false
 
@@ -638,6 +639,25 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         val context = getApplication<Application>()
         context.packageManager.getLaunchIntentForPackage(SPOTIFY_PACKAGE)?.let { intent ->
             context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+    }
+
+    /** Al salir de las rondas a Nivel cómodo no se pierde el progreso: se sigue donde iba. */
+    fun leaveRounds() {
+        resumeRounds = true
+    }
+
+    /** Volver hasta Preparación es empezar de nuevo. */
+    fun forgetLeftRounds() {
+        resumeRounds = false
+    }
+
+    fun startOrResumeTest() {
+        if (resumeRounds) {
+            resumeRounds = false
+            refresh()
+        } else {
+            startTest()
         }
     }
 

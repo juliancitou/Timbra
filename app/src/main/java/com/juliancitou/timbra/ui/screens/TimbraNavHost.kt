@@ -125,7 +125,10 @@ fun TimbraNavHost(
                     )
                 }
                 screen<PreparationRoute> {
-                    LaunchedEffect(Unit) { finder.syncWithPoweramp() }
+                    LaunchedEffect(Unit) {
+                        finder.forgetLeftRounds()
+                        finder.syncWithPoweramp()
+                    }
                     PreparationScreen(
                         output = finderState.finder.output,
                         onOutputChange = finder::setOutput,
@@ -180,7 +183,7 @@ fun TimbraNavHost(
                         onOpenSpotify = finder::openSpotify,
                         onTogglePlayback = finder::togglePlayback,
                         onReady = {
-                            finder.startTest()
+                            finder.startOrResumeTest()
                             navController.navigate(FinderRoundRoute)
                         },
                         onBack = back,
@@ -198,8 +201,11 @@ fun TimbraNavHost(
                             onKeepCurrent = finder::keepCurrent,
                             onHoldCurrent = finder::holdCurrent,
                             onTogglePlayback = finder::togglePlayback,
-                            onPreviousRound = finder::previousRound,
-                            onExit = back,
+                            onPreviousRound = { finder.previousRound() },
+                            onExit = {
+                                finder.leaveRounds()
+                                navController.popBackStack()
+                            },
                         )
                     }
                 }
