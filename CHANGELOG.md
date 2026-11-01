@@ -19,6 +19,14 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `68d5c37` · feat: encender Poweramp si se abandona el test
+- Si Timbra apagó Poweramp, lo vuelve a encender al llegar a Inicio, Preparación, Ajustes o Exportar, y tras 45 s fuera de la
+  app. Si se regresa a un test abierto, lo apaga otra vez y recupera el efecto en Spotify.
+- La marca se guarda en disco: si la app murió, se restaura al abrirla. Solo enciende lo que Timbra apagó.
+- En HyperOS, deslizar la app de recientes la mata sin llamar a `onTaskRemoved`: Poweramp sigue apagado hasta abrir Timbra.
+- Con Spotify en pausa, Timbra ya no dice "Apagado" solo porque Poweramp no esté unido a la sesión.
+- Comprobado en el teléfono: volver a Preparación, 45 s fuera, regresar y deslizar de recientes.
+
 ### 2026-11-01 · `12ec8c9` · ui: igualar el tamaño de los botones
 - `TerminalButtonRow` da el mismo alto a los botones de una fila aunque alguno ocupe dos renglones.
 - Se redujo el margen lateral dentro de los botones y se acortaron textos: "Ninguno", "Descargar" y "Pausar / seguir".
