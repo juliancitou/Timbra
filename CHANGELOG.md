@@ -19,6 +19,17 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `61bd810` · feat: detectar Spotify y usar el preset en Poweramp
+- HyperOS no deja a Timbra arrancar sola para oír el aviso de sesión de Spotify. Al elegir Spotify con música sonando,
+  Timbra pausa ~0.9 s y reanuda con las teclas multimedia, y Spotify vuelve a avisar. Comprobado en el teléfono: con
+  350 ms la música no volvía, con 900 ms sí. Falta probarlo desde la pantalla de Nivel cómodo.
+- Al importar desde Exportar, o con "Usar en Poweramp", el preset se asigna a la salida en uso con `bind_to_*`, se quita
+  de los demás presets de esa salida, se activa y se enciende Poweramp.
+- Con Bluetooth también se quitan los audífonos del preset que los tuviera asignados, porque lo asignado a un dispositivo
+  manda sobre la salida. Asignar al dispositivo pediría su dirección, que Android oculta sin otro permiso.
+- En el teléfono se comprobó actualizar `bind_to_speaker`, activar un preset y encender Poweramp, por separado. Falta probar
+  el flujo completo y `__unbind_from_all_devices`.
+
 ### 2026-11-01 · `c089222` · fix: oír el test al nivel de Poweramp
 - El usuario oía Timbra mucho más fuerte que Poweramp. Igualar el volumen subía las opciones hasta el nivel del sonido
   original, sin margen; con música masterizada podía actuar el limitador de `SessionEqualizer`.
