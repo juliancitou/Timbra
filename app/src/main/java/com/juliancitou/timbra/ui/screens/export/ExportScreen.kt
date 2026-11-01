@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.audio.POWERAMP_EQ_PACKAGE
 import com.juliancitou.timbra.audio.PowerampIssue
 import com.juliancitou.timbra.audio.PowerampSettings
 import com.juliancitou.timbra.export.BandLayout
@@ -55,6 +56,7 @@ fun ExportScreen(
     output: OutputKind,
     bandLayout: BandLayout,
     powerampSettings: PowerampSettings?,
+    presetImported: Boolean,
     presetJson: () -> String,
     onGoHome: () -> Unit,
     onBack: () -> Unit,
@@ -66,27 +68,42 @@ fun ExportScreen(
         if (uri != null) saveResult = if (writeTo(context, uri, presetJson())) SaveResult.Saved else SaveResult.Failed
     }
     val shareTitle = stringResource(R.string.export_share_chooser)
+    var importFailed by rememberSaveable { mutableStateOf(false) }
 
     TerminalScreen(
         title = stringResource(R.string.export_title),
         lead = stringResource(R.string.export_lead),
         onBack = onBack,
         actions = {
-            TerminalButton(
-                text = stringResource(R.string.action_save_file),
-                onClick = { saveLauncher.launch(fileName) },
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
+            if (presetImported) {
                 TerminalButton(
-                    text = stringResource(R.string.action_share),
-                    onClick = { share(context, fileName, presetJson(), shareTitle) },
-                    style = TerminalButtonStyle.Secondary,
-                    modifier = Modifier.weight(1f),
+                    text = stringResource(R.string.action_go_home),
+                    onClick = onGoHome,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            } else {
+                TerminalButton(
+                    text = stringResource(R.string.action_import_poweramp),
+                    onClick = { importFailed = !openInPoweramp(context, fileName, presetJson()) },
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 TerminalButton(
                     text = stringResource(R.string.action_go_home),
                     onClick = onGoHome,
+                    style = TerminalButtonStyle.Secondary,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
+                TerminalButton(
+                    text = stringResource(R.string.action_save_file),
+                    onClick = { saveLauncher.launch(fileName) },
+                    style = TerminalButtonStyle.Secondary,
+                    modifier = Modifier.weight(1f),
+                )
+                TerminalButton(
+                    text = stringResource(R.string.action_share),
+                    onClick = { share(context, fileName, presetJson(), shareTitle) },
                     style = TerminalButtonStyle.Secondary,
                     modifier = Modifier.weight(1f),
                 )
@@ -103,6 +120,15 @@ fun ExportScreen(
                 text = fileName,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (presetImported) {
+            TerminalChip(label = stringResource(R.string.export_imported), selected = true)
+        } else if (importFailed) {
+            TerminalChip(
+                label = stringResource(R.string.export_import_failed),
+                selected = false,
+                tone = TerminalChipTone.Warning,
             )
         }
         saveResult?.let { result ->
@@ -174,10 +200,29 @@ internal fun writeTo(context: Context, uri: Uri, json: String): Boolean = runCat
 }.isSuccess
 
 /** Escribe una copia en la caché y abre el menú de compartir del sistema con ella. */
-private fun share(context: Context, fileName: String, json: String, chooserTitle: String) {
+/** Poweramp abre los `.json` y pregunta si importarlos. Devuelve `false` si no está instalado. */
+private fun openInPoweramp(context: Context, fileName: String, json: String): Boolean {
+    val view = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(temporaryPresetUri(context, fileName, json), PRESET_MIME_TYPE)
+        setPackage(POWERAMP_EQ_PACKAGE)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    return try {
+        context.startActivity(view)
+        true
+    } catch (_: ActivityNotFoundException) {
+        false
+    }
+}
+
+private fun temporaryPresetUri(context: Context, fileName: String, json: String): Uri {
     val directory = File(context.cacheDir, SHARED_PRESETS_DIRECTORY).apply { mkdirs() }
     val file = File(directory, fileName).apply { writeText(json) }
-    val uri = FileProvider.getUriForFile(context, "${context.packageName}.presets", file)
+    return FileProvider.getUriForFile(context, "${context.packageName}.presets", file)
+}
+
+private fun share(context: Context, fileName: String, json: String, chooserTitle: String) {
+    val uri = temporaryPresetUri(context, fileName, json)
     val send = Intent(Intent.ACTION_SEND).apply {
         type = PRESET_MIME_TYPE
         putExtra(Intent.EXTRA_STREAM, uri)

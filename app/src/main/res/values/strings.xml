@@ -83,7 +83,7 @@
     <string name="export_setting_preamp">Sin DVC, reducción de preamp: 0 dB. Baja antes el volumen: sonará más fuerte.</string>
     <string name="export_setting_clean">En su pantalla principal: tono en 0 y compresor apagado.</string>
     <string name="export_setting_pipeline">Modo Pipeline: \"Por defecto\", salvo que falle el sonido.</string>
-    <string name="export_section_steps">cómo importarlo</string>
+    <string name="export_section_steps">si lo descargas</string>
     <string name="export_step_open">Abre Poweramp Equalizer.</string>
     <string name="export_step_presets">Entra a la lista de presets y elige importar.</string>
     <string name="export_step_select">Selecciona el archivo que descargaste.</string>
@@ -331,6 +331,20 @@
     <string name="preparation_noise_quiet">Se oye tranquilo.</string>
     <string name="preparation_noise_loud">Se oye ruido. Si la música suena por la bocina, páusala y mide otra vez.</string>
     <string name="preparation_noise_measure">Medir con el micrófono</string>
+    <string name="noise_mode_cancelling">Cancelación</string>
+    <string name="noise_mode_aware">Atención</string>
+    <string name="noise_mode_off">Apagado</string>
+    <string name="preparation_section_noise_mode">control de ruido</string>
+    <string name="preparation_noise_mode_hint">Usa el mismo al escuchar: cada modo suena distinto.</string>
+    <string name="preparation_section_start">punto de partida</string>
+    <string name="preparation_start_measured">Medición</string>
+    <string name="preparation_start_plain">Sin medición</string>
+    <string name="preparation_start_measured_hint">Parte de la medición de AutoEq: %1$s, por %2$s. Tu unidad puede variar un poco.</string>
+    <string name="preparation_start_plain_hint">Parte solo de lo que elijas en las rondas.</string>
+    <string name="finder_includes_measurement">Incluye la medición de AutoEq: %1$s.</string>
+    <string name="action_import_poweramp">Importar en Poweramp</string>
+    <string name="export_imported">Ya está en Poweramp</string>
+    <string name="export_import_failed">No se pudo abrir Poweramp: descarga el archivo</string>
     <string name="finder_summary_doubt">%1$s: elegiste distinto al comprobar, así que dejé un punto medio.</string>
 
     <!-- Calibración -->

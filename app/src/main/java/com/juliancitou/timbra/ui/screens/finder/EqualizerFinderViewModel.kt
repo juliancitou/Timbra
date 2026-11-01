@@ -11,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.AudioOutput
+import com.juliancitou.timbra.audio.AutoEqProfile
 import com.juliancitou.timbra.audio.BandOverlap
 import com.juliancitou.timbra.audio.EqualizerSettings
 import com.juliancitou.timbra.audio.LoopSource
@@ -38,6 +39,7 @@ import com.juliancitou.timbra.audio.music.MusicLoop
 import com.juliancitou.timbra.audio.prepareSong
 import com.juliancitou.timbra.audio.previewBands
 import com.juliancitou.timbra.audio.resample
+import com.juliancitou.timbra.audio.startingCurveDb
 import com.juliancitou.timbra.data.BandLayoutPreferences
 import com.juliancitou.timbra.data.BandOverlapPreferences
 import com.juliancitou.timbra.export.BandLayout
@@ -60,6 +62,9 @@ import java.util.concurrent.Executors
 
 /** Estado de la ecualización en vivo de Spotify. [Off]: suena música de Timbra, no Spotify. */
 enum class SpotifyLink { Off, Waiting, Connected, Blocked, Failed }
+
+/** Cada modo cambia cómo suenan los audífonos, así que el preset es válido solo para el modo en que se hizo. */
+enum class NoiseMode { Cancelling, Aware, Off }
 
 /** De dónde salió lo que se muestra como "lo que suena ahora". */
 sealed interface SoundingProof {
@@ -93,6 +98,11 @@ data class FinderUiState(
     val sounding: SoundingCheck? = null,
     val poweramp: PowerampState = PowerampState.Unknown,
     val powerampSettings: PowerampSettings? = null,
+    val noiseMode: NoiseMode = NoiseMode.Cancelling,
+    val autoEq: AutoEqProfile? = null,
+    val useAutoEq: Boolean = true,
+    /** Si el preset con este nombre ya está en Poweramp. */
+    val presetImported: Boolean = false,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
     val isPlaying: Boolean get() = status == PlaybackStatus.Playing
@@ -181,6 +191,32 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     }
 
     fun setHeadphonesName(name: String) = state.update { it.copy(headphonesName = name) }
+
+    fun setNoiseMode(mode: NoiseMode) = state.update { it.copy(noiseMode = mode) }
+
+    fun setUseAutoEq(use: Boolean) = state.update { it.copy(useAutoEq = use) }
+
+    /** Busca la medición de los audífonos conectados entre los presets de Poweramp. */
+    fun loadAutoEq() {
+        val current = state.value
+        val device = current.headphonesName.trim()
+        viewModelScope.launch(effectThread) {
+            val profile = if (device.isEmpty()) {
+                null
+            } else {
+                powerampControl.autoEqFor(device, current.noiseMode == NoiseMode.Cancelling)
+            }
+            state.update { it.copy(autoEq = profile) }
+        }
+    }
+
+    /** Actualiza si el preset [fullName] ya está en Poweramp, por ejemplo al volver de importarlo. */
+    fun checkPresetImported(fullName: String) {
+        viewModelScope.launch(effectThread) {
+            val imported = powerampControl.hasPreset(fullName)
+            state.update { it.copy(presetImported = imported) }
+        }
+    }
 
     fun setPresetName(name: String) = state.update { it.copy(presetName = name) }
 
@@ -363,9 +399,22 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     /** Empieza el test desde la primera ronda, conservando el género y el nombre de los audífonos. */
     fun startTest() {
         state.update {
-            it.withFinder(EqualizerFinder(it.finder.output, it.finder.layout)).copy(bypass = false, presetName = "")
+            it.withFinder(startingFinder(it)).copy(bypass = false, presetName = "")
         }
         refresh()
+    }
+
+    private fun startingFinder(current: FinderUiState): EqualizerFinder {
+        val output = current.finder.output
+        val layout = current.finder.layout
+        val profile = current.autoEq?.takeIf { current.useAutoEq && output == OutputKind.Bluetooth }
+            ?: return EqualizerFinder(output, layout)
+        return EqualizerFinder(
+            output = output,
+            layout = layout,
+            valuesDb = output.neutralValuesDb(),
+            baseCurveDb = profile.startingCurveDb(layout.frequenciesHz),
+        )
     }
 
     /** Escucha la opción [index] de la ronda actual. */

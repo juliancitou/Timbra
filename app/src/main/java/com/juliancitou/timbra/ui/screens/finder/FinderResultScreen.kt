@@ -189,6 +189,9 @@ private fun ChangesSections(state: FinderUiState) {
             DetailText(changes.unchanged.map { stringResource(it.texts().title) }.joinToString(", "))
         }
     }
+    if (state.finder.baseCurveDb.isNotEmpty()) {
+        state.autoEq?.let { DetailText(stringResource(R.string.finder_includes_measurement, it.name)) }
+    }
     if (equalizerDifference(state.finder.result()).isSubtle) {
         DetailText(stringResource(R.string.finder_difference_subtle))
     }

@@ -26,11 +26,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.audio.AutoEqProfile
 import com.juliancitou.timbra.audio.PowerampIssue
 import com.juliancitou.timbra.audio.PowerampState
 import com.juliancitou.timbra.audio.QUIET_ROOM_MAX_DBFS
 import com.juliancitou.timbra.audio.measureAmbientNoiseDbfs
+import com.juliancitou.timbra.ui.screens.finder.NoiseMode
+import com.juliancitou.timbra.ui.screens.finder.labelRes
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import com.juliancitou.timbra.audio.DetectedOutput
 import com.juliancitou.timbra.audio.OutputDetector
@@ -55,6 +59,9 @@ import com.juliancitou.timbra.ui.theme.staggeredEntrance
 import kotlin.math.roundToInt
 
 private const val LAST_FREQUENCY_STEP_HZ = 100
+
+/** Espera a que se termine de escribir el nombre antes de buscarlo. */
+private const val AUTO_EQ_SEARCH_DELAY_MS = 400L
 
 private fun checklistFor(output: OutputKind): List<Int> = when (output) {
     OutputKind.Bluetooth -> listOf(
@@ -89,6 +96,12 @@ fun PreparationScreen(
     bandLayout: BandLayout,
     bandsFromPoweramp: Boolean,
     onBandLayoutChange: (BandLayout) -> Unit,
+    noiseMode: NoiseMode,
+    onNoiseModeChange: (NoiseMode) -> Unit,
+    autoEq: AutoEqProfile?,
+    useAutoEq: Boolean,
+    onUseAutoEqChange: (Boolean) -> Unit,
+    onLookForAutoEq: () -> Unit,
     headphonesName: String,
     onHeadphonesNameChange: (String) -> Unit,
     onContinue: () -> Unit,
@@ -108,6 +121,11 @@ fun PreparationScreen(
             filledName = current.name.orEmpty()
             onHeadphonesNameChange(filledName)
         }
+    }
+
+    LaunchedEffect(headphonesName, noiseMode) {
+        delay(AUTO_EQ_SEARCH_DELAY_MS)
+        onLookForAutoEq()
     }
 
     TerminalScreen(
@@ -137,6 +155,10 @@ fun PreparationScreen(
                 label = stringResource(R.string.preparation_headphones_label),
                 placeholder = stringResource(R.string.preparation_headphones_placeholder),
             )
+        }
+        if (output == OutputKind.Bluetooth) {
+            NoiseModeSection(noiseMode, onNoiseModeChange)
+            autoEq?.let { AutoEqSection(it, useAutoEq, onUseAutoEqChange) }
         }
         BandsSection(bandLayout, bandsFromPoweramp, onBandLayoutChange)
     }
@@ -244,6 +266,54 @@ fun ChecklistScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
+    }
+}
+
+@Composable
+private fun NoiseModeSection(mode: NoiseMode, onChange: (NoiseMode) -> Unit) {
+    TerminalSection(stringResource(R.string.preparation_section_noise_mode)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(Spacing.small),
+        ) {
+            NoiseMode.entries.forEach { candidate ->
+                TerminalChip(
+                    label = stringResource(candidate.labelRes),
+                    selected = candidate == mode,
+                    onClick = { onChange(candidate) },
+                )
+            }
+        }
+        DetailText(stringResource(R.string.preparation_noise_mode_hint))
+    }
+}
+
+/** La medición es un punto de partida: lo que se elija en las rondas va encima. */
+@Composable
+private fun AutoEqSection(profile: AutoEqProfile, use: Boolean, onChange: (Boolean) -> Unit) {
+    TerminalSection(stringResource(R.string.preparation_section_start)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(Spacing.small),
+        ) {
+            TerminalChip(
+                label = stringResource(R.string.preparation_start_measured),
+                selected = use,
+                onClick = { onChange(true) },
+            )
+            TerminalChip(
+                label = stringResource(R.string.preparation_start_plain),
+                selected = !use,
+                onClick = { onChange(false) },
+            )
+        }
+        DetailText(
+            if (use) {
+                stringResource(R.string.preparation_start_measured_hint, profile.name, profile.measuredBy.orEmpty())
+            } else {
+                stringResource(R.string.preparation_start_plain_hint)
+            },
+        )
     }
 }
 

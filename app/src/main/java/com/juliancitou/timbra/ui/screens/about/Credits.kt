@@ -60,6 +60,12 @@ object Credits {
             "Licencia de Poweramp API",
             "https://github.com/maxmpz/powerampapi",
         ),
+        Credit(
+            "AutoEq",
+            "Jaakko Pasanen",
+            "MIT",
+            "https://github.com/jaakkopasanen/AutoEq",
+        ),
         Credit("Audio EQ Cookbook", "Robert Bristow-Johnson", "W3C", "https://www.w3.org/TR/audio-eq-cookbook/"),
         Credit(
             "ITU-R BS.1770",

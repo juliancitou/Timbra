@@ -8,7 +8,7 @@ import android.net.Uri
 
 enum class PowerampState { NotInstalled, Off, On, Unknown }
 
-private const val POWERAMP_EQ_PACKAGE = "com.maxmpz.equalizer"
+const val POWERAMP_EQ_PACKAGE = "com.maxmpz.equalizer"
 private const val API_RECEIVER = "com.maxmpz.equalizer.PeqAPIReceiver"
 private const val API_ACTION = "com.maxmpz.equalizer.API_COMMAND"
 private const val EXTRA_COMMAND = "cmd"
@@ -18,6 +18,13 @@ private const val COMMAND_START_SERVICE = 101
 private const val STEREO_CHANNELS = 2
 private const val SETTINGS_URI = "content://com.maxmpz.equalizer.data"
 private const val CALL_PREFERENCE = "preference"
+private const val PRESETS_URI = "$SETTINGS_URI/eq_presets"
+private const val COLUMN_NAME = "name"
+private const val COLUMN_META = "meta"
+private const val COLUMN_PARAMETRIC = "parametric"
+private const val COLUMN_RESOLVED_BLOB = "COALESCE(data_blob, default_blob)"
+private const val ANC_ON_MARK = "ANC on"
+private const val ANC_OFF_MARK = "ANC off"
 
 /** Menor que la de Poweramp (1337): si el efecto ya tiene dueño, esta prioridad no se lo quita. */
 private const val PROBE_PRIORITY = 0
@@ -37,6 +44,40 @@ class PowerampControl(private val context: Context) {
         val bundle = context.contentResolver.call(Uri.parse(SETTINGS_URI), CALL_PREFERENCE, null, null) ?: return null
         @Suppress("DEPRECATION")
         powerampSettingsFrom(bundle.keySet().associateWith { bundle.get(it) })
+    }.getOrNull()
+
+    /** Si ya hay un preset con [name]; Poweramp agrega " (2)" al importar otro con el mismo nombre. */
+    fun hasPreset(name: String): Boolean = runCatching {
+        context.contentResolver.query(
+            Uri.parse(PRESETS_URI),
+            arrayOf(COLUMN_NAME),
+            "$COLUMN_NAME = ? OR $COLUMN_NAME LIKE ?",
+            arrayOf(name, "$name (%"),
+            null,
+        )?.use { it.count > 0 } ?: false
+    }.getOrDefault(false)
+
+    /**
+     * La curva de AutoEq de [device], de las miles que trae Poweramp. Se prefiere la del modo de cancelación
+     * de ruido en uso, porque esos audífonos suenan distinto en cada uno.
+     */
+    fun autoEqFor(device: String, noiseCancelling: Boolean): AutoEqProfile? = runCatching {
+        val wanted = if (noiseCancelling) ANC_ON_MARK else ANC_OFF_MARK
+        context.contentResolver.query(
+            Uri.parse(PRESETS_URI),
+            arrayOf(COLUMN_NAME, COLUMN_META, COLUMN_RESOLVED_BLOB),
+            "$COLUMN_NAME LIKE ? AND $COLUMN_PARAMETRIC = 0 AND $COLUMN_META IS NOT NULL",
+            arrayOf("$device%"),
+            null,
+        )?.use { cursor ->
+            val profiles = buildList {
+                while (cursor.moveToNext()) {
+                    val bands = cursor.getBlob(2)?.let(::graphicBandsOf) ?: continue
+                    add(AutoEqProfile(cursor.getString(0), cursor.getString(1), bands))
+                }
+            }
+            profiles.firstOrNull { wanted in it.name } ?: profiles.firstOrNull()
+        }
     }.getOrNull()
 
     fun turnOff() = send(COMMAND_STOP_SERVICE)

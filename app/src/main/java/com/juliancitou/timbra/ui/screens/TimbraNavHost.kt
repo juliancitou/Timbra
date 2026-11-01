@@ -35,6 +35,7 @@ import com.juliancitou.timbra.ui.screens.audiotest.AudioTestScreen
 import com.juliancitou.timbra.ui.screens.calibration.CalibrationScreen
 import com.juliancitou.timbra.ui.screens.comfort.ComfortLevelScreen
 import com.juliancitou.timbra.ui.screens.export.ExportScreen
+import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.ui.screens.finder.EqualizerFinderViewModel
 import com.juliancitou.timbra.ui.screens.finder.FinderResultScreen
 import com.juliancitou.timbra.ui.screens.finder.FinderRoundScreen
@@ -129,6 +130,12 @@ fun TimbraNavHost(
                         bandLayout = finderState.finder.layout,
                         bandsFromPoweramp = finderState.powerampSettings?.layout == finderState.finder.layout,
                         onBandLayoutChange = finder::setBandLayout,
+                        noiseMode = finderState.noiseMode,
+                        onNoiseModeChange = finder::setNoiseMode,
+                        autoEq = finderState.autoEq,
+                        useAutoEq = finderState.useAutoEq,
+                        onUseAutoEqChange = finder::setUseAutoEq,
+                        onLookForAutoEq = finder::loadAutoEq,
                         headphonesName = finderState.headphonesName,
                         onHeadphonesNameChange = finder::setHeadphonesName,
                         onContinue = { navController.navigate(ChecklistRoute) },
@@ -222,13 +229,18 @@ fun TimbraNavHost(
                 }
                 screen<ExportRoute> {
                     val suggestedName = suggestedPresetName(finderState)
-                    LaunchedEffect(Unit) { finder.refreshPowerampSettings() }
+                    val fullPresetName = PowerampExporter.NAME_PREFIX + finderState.effectivePresetName(suggestedName)
+                    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                        finder.refreshPowerampSettings()
+                        finder.checkPresetImported(fullPresetName)
+                    }
                     ExportScreen(
                         presetName = finderState.effectivePresetName(suggestedName),
                         fileName = finder.presetFileName(suggestedName),
                         output = finderState.finder.output,
                         bandLayout = finderState.finder.layout,
                         powerampSettings = finderState.powerampSettings,
+                        presetImported = finderState.presetImported,
                         presetJson = { finder.presetJson(suggestedName) },
                         onGoHome = { navController.popBackStack(HomeRoute, inclusive = false) },
                         onBack = back,

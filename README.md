@@ -288,6 +288,8 @@ La licencia de Cascadia Mono va incluida dentro de la app, en `assets/licenses/`
   y sin ecualizar (<https://doi.org/10.1109/TAU.1967.1161901>).
 - **Poweramp API** de Maksim Petrov (licencia propia para software que se comunica con Poweramp): los comandos para apagar y volver a encender Poweramp
   Equalizer durante el test (<https://github.com/maxmpz/powerampapi>).
+- **AutoEq** de Jaakko Pasanen (MIT): las mediciones de audífonos que Poweramp Equalizer incluye y que la
+  app puede usar como punto de partida (<https://github.com/jaakkopasanen/AutoEq>).
 - **ITU-R BS.1770**: la ponderación K con la que se iguala el volumen entre ecualizaciones.
 - **Paul Kellet**: el filtro que genera el ruido rosa (publicado en musicdsp.org).
 - **Manfred Schroeder** y **Freeverb** de Jezar at Dreampoint (dominio público): la estructura de

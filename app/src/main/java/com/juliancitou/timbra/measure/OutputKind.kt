@@ -57,6 +57,9 @@ enum class OutputKind(
     fun rangeDb(dimension: FinderDimension): ClosedFloatingPointRange<Double> =
         rangesDb[dimension] ?: dimension.rangeDb
 
+    /** Con una curva medida de partida, ninguna zona empieza movida: la medición ya corrige los audífonos. */
+    fun neutralValuesDb(): Map<FinderDimension, Double> = startValuesDb().mapValues { 0.0 }
+
     fun startValuesDb(): Map<FinderDimension, Double> =
         FinderDimension.entries.filterNot { it in skipped }.associateWith { startDb[it] ?: 0.0 }
 }

@@ -79,6 +79,8 @@ data class EqualizerFinder(
     val previous: EqualizerFinder? = null,
     /** Zonas donde la comprobación final no coincidió con lo elegido antes. */
     val doubts: Set<FinderDimension> = emptySet(),
+    /** Curva de la que parte el test, como la medición de los audífonos; las zonas se suman encima. */
+    val baseCurveDb: List<Double> = emptyList(),
 ) {
     val rounds: List<FinderRound> get() = output.rounds
     val isFinished: Boolean get() = roundIndex >= rounds.size
@@ -148,8 +150,8 @@ data class EqualizerFinder(
 
     private fun curveFor(values: Map<FinderDimension, Double>): List<Double> {
         val frequencies = layout.frequenciesHz
-        val zero = List(frequencies.size) { 0.0 }
-        return values.entries.fold(zero) { total, (dimension, value) ->
+        val start = baseCurveDb.ifEmpty { List(frequencies.size) { 0.0 } }
+        return values.entries.fold(start) { total, (dimension, value) ->
             sum(total, dimension.curve(value, frequencies, output))
         }
     }
