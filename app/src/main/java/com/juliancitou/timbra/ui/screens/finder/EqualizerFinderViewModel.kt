@@ -16,10 +16,9 @@ import com.juliancitou.timbra.audio.BandOverlap
 import com.juliancitou.timbra.audio.EqualizerSettings
 import com.juliancitou.timbra.audio.LoopSource
 import com.juliancitou.timbra.audio.LoudnessMatcher
-import com.juliancitou.timbra.audio.MeasuredSpectrum
 import com.juliancitou.timbra.audio.alignedToItsMedian
+import com.juliancitou.timbra.audio.bandDifferenceDb
 import com.juliancitou.timbra.audio.cutDepthDb
-import com.juliancitou.timbra.audio.OutputMeter
 import com.juliancitou.timbra.audio.PinkNoise
 import com.juliancitou.timbra.audio.PowerampControl
 import com.juliancitou.timbra.audio.PowerampSettings
@@ -42,8 +41,8 @@ import com.juliancitou.timbra.audio.music.MusicFocus
 import com.juliancitou.timbra.audio.music.MusicLoop
 import com.juliancitou.timbra.audio.prepareSong
 import com.juliancitou.timbra.audio.previewBands
+import com.juliancitou.timbra.audio.recordMicrophone
 import com.juliancitou.timbra.audio.resample
-import com.juliancitou.timbra.audio.spectrumDifferenceDb
 import com.juliancitou.timbra.audio.startingCurveDb
 import com.juliancitou.timbra.data.BandLayoutPreferences
 import com.juliancitou.timbra.data.BandOverlapPreferences
@@ -82,10 +81,13 @@ sealed interface PowerampMeasure {
     data object Idle : PowerampMeasure
     data object Running : PowerampMeasure
 
-    /** El medidor de Android no vio ni el ecualizador de Timbra, así que no sirve en este teléfono. */
+    /** No se pudo grabar, o no se notó ni el ecualizador de Timbra: la medición no es válida. */
     data object CouldNotCapture : PowerampMeasure
 
-    /** El medidor funciona, pero Poweramp no aplicó el preset de prueba. */
+    /** La señal apenas le gana al ruido del cuarto. */
+    data object TooQuiet : PowerampMeasure
+
+    /** La medición funciona, pero Poweramp no aplicó el preset de prueba. */
     data object NoEffect : PowerampMeasure
 
     data class Done(
@@ -163,7 +165,11 @@ private const val STOP_SHARING_AFTER_MS = 5_000L
 private const val POWERAMP_STOP_WAIT_MS = 1_000L
 private const val MEASURE_NOISE_SECONDS = 8
 private const val MEASURE_SETTLE_MS = 3_000L
-private const val MEASURE_CAPTURE_MS = 6_000L
+private const val MEASURE_CAPTURE_SECONDS = 6
+
+/** Con menos, lo grabado en esa banda es en buena parte ruido del cuarto y no se puede comparar. */
+private const val MEASURE_MIN_OVER_ROOM_DB = 12f
+private const val MEASURE_MIN_CUT_BANDS = 2
 
 /** El preset de prueba corta −8 dB: si esas bandas casi no bajan respecto a las demás, ese ecualizador no se vio. */
 private const val MEASURE_MIN_CUT_DB = 3f
@@ -451,10 +457,10 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     }
 
     /**
-     * Compara con datos a Poweramp y a Timbra, con el mismo instrumento y el mismo preset de prueba: suena ruido
-     * rosa solo, luego con el ecualizador de Timbra y luego con el de Poweramp. Medir primero a Timbra, cuya curva
-     * se conoce, dice si el medidor alcanza a ver los efectos: sin eso, una línea plana no significaría nada.
-     * Debe estar activo el preset de prueba en Poweramp, que suelta la sesión al terminar.
+     * Compara a Poweramp y a Timbra con el micrófono y el mismo preset de prueba: silencio, ruido rosa solo, con el
+     * ecualizador de Timbra y con el de Poweramp. Solo importa la diferencia entre grabaciones, así que el micrófono y
+     * la bocina, que distan de ser planos, se cancelan. El ruido del cuarto no: las bandas donde la señal no le gana
+     * se descartan. Medir primero a Timbra, cuya curva se conoce, dice si la medición es válida.
      */
     fun measurePoweramp() {
         if (state.value.powerampMeasure == PowerampMeasure.Running) return
@@ -463,31 +469,30 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         state.update { it.copy(powerampMeasure = PowerampMeasure.Running) }
         viewModelScope.launch(synthesis) {
             val noise = PinkNoise()
+            val rate = output.sampleRate
             output.renderer.changeEqualization(EqualizerSettings.Flat)
-            output.renderer.changeSource(
-                LoopSource(DoubleArray(MEASURE_NOISE_SECONDS * output.sampleRate) { noise.next() }),
-            )
+            output.renderer.changeSource(LoopSource(DoubleArray(MEASURE_NOISE_SECONDS * rate) { noise.next() }))
             val session = output.sessionId
             val preset = calibrationSettings()
-            val meter = OutputMeter()
-            output.play()
             val result = try {
+                val room = recordForMeasure()
+                output.play()
                 delay(MEASURE_SETTLE_MS)
-                val alone = meter.capture(MEASURE_CAPTURE_MS)
+                val alone = recordForMeasure()
                 withContext(effectThread) {
-                    sessionEqualizer.apply(session, 0f, previewBands(preset, state.value.bandOverlap, output.sampleRate))
+                    sessionEqualizer.apply(session, 0f, previewBands(preset, state.value.bandOverlap, rate))
                 }
                 delay(MEASURE_SETTLE_MS)
-                val withTimbra = meter.capture(MEASURE_CAPTURE_MS)
+                val withTimbra = recordForMeasure()
                 withContext(effectThread) { sessionEqualizer.release() }
                 powerampControl.turnOn()
                 powerampControl.announceSession(session, open = true)
                 delay(MEASURE_SETTLE_MS)
-                val withPoweramp = meter.capture(MEASURE_CAPTURE_MS)
-                if (alone == null || withTimbra == null || withPoweramp == null) {
+                val withPoweramp = recordForMeasure()
+                if (room == null || alone == null || withTimbra == null || withPoweramp == null) {
                     PowerampMeasure.CouldNotCapture
                 } else {
-                    compareMeasurements(preset, alone, withTimbra, withPoweramp)
+                    compareMeasurements(preset, room, alone, withTimbra, withPoweramp)
                 }
             } finally {
                 output.stop()
@@ -501,18 +506,28 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
+    private suspend fun recordForMeasure(): DoubleArray? = withContext(Dispatchers.IO) {
+        recordMicrophone(MEASURE_CAPTURE_SECONDS * output.sampleRate, output.sampleRate)
+            ?.let { samples -> DoubleArray(samples.size) { samples[it].toDouble() / Short.MAX_VALUE } }
+    }
+
     private fun compareMeasurements(
         preset: EqualizerSettings,
-        alone: MeasuredSpectrum,
-        withTimbra: MeasuredSpectrum,
-        withPoweramp: MeasuredSpectrum,
+        room: DoubleArray,
+        alone: DoubleArray,
+        withTimbra: DoubleArray,
+        withPoweramp: DoubleArray,
     ): PowerampMeasure {
+        val rate = output.sampleRate
         val frequencies = preset.bandFrequenciesHz
-        val timbra = spectrumDifferenceDb(alone, withTimbra, frequencies)
-        val poweramp = spectrumDifferenceDb(alone, withPoweramp, frequencies)
-        val bands = frequencies.indices.filter { timbra[it] != null && poweramp[it] != null }
-        if (bands.isEmpty()) return PowerampMeasure.CouldNotCapture
+        val overRoom = bandDifferenceDb(room, alone, rate, frequencies)
+        val timbra = bandDifferenceDb(alone, withTimbra, rate, frequencies)
+        val poweramp = bandDifferenceDb(alone, withPoweramp, rate, frequencies)
+        val bands = frequencies.indices.filter {
+            (overRoom[it] ?: 0f) >= MEASURE_MIN_OVER_ROOM_DB && timbra[it] != null && poweramp[it] != null
+        }
         val cuts = bands.map { preset.bandGainsDb[it] < 0f }
+        if (cuts.count { it } < MEASURE_MIN_CUT_BANDS) return PowerampMeasure.TooQuiet
         val timbraDb = bands.map { requireNotNull(timbra[it]) }.alignedToItsMedian()
         val powerampDb = bands.map { requireNotNull(poweramp[it]) }.alignedToItsMedian()
         if (cutDepthDb(timbraDb, cuts) < MEASURE_MIN_CUT_DB) return PowerampMeasure.CouldNotCapture

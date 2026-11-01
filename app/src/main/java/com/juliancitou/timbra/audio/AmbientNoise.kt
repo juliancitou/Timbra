@@ -9,7 +9,7 @@ import kotlin.math.max
 import kotlin.math.sqrt
 
 private const val RECORD_RATE_HZ = 16_000
-private const val SKIPPED_SAMPLES = RECORD_RATE_HZ / 4
+private const val SKIPPED_FRACTION_OF_SECOND = 4
 private const val MEASURED_SAMPLES = 2 * RECORD_RATE_HZ
 private const val SILENCE_DBFS = -120f
 
@@ -27,37 +27,40 @@ fun rmsDbfs(samples: ShortArray): Float {
     return max(SILENCE_DBFS.toDouble(), 20 * log10(max(rms, 1e-9))).toFloat()
 }
 
+/** Oye el micrófono unos 2 segundos y devuelve solo su nivel. Es bloqueante. */
+fun measureAmbientNoiseDbfs(): Float? = recordMicrophone(MEASURED_SAMPLES, RECORD_RATE_HZ)?.let(::rmsDbfs)
+
 /**
- * Oye el micrófono unos 2 segundos y devuelve solo su nivel. El audio no se guarda ni sale del teléfono.
- * Es bloqueante. Quien llama debe haber comprobado el permiso; `null` si no se pudo grabar.
+ * Graba [samples] muestras del micrófono en memoria; no se guardan ni salen del teléfono. Es bloqueante, y quien
+ * llama debe haber comprobado el permiso. `null` si no se pudo grabar.
  */
 @SuppressLint("MissingPermission")
-fun measureAmbientNoiseDbfs(): Float? = runCatching {
+fun recordMicrophone(samples: Int, sampleRate: Int): ShortArray? = runCatching {
     val bufferBytes = AudioRecord.getMinBufferSize(
-        RECORD_RATE_HZ,
+        sampleRate,
         AudioFormat.CHANNEL_IN_MONO,
         AudioFormat.ENCODING_PCM_16BIT,
     )
-    // Esta fuente evita el control automático de ganancia, que subiría el ruido de un cuarto callado.
+    // Esta fuente evita el control automático de ganancia, que cambiaría el nivel entre una grabación y otra.
     val record = AudioRecord(
         MediaRecorder.AudioSource.VOICE_RECOGNITION,
-        RECORD_RATE_HZ,
+        sampleRate,
         AudioFormat.CHANNEL_IN_MONO,
         AudioFormat.ENCODING_PCM_16BIT,
         bufferBytes,
     )
     try {
         record.startRecording()
-        val skipped = ShortArray(SKIPPED_SAMPLES)
+        val skipped = ShortArray(sampleRate / SKIPPED_FRACTION_OF_SECOND)
         record.read(skipped, 0, skipped.size)
-        val samples = ShortArray(MEASURED_SAMPLES)
+        val recorded = ShortArray(samples)
         var filled = 0
-        while (filled < samples.size) {
-            val read = record.read(samples, filled, samples.size - filled)
+        while (filled < recorded.size) {
+            val read = record.read(recorded, filled, recorded.size - filled)
             if (read <= 0) return@runCatching null
             filled += read
         }
-        rmsDbfs(samples)
+        recorded
     } finally {
         record.release()
     }

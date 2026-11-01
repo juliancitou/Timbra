@@ -104,6 +104,20 @@ fun bandDifferenceDb(
     }
 }
 
+/** Sube o baja toda la curva para comparar solo su forma: el nivel general lo cambian el preamp y el DVC. */
+fun List<Float>.alignedToItsMedian(): List<Float> {
+    val median = sorted()[size / 2]
+    return map { it - median }
+}
+
+/** Cuánto más bajas están las bandas que el preset corta, en promedio, que las que deja igual. */
+fun cutDepthDb(curveDb: List<Float>, isCut: List<Boolean>): Float {
+    val cut = curveDb.filterIndexed { band, _ -> isCut[band] }
+    val kept = curveDb.filterIndexed { band, _ -> !isCut[band] }
+    if (cut.isEmpty() || kept.isEmpty()) return 0f
+    return kept.average().toFloat() - cut.average().toFloat()
+}
+
 private fun power10(decibels: Double) = Math.pow(10.0, decibels / 10)
 
 /** Cada banda llega hasta la media geométrica con la siguiente; las muy angostas usan su punto más cercano. */

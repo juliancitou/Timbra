@@ -42,6 +42,7 @@ private fun MeasureSection(measure: PowerampMeasure, onMeasure: () -> Unit) {
             PowerampMeasure.Idle -> Unit
             PowerampMeasure.Running -> DetailText(stringResource(R.string.calibration_measure_running))
             PowerampMeasure.CouldNotCapture -> DetailText(stringResource(R.string.calibration_measure_no_capture))
+            PowerampMeasure.TooQuiet -> DetailText(stringResource(R.string.calibration_measure_too_quiet))
             PowerampMeasure.NoEffect -> DetailText(stringResource(R.string.calibration_measure_no_effect))
             is PowerampMeasure.Done -> {
                 FrequencyChart(
@@ -155,15 +156,17 @@ fun CalibrationScreen(
                     )
                 }
             }
-            DetailText(
-                stringResource(
-                    if (state.spotify == SpotifyLink.Connected) {
-                        R.string.comfort_spotify_connected
-                    } else {
-                        R.string.calibration_waiting
-                    },
-                ),
-            )
+            if (state.spotify != SpotifyLink.Off) {
+                DetailText(
+                    stringResource(
+                        if (state.spotify == SpotifyLink.Connected) {
+                            R.string.comfort_spotify_connected
+                        } else {
+                            R.string.calibration_waiting
+                        },
+                    ),
+                )
+            }
         }
     }
 }

@@ -46,6 +46,18 @@ class AudioComparisonTest {
     }
 
     @Test
+    fun aFlatLineDoesNotCountAsSeeingTheCuts() {
+        val isCut = listOf(false, true, false, false, true, false)
+        assertEquals(0f, cutDepthDb(List(6) { 0.5f }, isCut), 0.001f)
+        assertEquals(8f, cutDepthDb(listOf(0f, -8f, 0f, 0f, -8f, 0f), isCut), 0.001f)
+    }
+
+    @Test
+    fun alignmentKeepsTheShape() {
+        assertEquals(listOf(-3f, 0f, 2f), listOf(-5f, -2f, 0f).alignedToItsMedian())
+    }
+
+    @Test
     fun differenceCountsBandsAndFindsTheStrongest() {
         val gains = flat.bandGainsDb.toMutableList()
         gains[3] = -4.5f

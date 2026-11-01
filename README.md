@@ -219,8 +219,8 @@ Tu oído es lo más importante:
 - Tus mediciones se guardan solo en el almacenamiento interno de la app.
 - Para ecualizar Spotify en vivo, la app pide el permiso `MODIFY_AUDIO_SETTINGS`, que Android concede
   al instalar. No copia ni graba su audio, y lo suelta al salir del test.
-- El micrófono es opcional: mide unos 2 segundos el nivel de ruido en "Antes de empezar". El audio no se
-  guarda ni sale del teléfono.
+- El micrófono es opcional: mide unos 2 segundos el nivel de ruido en "Antes de empezar" y, si lo pides en
+  Calibrar, compara Poweramp con la app. El audio no se guarda ni sale del teléfono.
 - El botón "Apagar Poweramp" apaga Poweramp Equalizer con su API pública, y la app lo vuelve a encender
   al terminar el test. Si la app se cierra de golpe, puede quedarse apagado.
 - Si eliges una canción tuya, solo se lee en memoria: no se copia, no se modifica ni sale del teléfono.
