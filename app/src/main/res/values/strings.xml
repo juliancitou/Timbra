@@ -345,6 +345,29 @@
     <string name="action_import_poweramp">Importar en Poweramp</string>
     <string name="export_imported">Ya está en Poweramp</string>
     <string name="export_import_failed">No se pudo abrir Poweramp: descarga el archivo</string>
+    <string name="finder_section_check">comprueba</string>
+    <string name="finder_check_spotify">Cambia de canción en Spotify: la comparación sigue aplicando.</string>
+    <string name="finder_check_music">Prueba con otra música.</string>
+    <string name="finder_check_blind">Prueba a ciegas</string>
+    <string name="blind_title">A ciegas</string>
+    <string name="blind_lead">Escucha las dos opciones y quédate con la que te guste más.</string>
+    <string name="blind_progress">intento %1$d de %2$d</string>
+    <string name="blind_option">Opción %1$d</string>
+    <string name="blind_choose">Me quedo con esta</string>
+    <string name="blind_verdict_equalization">Prefieres tu ecualización.</string>
+    <string name="blind_verdict_original">Prefieres el sonido original.</string>
+    <string name="blind_verdict_none">No hay una preferencia clara.</string>
+    <string name="blind_score">Elegiste tu ecualización %1$d de %2$d veces.</string>
+    <string name="blind_caveat">Con tan pocos intentos es una señal, no una prueba exacta.</string>
+    <string name="calibration_section_measure">medir con datos</string>
+    <string name="calibration_measure_hint">Con el preset de prueba activo en Poweramp, suena ruido unos 20 segundos. Pon el volumen bajo. Poweramp se apaga y queda encendido al final.</string>
+    <string name="calibration_measure_start">Medir Poweramp</string>
+    <string name="calibration_measure_running">Midiendo…</string>
+    <string name="calibration_measure_no_capture">Android no dejó medir la salida en este teléfono. Usa la comparación de oído.</string>
+    <string name="calibration_measure_no_effect">Poweramp no cambió la señal de prueba. Revisa que el preset de prueba esté activo.</string>
+    <string name="calibration_measure_chart">Lo que hizo Poweramp comparado con lo que espera Timbra.</string>
+    <string name="calibration_measure_legend">Ámbar: lo medido en Poweramp. Naranja: lo que espera Timbra.</string>
+    <string name="calibration_measure_result">Mayor diferencia: %1$s en %2$s. Es una medición tosca: menos de 2 dB no es concluyente.</string>
     <string name="finder_summary_doubt">%1$s: elegiste distinto al comprobar, así que dejé un punto medio.</string>
 
     <!-- Calibración -->

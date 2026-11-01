@@ -36,6 +36,7 @@ import com.juliancitou.timbra.ui.screens.calibration.CalibrationScreen
 import com.juliancitou.timbra.ui.screens.comfort.ComfortLevelScreen
 import com.juliancitou.timbra.ui.screens.export.ExportScreen
 import com.juliancitou.timbra.export.PowerampExporter
+import com.juliancitou.timbra.ui.screens.finder.BlindTestScreen
 import com.juliancitou.timbra.ui.screens.finder.EqualizerFinderViewModel
 import com.juliancitou.timbra.ui.screens.finder.FinderResultScreen
 import com.juliancitou.timbra.ui.screens.finder.FinderRoundScreen
@@ -66,6 +67,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object TasteRoute
 @Serializable data object FinderRoundRoute
 @Serializable data object FinderResultRoute
+@Serializable data object BlindTestRoute
 @Serializable data object ExportRoute
 @Serializable data object HistoryRoute
 @Serializable data object SettingsRoute
@@ -162,6 +164,7 @@ fun TimbraNavHost(
                         fileName = finder.calibrationFileName(),
                         onStart = finder::startCalibration,
                         onSelectOverlap = finder::setBandOverlap,
+                        onMeasurePoweramp = finder::measurePoweramp,
                         onOpenSpotify = finder::openSpotify,
                         onBack = back,
                     )
@@ -208,12 +211,29 @@ fun TimbraNavHost(
                         onTogglePlayback = finder::togglePlayback,
                         onPresetNameChange = finder::setPresetName,
                         onExport = { navController.navigate(ExportRoute) },
+                        onBlindTest = {
+                            finder.startBlindTest()
+                            navController.navigate(BlindTestRoute)
+                        },
+                        onSelectGenre = finder::selectGenre,
                         onRestart = {
                             finder.startTest()
                             navController.popBackStack(FinderRoundRoute, inclusive = false)
                         },
                         onPreviousRound = {
                             finder.previousRound()
+                            navController.popBackStack()
+                        },
+                    )
+                }
+                screen<BlindTestRoute> {
+                    BlindTestScreen(
+                        state = finderState,
+                        onListen = finder::blindListen,
+                        onChoose = finder::blindChoose,
+                        onTogglePlayback = finder::togglePlayback,
+                        onBack = {
+                            finder.leaveBlindTest()
                             navController.popBackStack()
                         },
                     )
@@ -278,7 +298,13 @@ fun TimbraNavHost(
  */
 /** Pantallas del test en las que puede sonar la música; en cualquier otra, el sonido se detiene. */
 private val FinderSoundRoutes =
-    listOf(ComfortLevelRoute::class, FinderRoundRoute::class, FinderResultRoute::class, CalibrationRoute::class)
+    listOf(
+        ComfortLevelRoute::class,
+        FinderRoundRoute::class,
+        FinderResultRoute::class,
+        BlindTestRoute::class,
+        CalibrationRoute::class,
+    )
 
 /**
  * Detiene el sonido del test al salir de sus pantallas y cuando la app pasa a segundo plano o se

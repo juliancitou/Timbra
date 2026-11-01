@@ -11,7 +11,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import android.Manifest
+import android.content.pm.PackageManager
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.ui.screens.finder.PowerampMeasure
+import com.juliancitou.timbra.ui.theme.FrequencyChart
+import com.juliancitou.timbra.ui.theme.formatDecibels
+import com.juliancitou.timbra.ui.theme.formatHertz
 import com.juliancitou.timbra.audio.BandOverlap
 import com.juliancitou.timbra.ui.screens.export.writeTo
 import com.juliancitou.timbra.ui.screens.finder.FinderUiState
@@ -26,6 +32,43 @@ import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.TerminalSection
 
 private const val PRESET_MIME_TYPE = "application/json"
+
+/** La gráfica muestra lo medido en ámbar y lo que Timbra espera en naranja. */
+@Composable
+private fun MeasureSection(measure: PowerampMeasure, onMeasure: () -> Unit) {
+    TerminalSection(stringResource(R.string.calibration_section_measure)) {
+        DetailText(stringResource(R.string.calibration_measure_hint))
+        when (measure) {
+            PowerampMeasure.Idle -> Unit
+            PowerampMeasure.Running -> DetailText(stringResource(R.string.calibration_measure_running))
+            PowerampMeasure.CouldNotCapture -> DetailText(stringResource(R.string.calibration_measure_no_capture))
+            PowerampMeasure.NoEffect -> DetailText(stringResource(R.string.calibration_measure_no_effect))
+            is PowerampMeasure.Done -> {
+                FrequencyChart(
+                    gainsDb = measure.measuredDb,
+                    contentDescription = stringResource(R.string.calibration_measure_chart),
+                    frequenciesHz = measure.frequenciesHz,
+                    overlayDb = measure.expectedDb,
+                )
+                DetailText(stringResource(R.string.calibration_measure_legend))
+                DetailText(
+                    stringResource(
+                        R.string.calibration_measure_result,
+                        formatDecibels(measure.largestErrorDb),
+                        formatHertz(measure.largestErrorHz),
+                    ),
+                )
+            }
+        }
+        if (measure != PowerampMeasure.Running) {
+            TerminalChip(
+                label = stringResource(R.string.calibration_measure_start),
+                selected = false,
+                onClick = onMeasure,
+            )
+        }
+    }
+}
 
 private fun BandOverlap.labelRes() = when (this) {
     BandOverlap.Envelope -> R.string.calibration_overlap_envelope
@@ -43,11 +86,15 @@ fun CalibrationScreen(
     fileName: String,
     onStart: () -> Unit,
     onSelectOverlap: (BandOverlap) -> Unit,
+    onMeasurePoweramp: () -> Unit,
     onOpenSpotify: () -> Unit,
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) { onStart() }
+    val microphone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) onMeasurePoweramp()
+    }
     val save = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(PRESET_MIME_TYPE)) { uri ->
         if (uri != null) writeTo(context, uri, presetJson())
     }
@@ -87,6 +134,13 @@ fun CalibrationScreen(
                     stringResource(R.string.calibration_step_choose),
                 ),
             )
+        }
+        MeasureSection(state.powerampMeasure) {
+            if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                onMeasurePoweramp()
+            } else {
+                microphone.launch(Manifest.permission.RECORD_AUDIO)
+            }
         }
         TerminalSection(stringResource(R.string.calibration_section_shape)) {
             FlowRow(

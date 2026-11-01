@@ -13,9 +13,11 @@ import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
 import com.juliancitou.timbra.audio.EqualizerSettings
 import com.juliancitou.timbra.audio.equalizerDifference
+import com.juliancitou.timbra.audio.music.Genre
 import com.juliancitou.timbra.measure.FinderDimension
 import com.juliancitou.timbra.measure.ZoneChange
 import com.juliancitou.timbra.measure.changes
+import com.juliancitou.timbra.ui.screens.label
 import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.DetailText
 import com.juliancitou.timbra.ui.theme.DisplayZone
@@ -52,6 +54,8 @@ fun FinderResultScreen(
     onTogglePlayback: () -> Unit,
     onPresetNameChange: (String) -> Unit,
     onExport: () -> Unit,
+    onBlindTest: () -> Unit,
+    onSelectGenre: (Genre) -> Unit,
     onRestart: () -> Unit,
     onPreviousRound: () -> Unit,
 ) {
@@ -105,12 +109,38 @@ fun FinderResultScreen(
         }
         SoundingStatus(state)
         ChangesSections(state)
+        CheckSection(state, onBlindTest, onSelectGenre)
         TerminalTextField(
             value = state.presetName,
             onValueChange = onPresetNameChange,
             label = stringResource(R.string.finder_preset_label),
             placeholder = suggestedPresetName(state),
         )
+    }
+}
+
+/** Un preset que solo suena bien con una canción no sirve: aquí se prueba con otra, y a ciegas. */
+@Composable
+private fun CheckSection(state: FinderUiState, onBlindTest: () -> Unit, onSelectGenre: (Genre) -> Unit) {
+    TerminalSection(stringResource(R.string.finder_section_check)) {
+        if (state.usesSpotify) {
+            DetailText(stringResource(R.string.finder_check_spotify))
+        } else {
+            DetailText(stringResource(R.string.finder_check_music))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
+                verticalArrangement = Arrangement.spacedBy(Spacing.small),
+            ) {
+                Genre.entries.forEach { genre ->
+                    TerminalChip(
+                        label = stringResource(genre.label()),
+                        selected = state.songName == null && state.genre == genre,
+                        onClick = { onSelectGenre(genre) },
+                    )
+                }
+            }
+        }
+        TerminalChip(label = stringResource(R.string.finder_check_blind), selected = false, onClick = onBlindTest)
     }
 }
 

@@ -3,6 +3,7 @@ package com.juliancitou.timbra.audio
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.media.audiofx.AudioEffect
 import android.media.audiofx.DynamicsProcessing
 import android.net.Uri
 
@@ -79,6 +80,22 @@ class PowerampControl(private val context: Context) {
             profiles.firstOrNull { wanted in it.name } ?: profiles.firstOrNull()
         }
     }.getOrNull()
+
+    /** Avisa a Poweramp de una sesión de audio, como hace cualquier reproductor, para que la ecualice. */
+    fun announceSession(sessionId: Int, open: Boolean) {
+        val action = if (open) {
+            AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION
+        } else {
+            AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION
+        }
+        context.sendBroadcast(
+            Intent(action)
+                .setPackage(POWERAMP_EQ_PACKAGE)
+                .putExtra(AudioEffect.EXTRA_AUDIO_SESSION, sessionId)
+                .putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.packageName)
+                .putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC),
+        )
+    }
 
     fun turnOff() = send(COMMAND_STOP_SERVICE)
 

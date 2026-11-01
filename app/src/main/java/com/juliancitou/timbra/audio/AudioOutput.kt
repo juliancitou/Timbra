@@ -80,6 +80,8 @@ class AudioOutput(context: Context, sourceFactory: (sampleRate: Int) -> SignalSo
         }
     }
 
+    val sessionId: Int get() = track.audioSessionId
+
     private val lock = Any()
     private var renderThread: Thread? = null
     private var receiverRegistered = false
