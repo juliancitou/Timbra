@@ -19,6 +19,14 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `ff8ef3c` · fix: no aplicar sola la fuerza medida de Poweramp
+- La vista previa vuelve al 100 % por defecto. La fuerza medida se ofrece como opción en Calibrar: al 45 %, el usuario
+  oyó en Timbra más agudos que en Poweramp, y la medición no cubre un corte de 5 a 20 kHz como el de su preset.
+- Se intentó medir ese preset y las dos tandas no fueron válidas. En la primera no se apagó Poweramp; en la segunda, su
+  `DynamicsProcessing` siguió en la sesión tras la orden de apagar, y encendido y apagado dieron lo mismo. Al ceder el
+  efecto a Timbra, el nivel saltó hasta 14 dB, posiblemente por DVC en la bocina.
+- Sigue válida la medición de cortes de −6 dB que terminan en 10 kHz, pero no se generaliza a cualquier preset.
+
 ### 2026-11-01 · `7462b14` · feat: oír el resultado con el volumen de Poweramp
 - El usuario oye los agudos más fuertes y molestos en Timbra que en Poweramp. Su preset quedó en −8 dB, el mínimo, en todas
   las bandas de 5.2 a 20 kHz, y con preamp de −6 dB: la vista previa al 45 % cortaba menos, e igualar el volumen la hacía
