@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
 import com.juliancitou.timbra.R
-import com.juliancitou.timbra.audio.POWERAMP_EQ_PACKAGE
 import com.juliancitou.timbra.audio.PowerampIssue
 import com.juliancitou.timbra.audio.PowerampSettings
 import com.juliancitou.timbra.export.BandLayout
@@ -57,6 +56,7 @@ fun ExportScreen(
     bandLayout: BandLayout,
     powerampSettings: PowerampSettings?,
     presetImported: Boolean,
+    onImportPreset: (json: String) -> Boolean,
     presetJson: () -> String,
     onGoHome: () -> Unit,
     onBack: () -> Unit,
@@ -84,7 +84,7 @@ fun ExportScreen(
             } else {
                 TerminalButton(
                     text = stringResource(R.string.action_import_poweramp),
-                    onClick = { importFailed = !openInPoweramp(context, fileName, presetJson()) },
+                    onClick = { importFailed = !onImportPreset(presetJson()) },
                     modifier = Modifier.fillMaxWidth(),
                 )
                 TerminalButton(
@@ -198,21 +198,6 @@ internal fun writeTo(context: Context, uri: Uri, json: String): Boolean = runCat
 }.isSuccess
 
 /** Escribe una copia en la caché y abre el menú de compartir del sistema con ella. */
-/** Poweramp abre los `.json` y pregunta si importarlos. Devuelve `false` si no está instalado. */
-private fun openInPoweramp(context: Context, fileName: String, json: String): Boolean {
-    val view = Intent(Intent.ACTION_VIEW).apply {
-        setDataAndType(temporaryPresetUri(context, fileName, json), PRESET_MIME_TYPE)
-        setPackage(POWERAMP_EQ_PACKAGE)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    return try {
-        context.startActivity(view)
-        true
-    } catch (_: ActivityNotFoundException) {
-        false
-    }
-}
-
 private fun temporaryPresetUri(context: Context, fileName: String, json: String): Uri {
     val directory = File(context.cacheDir, SHARED_PRESETS_DIRECTORY).apply { mkdirs() }
     val file = File(directory, fileName).apply { writeText(json) }

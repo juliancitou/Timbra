@@ -63,6 +63,14 @@ class GraphicEqualizerTest {
     }
 
     @Test
+    fun previewStrengthScalesTheCurveButNotThePreset() {
+        val gains = POWERAMP_BAND_FREQUENCIES_HZ.map { if (it in 200..2000) -6f else 0f }
+        val settings = EqualizerSettings(gains, previewStrength = 0.5)
+        assertEquals(-3.0, GraphicEqualizer(SAMPLE_RATE, settings).magnitudeDb(632.0), 0.1)
+        assertEquals(gains, settings.bandGainsDb)
+    }
+
+    @Test
     fun cascadeAddsNeighbouringBands() {
         val settings = EqualizerSettings(List(POWERAMP_BAND_FREQUENCIES_HZ.size) { 3f }, overlap = BandOverlap.Cascade)
         assertTrue(GraphicEqualizer(SAMPLE_RATE, settings).magnitudeDb(1125.0) > 6.0)

@@ -251,7 +251,8 @@ class EqualizerFinderTest {
     @Test
     fun calibrationPresetFollowsTheContract() {
         val preset = calibrationPreset(BandLayout.Default)
-        assertTrue(preset.bandGainsDb.any { it == POWERAMP_MIN_GAIN_DB })
+        assertTrue(preset.bandGainsDb.any { it == -6f })
+        assertEquals(0f, gainAt(preset.bandGainsDb.map { it.toDouble() }, 2000).toFloat(), 0f)
         assertEquals(-4.5f, preset.preampDb, 0f)
     }
 }

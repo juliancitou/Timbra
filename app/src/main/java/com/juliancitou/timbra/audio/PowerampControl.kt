@@ -16,6 +16,13 @@ private const val EXTRA_COMMAND = "cmd"
 private const val EXTRA_PACKAGE = "pak"
 private const val COMMAND_STOP_SERVICE = 100
 private const val COMMAND_START_SERVICE = 101
+private const val COMMAND_SET_PRESET = 50
+private const val EXTRA_ID = "id"
+private const val API_ACTIVITY = "com.maxmpz.equalizer.PeqAPIActivity"
+private const val ACTION_IMPORT_PRESETS = "com.maxmpz.equalizer.IMPORT_PRESETS"
+private const val EXTRA_NAMES = "names"
+private const val EXTRA_PRESETS = "presets"
+private const val COLUMN_ID = "_id"
 private const val STEREO_CHANNELS = 2
 private const val SETTINGS_URI = "content://com.maxmpz.equalizer.data"
 private const val CALL_PREFERENCE = "preference"
@@ -97,6 +104,32 @@ class PowerampControl(private val context: Context) {
         )
     }
 
+    /** Abre el aviso de Poweramp para importar un preset. `false` si no se pudo abrir. */
+    fun importPreset(name: String, json: String): Boolean = runCatching {
+        context.startActivity(
+            Intent(ACTION_IMPORT_PRESETS)
+                .setComponent(ComponentName(POWERAMP_EQ_PACKAGE, API_ACTIVITY))
+                .putExtra(EXTRA_NAMES, arrayOf(name))
+                .putExtra(EXTRA_PRESETS, arrayOf(json))
+                .putExtra(EXTRA_PACKAGE, context.packageName)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+        )
+        true
+    }.getOrDefault(false)
+
+    /** Deja activo el preset con [name]. `false` si no existe. Poweramp no dice cuál estaba antes. */
+    fun activatePreset(name: String): Boolean = runCatching {
+        val id = context.contentResolver.query(
+            Uri.parse(PRESETS_URI),
+            arrayOf(COLUMN_ID),
+            "$COLUMN_NAME = ?",
+            arrayOf(name),
+            null,
+        )?.use { if (it.moveToFirst()) it.getLong(0) else null } ?: return false
+        apiIntent(COMMAND_SET_PRESET).putExtra(EXTRA_ID, id).let(context::sendBroadcast)
+        true
+    }.getOrDefault(false)
+
     fun turnOff() = send(COMMAND_STOP_SERVICE)
 
     fun turnOn() = send(COMMAND_START_SERVICE)
@@ -126,12 +159,10 @@ class PowerampControl(private val context: Context) {
         }
     }
 
-    private fun send(command: Int) {
-        context.sendBroadcast(
-            Intent(API_ACTION)
-                .setComponent(ComponentName(POWERAMP_EQ_PACKAGE, API_RECEIVER))
-                .putExtra(EXTRA_COMMAND, command)
-                .putExtra(EXTRA_PACKAGE, context.packageName),
-        )
-    }
+    private fun send(command: Int) = context.sendBroadcast(apiIntent(command))
+
+    private fun apiIntent(command: Int) = Intent(API_ACTION)
+        .setComponent(ComponentName(POWERAMP_EQ_PACKAGE, API_RECEIVER))
+        .putExtra(EXTRA_COMMAND, command)
+        .putExtra(EXTRA_PACKAGE, context.packageName)
 }

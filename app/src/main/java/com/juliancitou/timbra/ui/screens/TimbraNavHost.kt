@@ -160,8 +160,8 @@ fun TimbraNavHost(
                     LaunchedEffect(Unit) { finder.syncWithPoweramp() }
                     CalibrationScreen(
                         state = finderState,
-                        presetJson = finder::calibrationJson,
-                        fileName = finder.calibrationFileName(),
+                        onImportPreset = finder::importMeasurePreset,
+                        onResetStrength = finder::resetPreviewStrength,
                         onStart = finder::startCalibration,
                         onSelectOverlap = finder::setBandOverlap,
                         onMeasurePoweramp = finder::measurePoweramp,
@@ -261,6 +261,7 @@ fun TimbraNavHost(
                         bandLayout = finderState.finder.layout,
                         powerampSettings = finderState.powerampSettings,
                         presetImported = finderState.presetImported,
+                        onImportPreset = { json -> finder.importPreset(fullPresetName, json) },
                         presetJson = { finder.presetJson(suggestedName) },
                         onGoHome = { navController.popBackStack(HomeRoute, inclusive = false) },
                         onBack = back,

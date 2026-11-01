@@ -359,7 +359,7 @@
     <string name="blind_score">Elegiste tu ecualización %1$d de %2$d veces.</string>
     <string name="blind_caveat">Con tan pocos intentos es una señal, no una prueba exacta.</string>
     <string name="calibration_section_measure">medir con datos</string>
-    <string name="calibration_measure_hint">Activa el preset de prueba en Poweramp, pausa la música y busca silencio. Timbra usa el micrófono y suena ruido unos 40 segundos. Bocina: volumen medio. Audífonos: volumen bajo, con uno pegado al micrófono del teléfono y sin ponértelos.</string>
+    <string name="calibration_measure_hint">Importa el preset, pausa la música y busca silencio. Timbra lo activa, usa el micrófono y suena ruido unos 40 segundos. Usa la bocina con volumen medio. Al terminar, elige de nuevo tu preset en Poweramp.</string>
     <string name="calibration_measure_start">Medir Poweramp</string>
     <string name="calibration_measure_running">Midiendo…</string>
     <string name="calibration_measure_no_capture">No se pudo medir: ni siquiera se notó el ecualizador de Timbra. Revisa que el micrófono no esté tapado, o usa la comparación de oído.</string>
@@ -367,7 +367,10 @@
     <string name="calibration_measure_no_effect">La medición funciona, pero no se notó Poweramp. Revisa que el preset de prueba esté activo.</string>
     <string name="calibration_measure_chart">Lo que hace Poweramp comparado con lo que hace Timbra.</string>
     <string name="calibration_measure_legend">Ámbar: Poweramp. Naranja: Timbra. Las dos medidas igual.</string>
-    <string name="calibration_measure_result">Cortes de −8 dB: Timbra %1$s, Poweramp %2$s. Es una medición casera: menos de 2 dB de diferencia no es concluyente.</string>
+    <string name="calibration_measure_result">Cortes de −6 dB: Timbra %1$s, Poweramp %2$s.</string>
+    <string name="calibration_measure_no_preset">Primero toca Importar y acepta en Poweramp.</string>
+    <string name="calibration_strength">Tu Poweramp aplica cerca del %1$d %% de cada preset. La vista previa ya suena con esa fuerza.</string>
+    <string name="calibration_strength_reset">Oír el preset completo</string>
     <string name="finder_summary_doubt">%1$s: elegiste distinto al comprobar, así que dejé un punto medio.</string>
 
     <!-- Calibración -->
@@ -375,15 +378,15 @@
     <string name="settings_calibration_body">Ajusta lo que oyes en Timbra para que suene igual que en tu Poweramp.</string>
     <string name="action_calibrate">Calibrar</string>
     <string name="calibration_title">Calibrar</string>
-    <string name="calibration_lead">Haz que Timbra suene igual que tu Poweramp.</string>
+    <string name="calibration_lead">Mide cuánto aplica tu Poweramp, para que Timbra suene igual.</string>
     <string name="calibration_section_steps">pasos</string>
-    <string name="calibration_step_import">Descarga el preset de prueba e impórtalo en Poweramp.</string>
+    <string name="calibration_step_import">Toca Importar y acepta en Poweramp. Solo hace falta una vez.</string>
     <string name="calibration_step_listen">Con Poweramp encendido, pon una canción en Spotify y escúchala.</string>
     <string name="calibration_step_return">Apaga Poweramp, deja la canción sonando y regresa aquí.</string>
     <string name="calibration_step_choose">Elige la \"Superposición de bandas\" que tienes en los ajustes del ecualizador de Poweramp.</string>
     <string name="calibration_section_shape">superposición de bandas</string>
     <string name="calibration_overlap_envelope">Envolvente</string>
     <string name="calibration_overlap_cascade">Cascada</string>
-    <string name="calibration_download">Descargar</string>
+    <string name="calibration_import">Importar</string>
     <string name="calibration_waiting">Esperando a Spotify: pausa y reanuda la canción.</string>
 </resources>

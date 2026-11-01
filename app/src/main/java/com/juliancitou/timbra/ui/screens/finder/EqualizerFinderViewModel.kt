@@ -46,6 +46,7 @@ import com.juliancitou.timbra.audio.resample
 import com.juliancitou.timbra.audio.startingCurveDb
 import com.juliancitou.timbra.data.BandLayoutPreferences
 import com.juliancitou.timbra.data.BandOverlapPreferences
+import com.juliancitou.timbra.data.PreviewStrengthPreferences
 import com.juliancitou.timbra.export.BandLayout
 import com.juliancitou.timbra.export.PowerampExporter
 import com.juliancitou.timbra.measure.BLIND_OPTIONS
@@ -82,6 +83,9 @@ sealed interface PowerampMeasure {
 
     /** No se pudo grabar, o no se notó ni el ecualizador de Timbra: la medición no es válida. */
     data object CouldNotCapture : PowerampMeasure
+
+    /** Falta importar el preset de medición. */
+    data object PresetMissing : PowerampMeasure
 
     /** La señal apenas le gana al ruido del cuarto. */
     data object TooQuiet : PowerampMeasure
@@ -139,6 +143,8 @@ data class FinderUiState(
     /** La opción que se está escuchando en la prueba a ciegas; ninguna hasta tocar una. */
     val blindOption: Int? = null,
     val powerampMeasure: PowerampMeasure = PowerampMeasure.Idle,
+    /** Qué fracción del preset aplica este Poweramp, medida. La vista previa suena con esa fuerza. */
+    val previewStrength: Double = 1.0,
     val status: PlaybackStatus = PlaybackStatus.Stopped,
 ) {
     val isPlaying: Boolean get() = status == PlaybackStatus.Playing
@@ -156,7 +162,9 @@ data class FinderUiState(
 
 private const val CENTER_OPTION = 2
 private const val REFERENCE_SECONDS = 4
-private const val CALIBRATION_NAME = "Calibracion"
+private const val MEASURE_PRESET_NAME = "Medicion"
+private const val MIN_PREVIEW_STRENGTH = 0.2
+private const val FULL_PREVIEW_STRENGTH = 1.0
 
 /** Con 2 minutos basta para el test, y una canción en estéreo no ocupa más de ~50 MB de memoria. */
 private const val MAX_SONG_SECONDS = 120
@@ -199,8 +207,9 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private val output by outputHolder
     private val bandPreferences = BandLayoutPreferences(application)
     private val overlapPreferences = BandOverlapPreferences(application)
+    private val strengthPreferences = PreviewStrengthPreferences(application)
     private val state = MutableStateFlow(
-        FinderUiState(finder = EqualizerFinder(layout = bandPreferences.load()), bandOverlap = overlapPreferences.load()),
+        FinderUiState(finder = EqualizerFinder(layout = bandPreferences.load()), bandOverlap = overlapPreferences.load(), previewStrength = strengthPreferences.load()),
     )
     private val playback = MutableStateFlow(PlaybackStatus.Stopped)
 
@@ -425,10 +434,20 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         if (calibrating) applyEqualization(calibrationSettings()) else refresh()
     }
 
-    fun calibrationJson(): String =
-        PowerampExporter.toJson(CALIBRATION_NAME, calibrationPreset(state.value.finder.layout))
+    fun importMeasurePreset(): Boolean = powerampControl.importPreset(
+        PowerampExporter.NAME_PREFIX + MEASURE_PRESET_NAME,
+        PowerampExporter.toJson(MEASURE_PRESET_NAME, calibrationPreset(state.value.finder.layout)),
+    )
 
-    fun calibrationFileName(): String = PowerampExporter.fileName(CALIBRATION_NAME)
+    fun importPreset(fullName: String, json: String): Boolean = powerampControl.importPreset(fullName, json)
+
+    /** Vuelve a escuchar el preset completo, como si Poweramp lo aplicara entero. */
+    fun resetPreviewStrength() = savePreviewStrength(FULL_PREVIEW_STRENGTH)
+
+    private fun savePreviewStrength(strength: Double) {
+        strengthPreferences.save(strength)
+        state.update { it.copy(previewStrength = strength) }
+    }
 
     fun startBlindTest() {
         state.update { it.copy(blindTest = BlindTest(equalizedOption = Random.nextInt(BLIND_OPTIONS)), blindOption = null) }
@@ -475,7 +494,11 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             output.renderer.changeEqualization(EqualizerSettings.Flat)
             output.renderer.changeSource(LoopSource(DoubleArray(MEASURE_NOISE_SECONDS * rate) { noise.next() }))
             val session = output.sessionId
-            val preset = calibrationSettings()
+            val preset = calibrationSettings().copy(previewStrength = FULL_PREVIEW_STRENGTH)
+            if (!powerampControl.activatePreset(PowerampExporter.NAME_PREFIX + MEASURE_PRESET_NAME)) {
+                state.update { it.copy(powerampMeasure = PowerampMeasure.PresetMissing) }
+                return@launch
+            }
             val result = try {
                 val room = recordForMeasure()
                 output.play()
@@ -503,6 +526,12 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
                 currentLoop = null
                 currentGenre = null
                 playingSong = null
+            }
+            if (result is PowerampMeasure.Done) {
+                savePreviewStrength(
+                    (result.powerampCutDb / result.timbraCutDb).toDouble()
+                        .coerceIn(MIN_PREVIEW_STRENGTH, FULL_PREVIEW_STRENGTH),
+                )
             }
             state.update { it.copy(powerampMeasure = result) }
         }
@@ -826,7 +855,8 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    private fun EqualizerSettings.overlappingAs(shape: BandOverlap) = copy(overlap = shape)
+    private fun EqualizerSettings.overlappingAs(shape: BandOverlap) =
+        copy(overlap = shape, previewStrength = state.value.previewStrength)
 
     private fun calibrationSettings(): EqualizerSettings {
         val current = state.value

@@ -2,6 +2,7 @@ package com.juliancitou.timbra.ui.screens.calibration
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import kotlin.math.roundToInt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -18,7 +19,6 @@ import com.juliancitou.timbra.ui.screens.finder.PowerampMeasure
 import com.juliancitou.timbra.ui.theme.FrequencyChart
 import com.juliancitou.timbra.ui.theme.formatDecibels
 import com.juliancitou.timbra.audio.BandOverlap
-import com.juliancitou.timbra.ui.screens.export.writeTo
 import com.juliancitou.timbra.ui.screens.finder.FinderUiState
 import com.juliancitou.timbra.ui.screens.finder.SpotifyLink
 import com.juliancitou.timbra.ui.theme.CodeLines
@@ -30,11 +30,14 @@ import com.juliancitou.timbra.ui.theme.TerminalChip
 import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.TerminalSection
 
-private const val PRESET_MIME_TYPE = "application/json"
-
 /** La gráfica muestra lo medido en ámbar y lo que Timbra espera en naranja. */
 @Composable
-private fun MeasureSection(measure: PowerampMeasure, onMeasure: () -> Unit) {
+private fun MeasureSection(
+    measure: PowerampMeasure,
+    previewStrength: Double,
+    onResetStrength: () -> Unit,
+    onMeasure: () -> Unit,
+) {
     TerminalSection(stringResource(R.string.calibration_section_measure)) {
         DetailText(stringResource(R.string.calibration_measure_hint))
         when (measure) {
@@ -42,6 +45,7 @@ private fun MeasureSection(measure: PowerampMeasure, onMeasure: () -> Unit) {
             PowerampMeasure.Running -> DetailText(stringResource(R.string.calibration_measure_running))
             PowerampMeasure.CouldNotCapture -> DetailText(stringResource(R.string.calibration_measure_no_capture))
             PowerampMeasure.TooQuiet -> DetailText(stringResource(R.string.calibration_measure_too_quiet))
+            PowerampMeasure.PresetMissing -> DetailText(stringResource(R.string.calibration_measure_no_preset))
             PowerampMeasure.NoEffect -> DetailText(stringResource(R.string.calibration_measure_no_effect))
             is PowerampMeasure.Done -> {
                 FrequencyChart(
@@ -60,12 +64,22 @@ private fun MeasureSection(measure: PowerampMeasure, onMeasure: () -> Unit) {
                 )
             }
         }
+        if (previewStrength < 1.0) {
+            DetailText(stringResource(R.string.calibration_strength, (previewStrength * 100).roundToInt()))
+        }
         if (measure != PowerampMeasure.Running) {
             TerminalChip(
                 label = stringResource(R.string.calibration_measure_start),
                 selected = false,
                 onClick = onMeasure,
             )
+            if (previewStrength < 1.0) {
+                TerminalChip(
+                    label = stringResource(R.string.calibration_strength_reset),
+                    selected = false,
+                    onClick = onResetStrength,
+                )
+            }
         }
     }
 }
@@ -82,8 +96,8 @@ private fun BandOverlap.labelRes() = when (this) {
 @Composable
 fun CalibrationScreen(
     state: FinderUiState,
-    presetJson: () -> String,
-    fileName: String,
+    onImportPreset: () -> Boolean,
+    onResetStrength: () -> Unit,
     onStart: () -> Unit,
     onSelectOverlap: (BandOverlap) -> Unit,
     onMeasurePoweramp: () -> Unit,
@@ -95,10 +109,6 @@ fun CalibrationScreen(
     val microphone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) onMeasurePoweramp()
     }
-    val save = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(PRESET_MIME_TYPE)) { uri ->
-        if (uri != null) writeTo(context, uri, presetJson())
-    }
-
     TerminalScreen(
         title = stringResource(R.string.calibration_title),
         lead = stringResource(R.string.calibration_lead),
@@ -106,8 +116,8 @@ fun CalibrationScreen(
         actions = {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.inSection)) {
                 TerminalButton(
-                    text = stringResource(R.string.calibration_download),
-                    onClick = { save.launch(fileName) },
+                    text = stringResource(R.string.calibration_import),
+                    onClick = { onImportPreset() },
                     style = TerminalButtonStyle.Secondary,
                     modifier = Modifier.weight(1f),
                 )
@@ -135,7 +145,7 @@ fun CalibrationScreen(
                 ),
             )
         }
-        MeasureSection(state.powerampMeasure) {
+        MeasureSection(state.powerampMeasure, state.previewStrength, onResetStrength) {
             if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 onMeasurePoweramp()
             } else {

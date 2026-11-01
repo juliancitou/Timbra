@@ -181,8 +181,11 @@ terminó en estilo terminal/ASCII).
 - [x] Medir con el micrófono en bocina: Timbra corta −7 dB y Poweramp cerca de −2 dB con la señal de prueba
 - [x] Medir Poweramp con Spotify en bocina: también corta menos y además sube los agudos
 - [x] Medir con los FreeBuds: arriba de 2 kHz, Poweramp aplica menos de la mitad; abajo no hay señal suficiente
-- [ ] Medir en bocina un preset plano y uno de corte ancho, para separar la subida de agudos de la falta de profundidad
-- [ ] Aplicar esa respuesta a la vista previa, para escuchar en el test lo que dará Poweramp
+- [x] Medir en bocina un preset plano y uno de corte ancho: Poweramp aplica ~45 % y sube ~1.4 dB arriba de 5 kHz
+- [x] Vista previa con la fuerza medida de Poweramp (Ajustes → Calibrar) e importación con su API oficial
+- [ ] Repetir el test con la nueva vista previa y comparar de oído con Poweramp
+- [ ] Decidir si también se compensa la subida de agudos
+- [ ] Revisar si a Poweramp le falta profundidad en otros teléfonos o versiones
 - [x] Comprobado con sesiones en silencio: el comando de apagar suelta el efecto de Poweramp y el de encender lo recupera
 - [x] Abrir el preset en Poweramp desde Exportar y detectar cuando ya se importó
 - [x] Prueba a ciegas final: elegir entre Timbra y sin ecualizar sin saber cuál es

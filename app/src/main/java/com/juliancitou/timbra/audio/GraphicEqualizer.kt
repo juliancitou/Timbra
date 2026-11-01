@@ -47,6 +47,8 @@ data class EqualizerSettings(
     val bandFrequenciesHz: List<Int> = POWERAMP_BAND_FREQUENCIES_HZ,
     /** Solo para escuchar: debe coincidir con lo elegido en Poweramp. No se exporta. */
     val overlap: BandOverlap = BandOverlap.Envelope,
+    /** Solo para escuchar: fracción de cada ganancia que de verdad aplica Poweramp. No se exporta. */
+    val previewStrength: Double = 1.0,
 ) {
     init {
         require(bandGainsDb.size == bandFrequenciesHz.size) {
@@ -153,7 +155,9 @@ class GraphicEqualizer(private val sampleRate: Int, val settings: EqualizerSetti
 
     /** Frecuencia y ganancia de cada campana. */
     private fun filterBands(): List<Pair<Double, Double>> {
-        val bands = settings.bandFrequenciesHz.zip(settings.bandGainsDb).filter { (hz, _) -> isFilterable(hz) }
+        val bands = settings.bandFrequenciesHz
+            .zip(settings.bandGainsDb) { hz, gainDb -> hz to (gainDb * settings.previewStrength).toFloat() }
+            .filter { (hz, _) -> isFilterable(hz) }
         val frequencies = bands.map { (hz, _) -> hz.toDouble() }
         val targets = bands.map { (_, gainDb) -> gainDb.toDouble() }
         if (settings.overlap == BandOverlap.Cascade || targets.all { it == 0.0 }) return frequencies.zip(targets)
