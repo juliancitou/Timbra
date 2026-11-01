@@ -142,6 +142,7 @@ data class FinderUiState(
     val bandOverlap: BandOverlap = BandOverlap.Envelope,
     val sounding: SoundingCheck? = null,
     val poweramp: PowerampState = PowerampState.Unknown,
+    val powerampOffByTimbra: Boolean = false,
     val powerampSettings: PowerampSettings? = null,
     val noiseMode: NoiseMode = NoiseMode.Cancelling,
     val autoEq: AutoEqProfile? = null,
@@ -262,6 +263,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private val powerampRestore = PowerampRestore(application)
     private var restoreAfterAway: Job? = null
     private var turnedBackOnWhileAway = false
+    private var turnedBackOnForExport = false
 
     /** Solo se tocan desde el hilo de síntesis. Medir toma cerca de un segundo: se guarda el resultado. */
     private var measuredFor: Any? = null
@@ -369,7 +371,9 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             sessionEqualizer.release()
             val found = readPowerampState()
             val settings = powerampControl.readSettings()
-            state.update { it.copy(poweramp = found, powerampSettings = settings) }
+            state.update {
+                it.copy(poweramp = found, powerampSettings = settings, powerampOffByTimbra = powerampRestore.isOffByTimbra)
+            }
         }
     }
 
@@ -382,15 +386,45 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             delay(POWERAMP_STOP_WAIT_MS)
             val found = readPowerampState()
             if (found == PowerampState.On) powerampRestore.forget()
-            state.update { it.copy(poweramp = found) }
+            state.update { it.copy(poweramp = found, powerampOffByTimbra = powerampRestore.isOffByTimbra) }
         }
     }
 
     /** Deja Poweramp como estaba, y solo si fue Timbra quien lo apagó. */
     fun restorePoweramp() {
+        turnedBackOnForExport = false
+        restorePowerampAfterRelease()
+    }
+
+    /** Para importar hace falta Poweramp encendido, pero desde Exportar aún se puede volver al resultado. */
+    fun restorePowerampForExport() {
+        turnedBackOnForExport = turnedBackOnForExport || powerampRestore.isOffByTimbra
+        restorePowerampAfterRelease()
+    }
+
+    /** De vuelta en el resultado sigue el test: Spotify suena con el efecto de Timbra y Poweramp no debe sumarse. */
+    fun resumeTestAfterExport() {
+        if (!turnedBackOnForExport) return
+        turnedBackOnForExport = false
+        viewModelScope.launch(effectThread) {
+            powerampControl.turnOff()
+            powerampRestore.markOff()
+            state.update { it.copy(poweramp = PowerampState.Off, powerampOffByTimbra = true) }
+        }
+    }
+
+    /**
+     * Va en la cola del efecto, después de soltarlo: Poweramp comparte ese efecto, y dejarlo plano con Poweramp ya
+     * encendido podría borrarle su curva.
+     */
+    private fun restorePowerampAfterRelease() {
         restoreAfterAway?.cancel()
         turnedBackOnWhileAway = false
-        if (powerampRestore.restore()) state.update { it.copy(poweramp = PowerampState.Unknown) }
+        viewModelScope.launch(effectThread) {
+            if (powerampRestore.restore()) {
+                state.update { it.copy(poweramp = PowerampState.Unknown, powerampOffByTimbra = false) }
+            }
+        }
     }
 
     /**
@@ -401,8 +435,8 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         restoreAfterAway?.cancel()
         restoreAfterAway = viewModelScope.launch {
             delay(AWAY_BEFORE_RESTORE_MS)
-            turnedBackOnWhileAway = powerampRestore.restore()
             withContext(effectThread) { sessionEqualizer.release() }
+            turnedBackOnWhileAway = powerampRestore.restore()
         }
     }
 
@@ -769,9 +803,9 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         PowerampExporter.fileName(state.value.effectivePresetName(suggestedName))
 
     override fun onCleared() {
-        restorePoweramp()
         if (outputHolder.isInitialized()) output.release()
         sessionEqualizer.release()
+        powerampRestore.restore()
         synthesis.close()
     }
 

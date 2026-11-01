@@ -100,6 +100,7 @@ fun TimbraNavHost(
         },
         onStart = finder::appReturned,
         onTestDone = finder::restorePoweramp,
+        onExportReached = finder::restorePowerampForExport,
     )
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
@@ -220,7 +221,10 @@ fun TimbraNavHost(
                 }
                 screen<FinderResultRoute> {
                     // Al volver de Exportar, Spotify ya se había soltado y hay que unirse otra vez.
-                    LaunchedEffect(Unit) { finder.prepareMusic() }
+                    LaunchedEffect(Unit) {
+                        finder.resumeTestAfterExport()
+                        finder.prepareMusic()
+                    }
                     FinderResultScreen(
                         state = finderState,
                         onBypassChange = finder::setBypass,
@@ -318,7 +322,7 @@ fun TimbraNavHost(
  */
 /** Pantallas del test en las que puede sonar la música; en cualquier otra, el sonido se detiene. */
 /** Llegar aquí es terminar o dejar el test: lo que Timbra cambió en Poweramp se devuelve. */
-private val TestOverRoutes = listOf(HomeRoute::class, PreparationRoute::class, ExportRoute::class, SettingsRoute::class)
+private val TestOverRoutes = listOf(HomeRoute::class, PreparationRoute::class, SettingsRoute::class)
 
 private val FinderSoundRoutes =
     listOf(
@@ -340,12 +344,14 @@ private fun StopFinderSoundOutsideItsScreens(
     onStop: () -> Unit,
     onStart: () -> Unit,
     onTestDone: () -> Unit,
+    onExportReached: () -> Unit,
 ) {
     val entry by navController.currentBackStackEntryAsState()
     LaunchedEffect(entry?.destination) {
         val destination = entry?.destination ?: return@LaunchedEffect
         if (FinderSoundRoutes.none { destination.hasRoute(it) }) onLeaveTest()
         if (TestOverRoutes.any { destination.hasRoute(it) }) onTestDone()
+        if (destination.hasRoute(ExportRoute::class)) onExportReached()
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
