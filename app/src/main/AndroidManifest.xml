@@ -45,6 +45,10 @@
                 <category android:name="android.intent.category.CATEGORY_CONTENT_MUSIC" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".audio.PowerampRestoreService"
+            android:exported="false"
+            android:stopWithTask="false" />
         <receiver
             android:name=".audio.AudioSessionReceiver"
             android:exported="true">

@@ -21,6 +21,7 @@ import com.juliancitou.timbra.audio.bandDifferenceDb
 import com.juliancitou.timbra.audio.cutDepthDb
 import com.juliancitou.timbra.audio.PinkNoise
 import com.juliancitou.timbra.audio.PowerampControl
+import com.juliancitou.timbra.audio.PowerampRestore
 import com.juliancitou.timbra.audio.PowerampSettings
 import com.juliancitou.timbra.audio.PowerampState
 import com.juliancitou.timbra.audio.PlaybackStatus
@@ -57,6 +58,7 @@ import com.juliancitou.timbra.measure.calibrationPreset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -179,6 +181,9 @@ private const val MAX_SONG_SECONDS = 120
 private const val STOP_SHARING_AFTER_MS = 5_000L
 private const val POWERAMP_STOP_WAIT_MS = 1_000L
 
+/** Alcanza para cambiar de canción o contestar un mensaje. Android detiene el servicio poco después de un minuto. */
+private const val AWAY_BEFORE_RESTORE_MS = 45_000L
+
 /** Con 350 ms la música no volvió en el teléfono del usuario; con 900 ms, sí. */
 private const val SESSION_NUDGE_PAUSE_MS = 900L
 private const val SESSION_NUDGE_CHECK_MS = 2_500L
@@ -254,7 +259,9 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     private var importRequested = false
     private var resumeRounds = false
     private val powerampControl = PowerampControl(application)
-    private var powerampOffByTimbra = false
+    private val powerampRestore = PowerampRestore(application)
+    private var restoreAfterAway: Job? = null
+    private var turnedBackOnWhileAway = false
 
     /** Solo se tocan desde el hilo de síntesis. Medir toma cerca de un segundo: se guarda el resultado. */
     private var measuredFor: Any? = null
@@ -266,6 +273,8 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_SHARING_AFTER_MS), FinderUiState())
 
     init {
+        // Si al abrir sigue marcado, la app murió con el test a medias: ese test ya no existe.
+        powerampRestore.restore()
         viewModelScope.launch { SpotifySession.id.collect { syncSpotifyEqualizer() } }
     }
 
@@ -357,35 +366,60 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    /** Solo cuando el usuario lo pide. Al terminar el test se vuelve a encender con [restorePoweramp]. */
+    /** Solo cuando el usuario lo pide. Si el test se abandona o termina, se vuelve a encender. */
     fun turnOffPoweramp() {
         powerampControl.turnOff()
-        powerampOffByTimbra = true
+        powerampRestore.markOff()
         state.update { it.copy(poweramp = PowerampState.Off) }
         viewModelScope.launch(effectThread) {
             delay(POWERAMP_STOP_WAIT_MS)
             val found = readPowerampState()
-            if (found == PowerampState.On) powerampOffByTimbra = false
+            if (found == PowerampState.On) powerampRestore.forget()
             state.update { it.copy(poweramp = found) }
         }
     }
 
     /** Deja Poweramp como estaba, y solo si fue Timbra quien lo apagó. */
     fun restorePoweramp() {
-        if (!powerampOffByTimbra) return
-        powerampOffByTimbra = false
-        powerampControl.turnOn()
-        state.update { it.copy(poweramp = PowerampState.Unknown) }
+        restoreAfterAway?.cancel()
+        turnedBackOnWhileAway = false
+        if (powerampRestore.restore()) state.update { it.copy(poweramp = PowerampState.Unknown) }
+    }
+
+    /**
+     * Salir un momento a Spotify o a un mensaje es normal, así que no se toca nada de inmediato. Si tarda, cuenta como
+     * abandonar el test: Poweramp se enciende y Spotify vuelve a sonar sin el efecto de Timbra.
+     */
+    fun appLeft() {
+        restoreAfterAway?.cancel()
+        restoreAfterAway = viewModelScope.launch {
+            delay(AWAY_BEFORE_RESTORE_MS)
+            turnedBackOnWhileAway = powerampRestore.restore()
+            withContext(effectThread) { sessionEqualizer.release() }
+        }
+    }
+
+    /** Al volver a un test que sigue abierto, se deja como estaba: Poweramp apagado y Spotify ecualizado. */
+    fun appReturned() {
+        restoreAfterAway?.cancel()
+        if (turnedBackOnWhileAway) {
+            turnedBackOnWhileAway = false
+            powerampControl.turnOff()
+            powerampRestore.markOff()
+        }
+        syncSpotifyEqualizer()
     }
 
     private fun readPowerampState(): PowerampState {
         if (!powerampControl.isInstalled) return PowerampState.NotInstalled
         if (powerampControl.readSettings()?.audioProcessingOn == false) return PowerampState.Off
-        val sessionId = SpotifySession.id.value
+        // Poweramp solo se une a la sesión mientras suena: con Spotify en pausa, no verlo no dice nada.
+        val audioManager = getApplication<Application>().getSystemService(AudioManager::class.java)
+        val sessionId = SpotifySession.id.value?.takeIf { audioManager.isMusicActive }
         val controlling = sessionId?.let(powerampControl::isControlling)
         return when {
             controlling == true -> PowerampState.On
-            controlling == false || powerampOffByTimbra -> PowerampState.Off
+            controlling == false || powerampRestore.isOffByTimbra -> PowerampState.Off
             else -> PowerampState.Unknown
         }
     }

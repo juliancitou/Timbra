@@ -91,7 +91,16 @@ fun TimbraNavHost(
     // El test se comparte entre varias pantallas: su ViewModel vive con la actividad.
     val finder: EqualizerFinderViewModel = viewModel()
     val finderState by finder.uiState.collectAsStateWithLifecycle()
-    StopFinderSoundOutsideItsScreens(navController, onLeaveTest = finder::stopTestAudio, onStop = finder::stopSound, onTestDone = finder::restorePoweramp)
+    StopFinderSoundOutsideItsScreens(
+        navController,
+        onLeaveTest = finder::stopTestAudio,
+        onStop = {
+            finder.stopSound()
+            finder.appLeft()
+        },
+        onStart = finder::appReturned,
+        onTestDone = finder::restorePoweramp,
+    )
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             NavHost(
@@ -308,6 +317,9 @@ fun TimbraNavHost(
  * usan las generales del `NavHost`.
  */
 /** Pantallas del test en las que puede sonar la música; en cualquier otra, el sonido se detiene. */
+/** Llegar aquí es terminar o dejar el test: lo que Timbra cambió en Poweramp se devuelve. */
+private val TestOverRoutes = listOf(HomeRoute::class, PreparationRoute::class, ExportRoute::class, SettingsRoute::class)
+
 private val FinderSoundRoutes =
     listOf(
         ComfortLevelRoute::class,
@@ -326,17 +338,24 @@ private fun StopFinderSoundOutsideItsScreens(
     navController: NavHostController,
     onLeaveTest: () -> Unit,
     onStop: () -> Unit,
+    onStart: () -> Unit,
     onTestDone: () -> Unit,
 ) {
     val entry by navController.currentBackStackEntryAsState()
     LaunchedEffect(entry?.destination) {
         val destination = entry?.destination ?: return@LaunchedEffect
         if (FinderSoundRoutes.none { destination.hasRoute(it) }) onLeaveTest()
-        if (destination.hasRoute(ExportRoute::class) || destination.hasRoute(HomeRoute::class)) onTestDone()
+        if (TestOverRoutes.any { destination.hasRoute(it) }) onTestDone()
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) onStop() }
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_STOP -> onStop()
+                Lifecycle.Event.ON_START -> onStart()
+                else -> Unit
+            }
+        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
