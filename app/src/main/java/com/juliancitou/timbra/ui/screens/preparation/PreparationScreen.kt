@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.audio.PowerampIssue
 import com.juliancitou.timbra.audio.PowerampState
 import com.juliancitou.timbra.audio.QUIET_ROOM_MAX_DBFS
 import com.juliancitou.timbra.audio.measureAmbientNoiseDbfs
@@ -38,6 +39,8 @@ import com.juliancitou.timbra.measure.OutputKind
 import com.juliancitou.timbra.ui.screens.finder.labelRes
 import com.juliancitou.timbra.ui.theme.CheckRow
 import com.juliancitou.timbra.ui.theme.DetailText
+import com.juliancitou.timbra.ui.screens.export.adviceRes
+import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
@@ -144,6 +147,7 @@ fun PreparationScreen(
 fun ChecklistScreen(
     output: OutputKind,
     poweramp: PowerampState,
+    powerampIssues: Set<PowerampIssue>,
     onTurnOffPoweramp: () -> Unit,
     onContinue: () -> Unit,
     onBack: () -> Unit,
@@ -218,6 +222,11 @@ fun ChecklistScreen(
                         },
                     )
                 }
+            }
+        }
+        if (powerampIssues.isNotEmpty()) {
+            TerminalSection(stringResource(R.string.export_section_poweramp)) {
+                CodeLines(powerampIssues.map { stringResource(it.adviceRes()) })
             }
         }
         TerminalSection(stringResource(R.string.preparation_section_why)) {

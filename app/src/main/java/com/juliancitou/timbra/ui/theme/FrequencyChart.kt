@@ -115,7 +115,7 @@ fun FrequencyChart(
  * transforme en vez de saltar al mover un control. Se leen al dibujar, sin recomponer.
  */
 @Composable
-private fun rememberMorphingGains(target: List<Float>): () -> List<Float> {
+internal fun rememberMorphingGains(target: List<Float>): () -> List<Float> {
     val animated = !isReducedMotionEnabled()
     val progress = remember { Animatable(1f) }
     var from by remember { mutableStateOf(target) }

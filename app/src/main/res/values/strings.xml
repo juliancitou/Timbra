@@ -78,11 +78,11 @@
     <string name="export_section_name">nombre del preset</string>
     <string name="export_section_poweramp">ajustes de Poweramp</string>
     <string name="export_settings_good">Revisé tus ajustes y están bien.</string>
-    <string name="export_setting_overlap">Superposición de bandas: "Envolvente"</string>
+    <string name="export_setting_overlap">Superposición de bandas: \"Envolvente\"</string>
     <string name="export_setting_smooth">Ecualizador suave: apagado. Con el volumen alto cambiaría tu preset.</string>
     <string name="export_setting_preamp">Sin DVC, reducción de preamp: 0 dB. Baja antes el volumen: sonará más fuerte.</string>
     <string name="export_setting_clean">En su pantalla principal: tono en 0 y compresor apagado.</string>
-    <string name="export_setting_pipeline">Modo Pipeline: "Por defecto", salvo que falle el sonido.</string>
+    <string name="export_setting_pipeline">Modo Pipeline: \"Por defecto\", salvo que falle el sonido.</string>
     <string name="export_section_steps">cómo importarlo</string>
     <string name="export_step_open">Abre Poweramp Equalizer.</string>
     <string name="export_step_presets">Entra a la lista de presets y elige importar.</string>
@@ -206,7 +206,7 @@
     <string name="finder_voice_hint">La presencia de las voces y los instrumentos solistas.</string>
     <string name="finder_voice_lower">más suave</string>
     <string name="finder_voice_upper">más presente</string>
-    <string name="finder_sibilance_title">La "S"</string>
+    <string name="finder_sibilance_title">La \"S\"</string>
     <string name="finder_sibilance_question">¿Te molestan la "S" o los platillos?</string>
     <string name="finder_sibilance_hint">Bájala si la "S" de las voces o el "tss" de los platillos pican.</string>
     <string name="finder_sibilance_lower">más suave</string>
@@ -219,10 +219,10 @@
 
     <!-- Test: resultado -->
     <string name="finder_result_title">Tu ecualización</string>
-    <string name="finder_result_lead">Escúchala y compárala con el sonido original.</string>
-    <string name="finder_result_chart">Gráfica de tu ecualización.</string>
-    <string name="finder_compare_with">Con ecualización</string>
-    <string name="finder_compare_without">Sin ecualizar</string>
+    <string name="finder_result_lead">Cambia entre A y B, y mira qué se movió.</string>
+    <string name="finder_result_chart">Pantalla de ecualizador. Debajo está en palabras lo que cambió.</string>
+    <string name="finder_compare_with">B · Con ecualización</string>
+    <string name="finder_compare_without">A · Sin ecualizar</string>
     <string name="finder_preset_label">nombre del preset</string>
     <string name="finder_default_preset_name">Mi ecualización</string>
     <string name="action_restart_test">Repetir el test</string>
@@ -274,9 +274,6 @@
     <string name="action_none">No me gustó ninguno</string>
     <string name="finder_step_none">Si ninguno convence, se queda como estaba.</string>
     <string name="finder_node_current">actual</string>
-    <string name="finder_section_changes">qué cambió</string>
-    <string name="finder_summary_line">%1$s: %2$s</string>
-    <string name="finder_summary_same">sin cambios</string>
     <string name="comfort_section_song">tu canción</string>
     <string name="action_pick_song">Elegir canción</string>
     <string name="comfort_song_hint">Un archivo guardado en tu teléfono. Se usan sus primeros 2 minutos y no sale de aquí.</string>
@@ -308,19 +305,20 @@
     <string name="finder_hold_current">Mantén para oír como estaba</string>
     <string name="finder_progress_recheck">ronda %1$d de %2$d · comprobar</string>
     <string name="finder_recheck_hint">Elige otra vez, sin marcas. Así vemos si de verdad te gusta.</string>
-    <string name="finder_chart_legend">Ámbar: tu preset. Naranja: lo que suena ahora. La línea en 0 es sin ecualizar.</string>
-    <string name="finder_section_sounding">suena ahora</string>
     <string name="finder_sounding_pending">Comprobando…</string>
     <string name="finder_sounding_measured">Medido comparando el audio con y sin ecualizar.</string>
     <string name="finder_sounding_confirmed">Spotify: el efecto tiene %1$d de %2$d bandas como se pidió.</string>
     <string name="finder_sounding_unconfirmed">Spotify: solo %1$d de %2$d bandas están aplicadas o el efecto no está activo. Apaga otros ecualizadores y vuelve a intentar.</string>
-    <string name="finder_section_difference">qué tan distinto es</string>
-    <string name="finder_difference_bands">Cambian %1$d de %2$d bandas</string>
-    <string name="finder_difference_strongest">Mayor cambio: %1$s en %2$s</string>
+    <string name="finder_display_on">B: CON ECUALIZACIÓN</string>
+    <string name="finder_display_off">A: SIN ECUALIZAR</string>
+    <string name="finder_display_readout">%1$s  preset %2$s  ahora %3$s dB</string>
+    <string name="finder_display_readout_unmeasured">%1$s  preset %2$s dB  sin música ahí</string>
+    <string name="finder_display_legend">Columnas: lo que está activo. Marca blanca: tu preset. Toca una banda.</string>
+    <string name="finder_section_added">se añadió</string>
+    <string name="finder_section_removed">se quitó</string>
+    <string name="finder_section_unchanged">quedó igual</string>
+    <string name="finder_change_line">%1$s %2$s: %3$s</string>
     <string name="finder_difference_subtle">Es un cambio pequeño: es normal que cueste oírlo.</string>
-    <string name="finder_difference_toggle">Ver banda por banda</string>
-    <string name="finder_difference_band">%1$s: %2$s · ahora %3$s</string>
-    <string name="finder_difference_unmeasured">sin música ahí</string>
     <string name="preparation_phone_equalizer">Ecualizador del teléfono en 0 y Dolby apagado</string>
     <string name="preparation_why_phone_equalizer">Timbra no puede ver ni cambiar el ecualizador del teléfono, y se suma a todo lo que escuchas. Revísalo tú.</string>
     <string name="preparation_open_sound_settings">Abrir ajustes de sonido</string>
@@ -345,7 +343,7 @@
     <string name="calibration_step_import">Descarga el preset de prueba e impórtalo en Poweramp.</string>
     <string name="calibration_step_listen">Con Poweramp encendido, pon una canción en Spotify y escúchala.</string>
     <string name="calibration_step_return">Apaga Poweramp, deja la canción sonando y regresa aquí.</string>
-    <string name="calibration_step_choose">Elige la "Superposición de bandas" que tienes en los ajustes del ecualizador de Poweramp.</string>
+    <string name="calibration_step_choose">Elige la \"Superposición de bandas\" que tienes en los ajustes del ecualizador de Poweramp.</string>
     <string name="calibration_section_shape">superposición de bandas</string>
     <string name="calibration_overlap_envelope">Envolvente</string>
     <string name="calibration_overlap_cascade">Cascada</string>

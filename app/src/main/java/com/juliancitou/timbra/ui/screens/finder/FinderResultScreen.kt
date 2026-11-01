@@ -7,18 +7,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.juliancitou.timbra.R
+import com.juliancitou.timbra.audio.EqualizerSettings
 import com.juliancitou.timbra.audio.equalizerDifference
+import com.juliancitou.timbra.measure.FinderDimension
+import com.juliancitou.timbra.measure.ZoneChange
+import com.juliancitou.timbra.measure.changes
 import com.juliancitou.timbra.ui.theme.CodeLines
 import com.juliancitou.timbra.ui.theme.DetailText
-import com.juliancitou.timbra.ui.theme.FrequencyChart
+import com.juliancitou.timbra.ui.theme.DisplayZone
+import com.juliancitou.timbra.ui.theme.EqualizerDisplay
 import com.juliancitou.timbra.ui.theme.Spacing
 import com.juliancitou.timbra.ui.theme.TerminalButton
 import com.juliancitou.timbra.ui.theme.TerminalButtonStyle
@@ -28,14 +29,21 @@ import com.juliancitou.timbra.ui.theme.TerminalScreen
 import com.juliancitou.timbra.ui.theme.TerminalSection
 import com.juliancitou.timbra.ui.theme.TerminalTextField
 import com.juliancitou.timbra.ui.theme.formatDecibels
-import com.juliancitou.timbra.ui.theme.formatHertz
 
-/** Menos que esto, en dB, casi no se distingue de oído. */
-private const val NOTICEABLE_CHANGE_DB = 0.5
+private const val DECIBELS_SUFFIX = " dB"
+
+/** Dónde se etiqueta cada zona bajo la gráfica. Balance mueve todo el sonido y no tiene un lugar. */
+private val DisplayZones = listOf(
+    FinderDimension.Bass to 60f,
+    FinderDimension.Clarity to 250f,
+    FinderDimension.Voice to 2000f,
+    FinderDimension.Sibilance to 7000f,
+    FinderDimension.Air to 15_000f,
+)
 
 /**
- * Resultado del test: la curva final, la comparación con y sin ecualizar (con el volumen igualado,
- * para que la diferencia sea solo de tono) y el nombre del preset antes de exportar.
+ * Resultado del test: la pantalla de ecualizador, la comparación con y sin ecualizar (con el volumen
+ * igualado, para que la diferencia sea solo de tono), lo que se añadió o quitó y el nombre del preset.
  */
 @Composable
 fun FinderResultScreen(
@@ -78,45 +86,70 @@ fun FinderResultScreen(
         },
     ) {
         TerminalPanel {
-            FrequencyChart(
-                gainsDb = preset.bandGainsDb,
-                contentDescription = stringResource(R.string.finder_result_chart),
-                frequenciesHz = preset.bandFrequenciesHz,
-                overlayDb = state.sounding?.gainsDb,
-            )
+            ResultDisplay(state, preset)
         }
-        DetailText(stringResource(R.string.finder_chart_legend))
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             verticalArrangement = Arrangement.spacedBy(Spacing.small),
         ) {
             TerminalChip(
-                label = stringResource(R.string.finder_compare_with),
-                selected = !state.bypass,
-                onClick = { onBypassChange(false) },
-            )
-            TerminalChip(
                 label = stringResource(R.string.finder_compare_without),
                 selected = state.bypass,
                 onClick = { onBypassChange(true) },
             )
+            TerminalChip(
+                label = stringResource(R.string.finder_compare_with),
+                selected = !state.bypass,
+                onClick = { onBypassChange(false) },
+            )
         }
         SoundingStatus(state)
-        DifferenceSection(state)
+        ChangesSections(state)
         TerminalTextField(
             value = state.presetName,
             onValueChange = onPresetNameChange,
             label = stringResource(R.string.finder_preset_label),
             placeholder = suggestedPresetName(state),
         )
-        ChangesSummary(state)
     }
 }
 
-/** Qué está sonando y cómo lo sabe la app: si no se pudo confirmar, se dice en rojo. */
+/** Lo que suena ahora en cada banda: medido o leído del efecto si se pudo, y si no, lo que se pidió. */
+private fun soundingGains(state: FinderUiState, preset: EqualizerSettings): List<Float?> =
+    state.sounding?.gainsDb ?: if (state.bypass) preset.bandGainsDb.map { 0f } else preset.bandGainsDb
+
+@Composable
+private fun ResultDisplay(state: FinderUiState, preset: EqualizerSettings) {
+    val changed = state.finder.changes().let { changes -> (changes.added + changes.removed).map { it.dimension } }
+    val zones = DisplayZones.filter { (dimension, _) -> dimension in state.finder.valuesDb }.map { (dimension, hz) ->
+        DisplayZone(stringResource(dimension.texts().title).lowercase(), hz, dimension in changed)
+    }
+    val readoutPlain = stringResource(R.string.finder_display_readout_unmeasured)
+    val readoutFull = stringResource(R.string.finder_display_readout)
+    EqualizerDisplay(
+        presetDb = preset.bandGainsDb,
+        soundingDb = soundingGains(state, preset),
+        frequenciesHz = preset.bandFrequenciesHz,
+        zones = zones,
+        statusLabel = stringResource(if (state.bypass) R.string.finder_display_off else R.string.finder_display_on),
+        statusActive = !state.bypass,
+        legend = stringResource(R.string.finder_display_legend),
+        readout = { frequency, wanted, sounding ->
+            val presetValue = wanted.removeSuffix(DECIBELS_SUFFIX)
+            if (sounding == null) {
+                readoutPlain.format(frequency, presetValue)
+            } else {
+                readoutFull.format(frequency, presetValue, sounding.removeSuffix(DECIBELS_SUFFIX))
+            }
+        },
+        contentDescription = stringResource(R.string.finder_result_chart),
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+/** De dónde sale lo que muestra la pantalla. Si no se pudo confirmar, se dice en rojo. */
 @Composable
 private fun SoundingStatus(state: FinderUiState) {
-    val current = stringResource(if (state.bypass) R.string.finder_compare_without else R.string.finder_compare_with)
     val check = state.sounding
     val proof = check?.proof
     val detail = when {
@@ -128,69 +161,38 @@ private fun SoundingStatus(state: FinderUiState) {
         else -> stringResource(R.string.finder_sounding_measured)
     }
     val failed = proof is SoundingProof.ReadFromEffect && !proof.isConfirmed
-    TerminalSection(stringResource(R.string.finder_section_sounding)) {
-        CodeLines(listOf(current))
-        DetailText(detail, color = if (failed) MaterialTheme.colorScheme.error else Color.Unspecified)
-    }
+    DetailText(detail, color = if (failed) MaterialTheme.colorScheme.error else Color.Unspecified)
 }
 
-/** La diferencia en números, con cada banda a la mano para quien quiera revisarla. */
+/** Lo que cambió respecto al sonido original, en palabras: quien no sabe de audio no tiene que leer la gráfica. */
 @Composable
-private fun DifferenceSection(state: FinderUiState) {
-    val preset = state.finder.result()
-    val difference = equalizerDifference(preset)
-    var showBands by rememberSaveable { mutableStateOf(false) }
-    TerminalSection(stringResource(R.string.finder_section_difference)) {
-        CodeLines(
-            listOf(
-                stringResource(R.string.finder_difference_bands, difference.changedBands, preset.bandGainsDb.size),
-                stringResource(
-                    R.string.finder_difference_strongest,
-                    formatDecibels(difference.strongestDb),
-                    formatHertz(difference.strongestHz),
-                ),
-            ),
-        )
-        if (difference.isSubtle) DetailText(stringResource(R.string.finder_difference_subtle))
-        TerminalChip(
-            label = stringResource(R.string.finder_difference_toggle),
-            selected = showBands,
-            onClick = { showBands = !showBands },
-        )
-        if (showBands) {
-            val overlay = state.sounding?.gainsDb
-            CodeLines(
-                preset.bandFrequenciesHz.indices.map { band ->
-                    val now = overlay?.getOrNull(band)?.let(::formatDecibels)
-                        ?: stringResource(R.string.finder_difference_unmeasured)
-                    stringResource(
-                        R.string.finder_difference_band,
-                        formatHertz(preset.bandFrequenciesHz[band]),
-                        formatDecibels(preset.bandGainsDb[band]),
-                        now,
-                    )
-                },
-            )
-        }
-    }
-}
-
-/** Lo que cambió, en palabras: quien no sabe de audio no tiene por qué leer la gráfica. */
-@Composable
-private fun ChangesSummary(state: FinderUiState) {
-    val lines = state.finder.valuesDb.entries.sortedBy { it.key.ordinal }.map { (dimension, valueDb) ->
+private fun ChangesSections(state: FinderUiState) {
+    val changes = state.finder.changes()
+    @Composable
+    fun lines(zones: List<ZoneChange>) = zones.map { (dimension, valueDb) ->
         val texts = dimension.texts()
-        val change = when {
-            valueDb <= -NOTICEABLE_CHANGE_DB -> stringResource(texts.lower)
-            valueDb >= NOTICEABLE_CHANGE_DB -> stringResource(texts.upper)
-            else -> stringResource(R.string.finder_summary_same)
-        }
-        stringResource(R.string.finder_summary_line, stringResource(texts.title), change)
+        stringResource(
+            R.string.finder_change_line,
+            stringResource(texts.title),
+            formatDecibels(valueDb.toFloat()),
+            stringResource(if (valueDb < 0) texts.lower else texts.upper),
+        )
     }
-    TerminalSection(stringResource(R.string.finder_section_changes)) {
-        CodeLines(lines)
-        state.finder.doubts.sortedBy { it.ordinal }.forEach { dimension ->
-            DetailText(stringResource(R.string.finder_summary_doubt, stringResource(dimension.texts().title)))
+    if (changes.added.isNotEmpty()) {
+        TerminalSection(stringResource(R.string.finder_section_added)) { CodeLines(lines(changes.added)) }
+    }
+    if (changes.removed.isNotEmpty()) {
+        TerminalSection(stringResource(R.string.finder_section_removed)) { CodeLines(lines(changes.removed)) }
+    }
+    if (changes.unchanged.isNotEmpty()) {
+        TerminalSection(stringResource(R.string.finder_section_unchanged)) {
+            DetailText(changes.unchanged.map { stringResource(it.texts().title) }.joinToString(", "))
         }
+    }
+    if (equalizerDifference(state.finder.result()).isSubtle) {
+        DetailText(stringResource(R.string.finder_difference_subtle))
+    }
+    state.finder.doubts.sortedBy { it.ordinal }.forEach { dimension ->
+        DetailText(stringResource(R.string.finder_summary_doubt, stringResource(dimension.texts().title)))
     }
 }

@@ -174,6 +174,9 @@ terminó en estilo terminal/ASCII).
 - [x] Ajustes recomendados de Poweramp en Exportar
 - [ ] Comprobar de oído que Timbra y Poweramp suenan igual con los ajustes recomendados
 - [x] Leer los ajustes de Poweramp desde Timbra y copiar bandas y superposición
+- [x] Pantalla de ecualizador por celdas y resumen de lo que se añadió o quitó
+- [x] Avisos de ajustes de Poweramp también en "Antes de empezar"
+- [ ] Revisar en el teléfono la pantalla corregida, el modo A y el final del resultado
 - [ ] Confirmar qué interruptor representan `dsp_border_gain` y `peq_enable` cambiándolos en Poweramp
 - [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp (Ajustes → Calibrar)
 - [x] Vista previa con la curva completa del preset y forma elegible al calibrar

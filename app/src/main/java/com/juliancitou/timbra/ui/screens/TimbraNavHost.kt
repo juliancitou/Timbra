@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -135,10 +136,12 @@ fun TimbraNavHost(
                     )
                 }
                 screen<ChecklistRoute> {
-                    LaunchedEffect(Unit) { finder.checkPoweramp() }
+                    // También al volver de cambiar algo en Poweramp o en los ajustes del teléfono.
+                    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { finder.checkPoweramp() }
                     ChecklistScreen(
                         output = finderState.finder.output,
                         poweramp = finderState.poweramp,
+                        powerampIssues = finderState.powerampSettings?.issues.orEmpty(),
                         onTurnOffPoweramp = finder::turnOffPoweramp,
                         onContinue = { navController.navigate(ComfortLevelRoute) },
                         onBack = back,

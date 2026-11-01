@@ -223,7 +223,8 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             // El efecto propio contaría como "otra app" controlando la sesión.
             sessionEqualizer.release()
             val found = readPowerampState()
-            state.update { it.copy(poweramp = found) }
+            val settings = powerampControl.readSettings()
+            state.update { it.copy(poweramp = found, powerampSettings = settings) }
         }
     }
 

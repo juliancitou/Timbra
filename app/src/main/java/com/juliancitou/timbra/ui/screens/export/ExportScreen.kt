@@ -139,6 +139,13 @@ fun ExportScreen(
     }
 }
 
+@StringRes
+internal fun PowerampIssue.adviceRes(): Int = when (this) {
+    PowerampIssue.SmoothGains -> R.string.export_setting_smooth
+    PowerampIssue.NoDvcReduction -> R.string.export_setting_preamp
+    PowerampIssue.Pipeline -> R.string.export_setting_pipeline
+}
+
 /** Solo lo que hay que cambiar si se pudo leer Poweramp; la lista completa si no. El tono y el compresor no se pueden leer. */
 private fun powerampAdvice(settings: PowerampSettings?): List<Int> {
     if (settings == null) {
@@ -150,13 +157,7 @@ private fun powerampAdvice(settings: PowerampSettings?): List<Int> {
             R.string.export_setting_pipeline,
         )
     }
-    val fixes = settings.issues.map {
-        when (it) {
-            PowerampIssue.SmoothGains -> R.string.export_setting_smooth
-            PowerampIssue.NoDvcReduction -> R.string.export_setting_preamp
-            PowerampIssue.Pipeline -> R.string.export_setting_pipeline
-        }
-    }
+    val fixes = settings.issues.map { it.adviceRes() }
     return fixes.ifEmpty { listOf(R.string.export_settings_good) } + R.string.export_setting_clean
 }
 
