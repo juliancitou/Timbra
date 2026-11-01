@@ -19,6 +19,16 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `1b3ca27` · ui: mostrar la ecualización como pantalla de estudio
+- `EqualizerDisplay`: columnas de celdas de 0.5 dB entre −8 y +3 dB, el rango de Poweramp. Las columnas muestran
+  lo que está activo y una marca blanca, el preset. En "Sin ecualizar" las columnas se vacían y la marca se queda.
+- Tocar o arrastrar elige una banda y muestra su frecuencia, el valor del preset y el valor actual.
+- Debajo se indican las frecuencias y las zonas (graves, claridad, voz, "S", aire), con las que cambiaron en ámbar.
+- El resultado dice en palabras qué se añadió, qué se quitó y qué quedó igual, respecto al sonido original.
+  Sustituye la lista de bandas y el conteo de bandas cambiadas.
+- "Antes de empezar" muestra los ajustes de Poweramp que conviene cambiar y los vuelve a leer al regresar a Timbra.
+- Comillas de "S" y de los ajustes de Poweramp corregidas: Android las quitaba por no estar escapadas.
+
 ### 2026-10-31 · `fb629c6` · feat: copiar bandas y ajustes de Poweramp
 - La llamada `preference` de la API de Poweramp Equalizer entrega sus ajustes sin pedir permisos (comprobado
   con build 1033). La propia API la marca como experimental: si faltan las claves, Timbra sigue como antes.
