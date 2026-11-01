@@ -19,6 +19,14 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `c870047` · docs: registrar mediciones de Poweramp
+- Mediciones con micrófono en la bocina, con "Creep" en Spotify y el mismo tramo de 60 s en cada pasada. Repetir la
+  pasada sin ecualizar dio 0.0 dB en casi todas las bandas (máximo −0.4), así que la medición es estable.
+- Preset de cortes angostos de −8 dB: Timbra corta cerca de −7 dB y Poweramp (AIDL 1) cerca de −2 a −3 dB.
+- Preset real "Timbra - Bocina": Timbra sigue el preset con ±1 dB. En Poweramp, con el nivel alineado a los medios, los
+  −4 dB de graves salen cerca de −2 dB y los agudos suben unos 3.5 dB arriba de 3 kHz, aunque el preset los deja en 0.
+- La causa no se conoce y solo se midió en la bocina. Aún no se compensa: falta medir con audífonos.
+
 ### 2026-10-31 · `657bc0a` · fix: mostrar cuánto corta Poweramp y no recomendar pipeline
 - Mediciones con micrófono en la bocina del POCO X8 Pro Max, con un preset de cortes de −8 dB y ruido rosa:
   - Timbra: cortes de cerca de −7 dB, como se esperaba.
