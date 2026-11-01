@@ -301,8 +301,15 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     /** Al volver de importar: si llegó el preset que se pidió, se asigna y se activa sin más pasos. */
     fun checkPresetImported(fullName: String) {
         viewModelScope.launch(effectThread) {
-            val imported = powerampControl.hasPreset(fullName)
-            state.update { it.copy(presetImported = imported) }
+            val imported = powerampControl.hasPreset(fullName, state.value.finder.result().bandGainsDb)
+            // Si la curva cambió desde la última vez, lo que quedó activo en Poweramp ya no es este preset.
+            state.update {
+                it.copy(
+                    presetImported = imported,
+                    presetInUse = it.presetInUse && imported,
+                    presetInUseFailed = it.presetInUseFailed && imported,
+                )
+            }
             if (imported && importRequested) {
                 importRequested = false
                 usePresetNow(fullName)

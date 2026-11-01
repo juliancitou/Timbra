@@ -42,6 +42,8 @@ private const val COLUMN_RESOLVED_BLOB = "COALESCE(data_blob, default_blob)"
 private const val ANC_ON_MARK = "ANC on"
 private const val ANC_OFF_MARK = "ANC off"
 
+private class StoredPreset(val id: Long, val blob: ByteArray?)
+
 /** Menor que la de Poweramp (1337): si el efecto ya tiene dueño, esta prioridad no se lo quita. */
 private const val PROBE_PRIORITY = 0
 
@@ -62,15 +64,9 @@ class PowerampControl(private val context: Context) {
         powerampSettingsFrom(bundle.keySet().associateWith { bundle.get(it) })
     }.getOrNull()
 
-    /** Si ya hay un preset con [name]; Poweramp agrega " (2)" al importar otro con el mismo nombre. */
-    fun hasPreset(name: String): Boolean = runCatching {
-        context.contentResolver.query(
-            Uri.parse(PRESETS_URI),
-            arrayOf(COLUMN_NAME),
-            "$COLUMN_NAME = ? OR $COLUMN_NAME LIKE ?",
-            arrayOf(name, "$name (%"),
-            null,
-        )?.use { it.count > 0 } ?: false
+    /** Si el preset más nuevo llamado [name] ya tiene la curva [gainsDb]. */
+    fun hasPreset(name: String, gainsDb: List<Float>): Boolean = runCatching {
+        newestPreset(name)?.let { !blobDiffersFrom(it.blob, gainsDb) } ?: false
     }.getOrDefault(false)
 
     /**
@@ -132,7 +128,7 @@ class PowerampControl(private val context: Context) {
      * dirección, que Android oculta sin otro permiso. `false` si el preset no existe.
      */
     fun usePreset(name: String, output: OutputKind, deviceName: String): Boolean = runCatching {
-        val id = newestPresetId(name) ?: return false
+        val id = newestPreset(name)?.id ?: return false
         val column = when (output) {
             OutputKind.Bluetooth -> COLUMN_BIND_BLUETOOTH
             OutputKind.Wired -> COLUMN_BIND_WIRED
@@ -161,8 +157,20 @@ class PowerampControl(private val context: Context) {
         }.orEmpty()
 
     /** Poweramp agrega " (2)" al importar otro con el mismo nombre: el más nuevo es el que acaba de llegar. */
-    private fun newestPresetId(name: String): Long? =
-        presetIds("$COLUMN_NAME = ? OR $COLUMN_NAME LIKE ?", name, "$name (%").maxOrNull()
+    private fun newestPreset(name: String): StoredPreset? =
+        context.contentResolver.query(
+            Uri.parse(PRESETS_URI),
+            arrayOf(COLUMN_ID, COLUMN_NAME, COLUMN_RESOLVED_BLOB),
+            "$COLUMN_NAME = ? OR $COLUMN_NAME LIKE ?",
+            arrayOf(name, "$name (%"),
+            null,
+        )?.use { cursor ->
+            buildList {
+                while (cursor.moveToNext()) {
+                    if (isSamePresetName(cursor.getString(1), name)) add(StoredPreset(cursor.getLong(0), cursor.getBlob(2)))
+                }
+            }
+        }?.maxByOrNull { it.id }
 
     private fun updatePreset(id: Long, column: String, value: Int) {
         val values = ContentValues().apply { put(column, value) }

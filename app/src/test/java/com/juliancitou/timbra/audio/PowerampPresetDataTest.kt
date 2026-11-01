@@ -2,6 +2,7 @@ package com.juliancitou.timbra.audio
 
 import com.juliancitou.timbra.export.BandLayout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -19,6 +20,34 @@ class PowerampPresetDataTest {
         assertEquals(20, bands.first().frequencyHz)
         assertEquals(-0.6f, bands.first().gainDb, 0.01f)
         assertEquals(5.77f, bands.first { it.frequencyHz == 119 }.gainDb, 0.01f)
+    }
+
+    @Test
+    fun aCopyMadeByPowerampKeepsTheName() {
+        assertTrue(isSamePresetName("Timbra - Bocina", "Timbra - Bocina"))
+        assertTrue(isSamePresetName("Timbra - Bocina (2)", "Timbra - Bocina"))
+        assertTrue(isSamePresetName("Timbra - A+B (Cable) (12)", "Timbra - A+B (Cable)"))
+    }
+
+    @Test
+    fun anotherPresetWithASimilarNameIsNotACopy() {
+        assertFalse(isSamePresetName("Timbra - Bocina (Bluetooth)", "Timbra - Bocina"))
+        assertFalse(isSamePresetName("Timbra - Bocina 2", "Timbra - Bocina"))
+        assertFalse(isSamePresetName("Timbra - Bocina (2) (3)", "Timbra - Bocina"))
+    }
+
+    @Test
+    fun aRepeatedTestWithAnotherCurveDiffersFromTheStoredPreset() {
+        val stored = bands.map { it.gainDb }
+        assertFalse(blobDiffersFrom(realBlob, stored))
+        assertTrue(blobDiffersFrom(realBlob, stored.map { it - 0.5f }))
+        assertTrue(blobDiffersFrom(realBlob, stored.drop(1)))
+    }
+
+    @Test
+    fun unreadableDataDoesNotContradictThePreset() {
+        assertFalse(blobDiffersFrom(null, listOf(0f)))
+        assertFalse(blobDiffersFrom(ByteArray(420), listOf(0f)))
     }
 
     @Test

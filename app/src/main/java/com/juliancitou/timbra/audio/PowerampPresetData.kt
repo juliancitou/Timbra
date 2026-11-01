@@ -2,6 +2,7 @@ package com.juliancitou.timbra.audio
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import kotlin.math.abs
 import kotlin.math.log2
 
 private const val BLOB_HEADER_BYTES = 12
@@ -30,6 +31,21 @@ fun graphicBandsOf(blob: ByteArray): List<PresetBand>? {
         PresetBand(frequencyHz = data.getInt(offset + 8), gainDb = data.getFloat(offset + 4))
     }
     return bands.ifEmpty { null }
+}
+
+private const val SAME_GAIN_TOLERANCE_DB = 0.05f
+
+/** Si [stored] es [name] o la copia que crea Poweramp al importar otro con el mismo nombre: "[name] (2)". */
+fun isSamePresetName(stored: String, name: String): Boolean =
+    stored == name || Regex("${Regex.escape(name)} \\(\\d+\\)").matches(stored)
+
+/**
+ * Si el preset guardado tiene otra curva que [gainsDb]: repetir el test da el mismo nombre con otro sonido. Un
+ * dato que no se puede leer no lo contradice, porque el formato no está documentado y puede cambiar.
+ */
+fun blobDiffersFrom(blob: ByteArray?, gainsDb: List<Float>): Boolean {
+    val stored = blob?.let(::graphicBandsOf) ?: return false
+    return stored.size != gainsDb.size || stored.zip(gainsDb).any { (band, gain) -> abs(band.gainDb - gain) > SAME_GAIN_TOLERANCE_DB }
 }
 
 /** La curva de [bands] en [frequenciesHz], interpolada en octavas. Fuera de sus límites se queda en el extremo. */
