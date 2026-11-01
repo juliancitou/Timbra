@@ -19,6 +19,14 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `f10008a` · docs: registrar medición con audífonos
+- FreeBuds Pro 4 pegados al micrófono, con Spotify y el preset real de esos audífonos. Debajo de ~1.7 kHz la señal
+  supera poco al ruido y repetir la pasada varió hasta 8.7 dB, así que esa zona no vale.
+- Arriba de 2 kHz, Timbra sigue el preset con menos de 1 dB (salvo en 20 kHz). En el corte de −5.7 dB, Poweramp da −2.4 dB en AIDL 1
+  y como mucho −4.3 dB en AIDL 2, sin seguir la curva.
+- Es el mismo patrón que en la bocina. Aún no se compensa: con estos datos no se separa cuánto es falta de profundidad y
+  cuánto subida de agudos. Falta medir un preset plano y uno de corte ancho.
+
 ### 2026-11-01 · `c870047` · docs: registrar mediciones de Poweramp
 - Mediciones con micrófono en la bocina, con "Creep" en Spotify y el mismo tramo de 60 s en cada pasada. Repetir la
   pasada sin ecualizar dio 0.0 dB en casi todas las bandas (máximo −0.4), así que la medición es estable.
