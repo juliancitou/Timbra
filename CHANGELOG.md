@@ -19,6 +19,13 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `7547049` · ui: mostrar la ecualización con una gráfica de líneas
+- Las columnas de celdas resultaron confusas. `EqualizerDisplay` ahora dibuja una línea en 0 dB (sonido original)
+  y una curva ámbar (lo activo), con relleno entre ambas. En "Sin ecualizar" la curva baja a 0 y el preset queda
+  punteado.
+- La línea muestra el preset o 0 dB según lo elegido. Lo medido o leído del efecto sigue en la lectura numérica y
+  en el texto de comprobación.
+
 ### 2026-10-31 · `1b3ca27` · ui: mostrar la ecualización como pantalla de estudio
 - `EqualizerDisplay`: columnas de celdas de 0.5 dB entre −8 y +3 dB, el rango de Poweramp. Las columnas muestran
   lo que está activo y una marca blanca, el preset. En "Sin ecualizar" las columnas se vacían y la marca se queda.
