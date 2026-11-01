@@ -19,6 +19,24 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-10-31 · `3d18eb7` · feat: agregar prueba a ciegas y medición de Poweramp
+- Prueba a ciegas desde el resultado: 5 intentos con dos opciones sin nombre. Con tan pocos intentos es una señal,
+  no una prueba estadística.
+- El resultado permite probar con otro género, o avisa que se puede cambiar de canción en Spotify.
+- Ajustes → Calibrar puede medir Poweramp: ruido rosa con Poweramp encendido y apagado, comparando la salida con
+  `Visualizer(0)`. Es tosco (8 bits, ~47 Hz por punto, solo arriba de ~100 Hz) y Android lo marca como obsoleto.
+  Falta comprobar en el teléfono que funciona. Solo compara la forma, y Poweramp queda encendido al terminar.
+- Sigue pendiente el modo paramétrico para resonancias: cambia el contrato del JSON y necesita antes una forma de
+  encontrarlas.
+
+### 2026-10-31 · `4ebd9f4` · feat: partir de AutoEq e importar desde Timbra
+- Poweramp incluye mediciones de AutoEq, también de los FreeBuds Pro 4 con y sin cancelación de ruido. Timbra las
+  lee de `eq_presets`; el formato binario se dedujo de sus presets y una prueba lo fija con un dato real.
+- Si existe para los audífonos conectados, el test parte de esa curva, y se puede elegir partir sin ella. AutoEq
+  sube hasta +6 dB y el preset no pasa de +3, así que la curva se baja entera y se conserva su forma.
+- Preparación pide el control de ruido en uso, para elegir la medición y nombrar el preset.
+- Exportar abre el archivo directamente en Poweramp y detecta cuando el preset ya está importado.
+
 ### 2026-10-31 · `7547049` · ui: mostrar la ecualización con una gráfica de líneas
 - Las columnas de celdas resultaron confusas. `EqualizerDisplay` ahora dibuja una línea en 0 dB (sonido original)
   y una curva ámbar (lo activo), con relleno entre ambas. En "Sin ecualizar" la curva baja a 0 y el preset queda
