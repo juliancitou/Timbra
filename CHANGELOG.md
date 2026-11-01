@@ -19,6 +19,11 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `12ec8c9` · ui: igualar el tamaño de los botones
+- `TerminalButtonRow` da el mismo alto a los botones de una fila aunque alguno ocupe dos renglones.
+- Se redujo el margen lateral dentro de los botones y se acortaron textos: "Ninguno", "Descargar" y "Pausar / seguir".
+- Comprobado en el teléfono en las rondas: los cuatro botones miden lo mismo y "Regresar" sale atenuado en la primera.
+
 ### 2026-11-01 · `800c02a` · feat: regresar a la ronda anterior con un botón
 - Las rondas tienen un botón "Regresar", bloqueado en la primera. Restaura el estado guardado antes de responder esa ronda,
   así que el ajuste no se suma al anterior. También deshace "No me gustó ninguno".
