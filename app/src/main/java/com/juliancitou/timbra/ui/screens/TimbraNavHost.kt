@@ -208,6 +208,7 @@ fun TimbraNavHost(
                     FinderResultScreen(
                         state = finderState,
                         onBypassChange = finder::setBypass,
+                        onRealLevel = finder::listenAtRealLevel,
                         onTogglePlayback = finder::togglePlayback,
                         onPresetNameChange = finder::setPresetName,
                         onExport = { navController.navigate(ExportRoute) },

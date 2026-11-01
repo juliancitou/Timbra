@@ -308,6 +308,8 @@
     <string name="finder_sounding_measured">Medido comparando el audio con y sin ecualizar.</string>
     <string name="finder_sounding_confirmed">Spotify: el efecto tiene %1$d de %2$d bandas como se pidió.</string>
     <string name="finder_sounding_unconfirmed">Spotify: solo %1$d de %2$d bandas están aplicadas o el efecto no está activo. Apaga otros ecualizadores y vuelve a intentar.</string>
+    <string name="finder_compare_real_level">C · Volumen de Poweramp</string>
+    <string name="finder_display_real_level">C: VOLUMEN DE POWERAMP</string>
     <string name="finder_display_on">B: CON ECUALIZACIÓN</string>
     <string name="finder_display_off">A: SIN ECUALIZAR</string>
     <string name="finder_display_readout">%1$s  preset %2$s  ahora %3$s dB</string>

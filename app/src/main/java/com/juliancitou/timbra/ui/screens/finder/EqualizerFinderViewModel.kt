@@ -123,6 +123,8 @@ data class FinderUiState(
     val auditionIndex: Int = CENTER_OPTION,
     val preparing: Boolean = true,
     val bypass: Boolean = false,
+    /** En el resultado: sin igualar el volumen, con el preamp del preset, como suena en Poweramp. */
+    val realLevel: Boolean = false,
     val headphonesName: String = "",
     val presetName: String = "",
     /** Nombre de la canción del usuario que suena; `null` si suena la música de la app. */
@@ -592,7 +594,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
     /** Empieza el test desde la primera ronda, conservando el género y el nombre de los audífonos. */
     fun startTest() {
         state.update {
-            it.withFinder(startingFinder(it)).copy(bypass = false, presetName = "")
+            it.withFinder(startingFinder(it)).copy(bypass = false, realLevel = false, presetName = "")
         }
         refresh()
     }
@@ -643,7 +645,16 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
 
     /** En el resultado: `true` para escuchar sin ecualizar y comparar. */
     fun setBypass(bypass: Boolean) {
-        state.update { it.copy(bypass = bypass) }
+        state.update { it.copy(bypass = bypass, realLevel = false) }
+        refresh()
+    }
+
+    /**
+     * Timbra iguala el volumen para comparar solo el tono, pero Poweramp no: suena con el preamp del preset, a
+     * veces 6 dB más bajo. Para comparar contra Poweramp hay que oírlo igual, porque más fuerte parece más agudo.
+     */
+    fun listenAtRealLevel() {
+        state.update { it.copy(bypass = false, realLevel = true) }
         refresh()
     }
 
@@ -681,6 +692,7 @@ class EqualizerFinderViewModel(application: Application) : AndroidViewModel(appl
             val latest = state.value
             val settings = when {
                 latest.finder.isFinished && latest.bypass -> matcher.compensated(flatFor(latest.finder))
+                latest.finder.isFinished && latest.realLevel -> latest.finder.result().overlappingAs(latest.bandOverlap)
                 latest.finder.isFinished -> matcher.compensated(latest.finder.result().overlappingAs(latest.bandOverlap))
                 else -> optionSettings.getOrNull(latest.auditionIndex) ?: EqualizerSettings.Flat
             }

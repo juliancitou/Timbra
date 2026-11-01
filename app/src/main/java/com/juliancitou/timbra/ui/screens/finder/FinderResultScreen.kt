@@ -51,6 +51,7 @@ private val DisplayZones = listOf(
 fun FinderResultScreen(
     state: FinderUiState,
     onBypassChange: (Boolean) -> Unit,
+    onRealLevel: () -> Unit,
     onTogglePlayback: () -> Unit,
     onPresetNameChange: (String) -> Unit,
     onExport: () -> Unit,
@@ -103,8 +104,13 @@ fun FinderResultScreen(
             )
             TerminalChip(
                 label = stringResource(R.string.finder_compare_with),
-                selected = !state.bypass,
+                selected = !state.bypass && !state.realLevel,
                 onClick = { onBypassChange(false) },
+            )
+            TerminalChip(
+                label = stringResource(R.string.finder_compare_real_level),
+                selected = state.realLevel,
+                onClick = onRealLevel,
             )
         }
         SoundingStatus(state)
@@ -161,7 +167,13 @@ private fun ResultDisplay(state: FinderUiState, preset: EqualizerSettings) {
         soundingDb = soundingGains(state, preset),
         frequenciesHz = preset.bandFrequenciesHz,
         zones = zones,
-        statusLabel = stringResource(if (state.bypass) R.string.finder_display_off else R.string.finder_display_on),
+        statusLabel = stringResource(
+            when {
+                state.bypass -> R.string.finder_display_off
+                state.realLevel -> R.string.finder_display_real_level
+                else -> R.string.finder_display_on
+            },
+        ),
         statusActive = !state.bypass,
         legend = stringResource(R.string.finder_display_legend),
         readout = { frequency, wanted, sounding ->
