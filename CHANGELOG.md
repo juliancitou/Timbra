@@ -19,6 +19,16 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `4fec879` · feat: escuchar la vista previa con la fuerza de Poweramp
+- Con Spotify y el micrófono, en la bocina: un preset plano baja el nivel y sube ~1.4 dB arriba de 5 kHz; uno de
+  mesetas de −6 dB da unos −2.5 dB relativos en Poweramp y −5.6 dB en Timbra. Poweramp aplica ~45 %.
+- Ajustes → Calibrar importa un preset de medición con esas mesetas, lo activa, mide y guarda esa fracción. La vista
+  previa suena con esa fuerza; el preset exportado no cambia. Se puede volver a oír el preset completo.
+- La subida de agudos no se compensa, y la causa de la falta de profundidad sigue sin conocerse. Se midió en un solo
+  teléfono, con AIDL 1. Como Poweramp no dice cuál era el preset activo, el usuario debe volver a elegirlo.
+- `Importar en Poweramp` usa la acción oficial `IMPORT_PRESETS`: el `ACTION_VIEW` anterior abría Poweramp sin importar.
+  Comprobado en el teléfono: aparece el aviso, se importa y Poweramp regresa a Timbra.
+
 ### 2026-11-01 · `f10008a` · docs: registrar medición con audífonos
 - FreeBuds Pro 4 pegados al micrófono, con Spotify y el preset real de esos audífonos. Debajo de ~1.7 kHz la señal
   supera poco al ruido y repetir la pasada varió hasta 8.7 dB, así que esa zona no vale.
