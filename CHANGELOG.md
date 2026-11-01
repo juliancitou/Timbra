@@ -19,6 +19,25 @@ versión publicada va en **Sin publicar**.
 
 ## [Sin publicar]
 
+### 2026-11-01 · `4cc6e66` · ui: avisar de bandas distintas y de cerrar desde recientes
+- Exportar ya no dice que los ajustes están bien si Poweramp usa otras bandas que el preset.
+- "Antes de empezar" avisa, al apagar Poweramp, que puede quedarse apagado si se cierra Timbra desde recientes.
+- Pendiente de ver en el teléfono.
+
+### 2026-11-01 · `4ce7601` · fix: encender Poweramp tras soltar el efecto de Spotify
+- Poweramp y Timbra comparten el efecto, y soltarlo lo deja plano. Encender Poweramp antes podía borrarle su curva, así que
+  ahora se enciende después, en la misma cola. El orden se dedujo del código; falta confirmarlo en el teléfono.
+- Exportar enciende Poweramp para importar, pero al volver al resultado sigue el test: se apaga otra vez y Spotify sigue
+  con el efecto de Timbra, sin que los dos se sumen.
+- Al destruirse la pantalla ya no se usa el `viewModelScope`, cancelado para entonces: se restaura directamente.
+
+### 2026-11-01 · `86b6795` · fix: no confundir el preset nuevo con uno anterior
+- Repetir el test da el mismo nombre con otra curva. Exportar lo daba por importado y solo ofrecía activar el preset viejo.
+  Ahora compara las ganancias con las del preset más nuevo de ese nombre.
+- Si el dato del preset no se puede leer, se decide solo por el nombre, para no bloquear la importación.
+- "Timbra - Bocina (Bluetooth)" ya no cuenta como copia de "Timbra - Bocina".
+- Falta confirmar en el teléfono que Poweramp guarda las ganancias importadas tal cual.
+
 ### 2026-11-01 · `68d5c37` · feat: encender Poweramp si se abandona el test
 - Si Timbra apagó Poweramp, lo vuelve a encender al llegar a Inicio, Preparación, Ajustes o Exportar, y tras 45 s fuera de la
   app. Si se regresa a un test abierto, lo apaga otra vez y recupera el efecto en Spotify.

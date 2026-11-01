@@ -116,7 +116,8 @@ terminó en estilo terminal/ASCII).
 - [x] Escuchar en los audífonos: pop suena musical
 - [x] Escuchar los seis géneros y ajustar lo que no convenza
 - [ ] Más géneros a futuro (mariachi, blues, balada acústica…)
-- [ ] Tag y release `v0.4.0`
+- [x] Tag `v0.4.0`
+- [ ] Publicar el release `v0.4.0` en GitHub (el tag existe, el release no)
 
 ## Fase 4 — Test de esferas y exportación · `v0.5.0`
 
@@ -145,7 +146,6 @@ terminó en estilo terminal/ASCII).
 
 ### Bandas de Poweramp
 - [x] `BandLayout`: personalizada (N de 5 a 32, inicio y fin)
-- [ ] Opciones fijas (5, 10, 12, 15, 16, 24, 31, 32): falta confirmar sus frecuencias en Poweramp
 - [x] Elegir la configuración de bandas en la app (por defecto: 25 bandas, 20 Hz–20 kHz)
 - [x] Exportar y previsualizar con la configuración elegida (Q según la separación de bandas)
 - [x] Gráfica y textos con cualquier cantidad de bandas
@@ -156,27 +156,17 @@ terminó en estilo terminal/ASCII).
 - [x] Probar con una canción guardada en el teléfono, en estéreo
 - [x] Nodos sin dB, con la opción "actual" marcada, y resumen en palabras del resultado
 - [x] Botones y opciones con bordes claros; Inicio con el flujo actual
-- [ ] Probar una canción real en el teléfono: MP3, FLAC y un archivo que no se pueda leer
 - [x] Ecualizar Spotify en vivo durante el test
-- [ ] Comprobar en el teléfono que Spotify conecta y que el cambio se oye, con Poweramp Equalizer apagado
 - [x] Mostrar en el resultado lo que suena ahora: medido en el audio de la app o leído del efecto en Spotify
 - [x] Afinar los graves del efecto en Spotify (bloque de ~85 ms en vez de 10 ms)
 - [x] Recordar el ecualizador del teléfono y abrir los ajustes de sonido en "Antes de empezar"
-- [ ] Comprobar en el teléfono que "Sin ecualizar" y "Con ecualización" se oyen distintos y que el resultado confirma las bandas
 - [x] "Antes de empezar" marca solo Poweramp y el ruido; botón para apagar Poweramp sin salir de la app
-- [ ] Comprobar en el teléfono que Timbra distingue Poweramp encendido y apagado con Spotify sonando
-- [ ] Comprobar que "Apagar Poweramp" lo apaga y que vuelve a encenderse al exportar o volver a Inicio
-- [ ] Ajustar el umbral de ruido (`QUIET_ROOM_MAX_DBFS`) con el micrófono real
-- [ ] Comprobar que Poweramp vuelve a sus ajustes después del test
 - [x] Pasos más grandes entre opciones y graves de bocina donde sí se oyen
-- [ ] Comprobar en el teléfono que cada ronda se distingue, sobre todo Aire, Claridad y las de afinar
 - [x] Vista previa en modo Envolvente, como Poweramp, y elegible en Calibrar
 - [x] Ajustes recomendados de Poweramp en Exportar
-- [ ] Comprobar de oído que Timbra y Poweramp suenan igual con los ajustes recomendados
 - [x] Leer los ajustes de Poweramp desde Timbra y copiar bandas y superposición
 - [x] Pantalla de ecualizador por celdas y resumen de lo que se añadió o quitó
 - [x] Avisos de ajustes de Poweramp también en "Antes de empezar"
-- [ ] Revisar en el teléfono la gráfica de líneas, el modo A y el final del resultado
 - [x] Medir con el micrófono la curva real de Poweramp (Ajustes → Calibrar); el visualizador global no ve los efectos
 - [x] Medir con el micrófono en bocina: Timbra corta −7 dB y Poweramp cerca de −2 dB con la señal de prueba
 - [x] Medir Poweramp con Spotify en bocina: también corta menos y además sube los agudos
@@ -190,34 +180,31 @@ terminó en estilo terminal/ASCII).
 - [x] El usuario confirmó que Timbra y Poweramp suenan igual al importar
 - [x] Botones en fila del mismo tamaño
 - [x] Si se abandona el test, Poweramp vuelve a encenderse si Timbra lo apagó
-- [ ] En HyperOS, deslizar Timbra de recientes la mata sin avisar: Poweramp solo vuelve al abrirla. Buscar otra salida
-- [ ] Probar en el teléfono ambos cambios en la app real, también con Cable
-- [ ] El usuario oye mejor definidos los graves en Poweramp y más fuertes los agudos en Timbra: revisar tras este cambio
 - [x] La vista previa vuelve al 100 % por defecto; la fuerza medida es opcional
-- [ ] Medir el preset real "Timbra - HUAWEI FreeBuds Pro 4 (Bluetooth)": a veces apagar Poweramp no suelta su efecto y no queda una referencia limpia
-- [ ] Repetir el test con la nueva vista previa y comparar de oído con Poweramp
-- [ ] Decidir si también se compensa la subida de agudos
-- [ ] Revisar si a Poweramp le falta profundidad en otros teléfonos o versiones
 - [x] Comprobado con sesiones en silencio: el comando de apagar suelta el efecto de Poweramp y el de encender lo recupera
 - [x] Abrir el preset en Poweramp desde Exportar y detectar cuando ya se importó
 - [x] Prueba a ciegas final: elegir entre Timbra y sin ecualizar sin saber cuál es
 - [x] Probar el preset con otra música desde el resultado
 - [x] Punto de partida con la medición AutoEq de los audífonos, y modo de control de ruido
-- [ ] Filtros angostos con modo paramétrico para resonancias (cambia el contrato del JSON)
-- [ ] Confirmar qué interruptor representan `dsp_border_gain` y `peq_enable` cambiándolos en Poweramp
-- [ ] Comparar lo que se oye en vivo con el preset importado en Poweramp (Ajustes → Calibrar)
 - [x] Vista previa con la curva completa del preset y forma elegible al calibrar
 - [x] Mantener presionado para oír como estaba y comprobación final de graves y voz
-- [ ] Probar con FreeBuds y con audífonos de cable
-- [ ] Revisar en el teléfono las pantallas nuevas: Nivel cómodo, rondas, resultado y Calibrar
 
-### Verificación
-- [ ] Importar en Poweramp y comparar con la vista previa
-- [ ] Calibrar el ancho de banda (`POWERAMP_BAND_Q`) si la vista previa no suena igual que Poweramp
-- [ ] Probar el test completo en el teléfono (12 rondas, 10 en bocina; resultado y exportación)
-- [ ] Comprobar en el teléfono la detección de salida y el nombre de los audífonos
-- [ ] Importar en Poweramp un preset con otra cantidad de bandas
-- [ ] Tag y release `v0.5.0`
+### Verificación en el teléfono (cierra la fase)
+- [ ] Test completo con FreeBuds y Spotify hasta Exportar: rondas, resultado y "Importar en Poweramp"
+- [ ] Al terminar, el preset queda asignado, activo y Poweramp encendido
+- [ ] Repetir el test con otra curva: Exportar debe ofrecer importar, no "Ya está en Poweramp"
+- [ ] Volver de Exportar al resultado: Poweramp se apaga otra vez y Spotify sigue ecualizado
+- [ ] Cada ronda se distingue, sobre todo Aire, Claridad y las de afinar
+- [ ] "Sin ecualizar" y "Con ecualización" se oyen distintos y el resultado confirma las bandas
+- [ ] Timbra distingue Poweramp encendido y apagado con Spotify sonando
+- [ ] Graves y agudos iguales en Timbra y Poweramp tras el test completo (si no, medir el preset real y decidir si se compensan)
+- [ ] Audífonos de cable y bocina: test completo y detección de salida
+- [ ] Canción real: MP3, FLAC y un archivo que no se pueda leer
+- [ ] Importar un preset con otra cantidad de bandas
+- [ ] Ajustar `QUIET_ROOM_MAX_DBFS` con el nivel que mide el micrófono en un cuarto callado y en uno ruidoso
+- [ ] Confirmar qué interruptor son `dsp_border_gain` y `peq_enable` cambiándolos en Poweramp
+- [ ] Probar si un servicio en primer plano sobrevive a deslizar de recientes en HyperOS (requiere aprobar su permiso)
+- [ ] Subir la versión a `0.5.0`, tag y release `v0.5.0`
 
 ## Fase 5 — Modo avanzado: medición por bandas · `v0.6.0`
 
@@ -270,3 +257,6 @@ terminó en estilo terminal/ASCII).
 
 - [ ] Widget o acceso rápido para exportar el último preset
 - [ ] Modo claro opcional
+- [ ] Bandas fijas de Poweramp (5, 10, 12, 15, 16, 24, 31, 32): sus frecuencias no están confirmadas; las personalizadas cubren esas mismas cantidades
+- [ ] Filtros angostos con modo paramétrico para resonancias (cambia el contrato del JSON)
+- [ ] Revisar si a Poweramp le falta profundidad en otros teléfonos o versiones
