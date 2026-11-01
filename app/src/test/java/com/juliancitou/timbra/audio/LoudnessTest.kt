@@ -10,6 +10,18 @@ private const val SAMPLE_RATE = 48_000
 
 class LoudnessTest {
 
+    @Test
+    fun flatMatchingSoundsAsLoudAsThePresetWithItsPreamp() {
+        val reference = PinkNoise().let { noise -> DoubleArray(48_000) { noise.next() } }
+        val matcher = LoudnessMatcher(48_000, reference)
+        val gains = EqualizerSettings.Flat.bandGainsDb.mapIndexed { band, _ -> if (band in 18..24) -8f else 0f }
+        val preset = EqualizerSettings.Flat.copy(bandGainsDb = gains, preampDb = -6f)
+        val flat = matcher.flatMatching(preset)
+        assertTrue(flat.bandGainsDb.all { it == 0f })
+        assertEquals(0.0, matcher.compensationDb(flat) - matcher.compensationDb(preset), 0.01)
+        assertTrue(flat.preampDb < 0f)
+    }
+
     private fun pinkNoise(seconds: Double): DoubleArray {
         val noise = PinkNoise(seed = 3)
         return DoubleArray((seconds * SAMPLE_RATE).toInt()) { noise.next() }

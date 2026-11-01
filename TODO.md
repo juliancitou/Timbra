@@ -183,7 +183,8 @@ terminó en estilo terminal/ASCII).
 - [x] Medir con los FreeBuds: arriba de 2 kHz, Poweramp aplica menos de la mitad; abajo no hay señal suficiente
 - [x] Medir en bocina un preset plano y uno de corte ancho: Poweramp aplica ~45 % y sube ~1.4 dB arriba de 5 kHz
 - [x] Vista previa con la fuerza medida de Poweramp (Ajustes → Calibrar) e importación con su API oficial
-- [x] Opción para oír el resultado con el volumen de Poweramp, sin igualar
+- [x] Todo el test suena al nivel de Poweramp, sin subir el volumen; se quita la opción C
+- [ ] El usuario oye mejor definidos los graves en Poweramp y más fuertes los agudos en Timbra: revisar tras este cambio
 - [x] La vista previa vuelve al 100 % por defecto; la fuerza medida es opcional
 - [ ] Medir el preset real "Timbra - HUAWEI FreeBuds Pro 4 (Bluetooth)": a veces apagar Poweramp no suelta su efecto y no queda una referencia limpia
 - [ ] Repetir el test con la nueva vista previa y comparar de oído con Poweramp

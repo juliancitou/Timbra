@@ -89,4 +89,10 @@ class LoudnessMatcher(private val sampleRate: Int, private val reference: Double
     /** [settings] con el preamp ajustado solo para escuchar; el preset exportado no cambia. */
     fun compensated(settings: EqualizerSettings): EqualizerSettings =
         settings.copy(preampDb = settings.preampDb + compensationDb(settings).toFloat())
+
+    /** El sonido sin ecualizar, bajado hasta sonar tan fuerte como [settings] con su preamp. */
+    fun flatMatching(settings: EqualizerSettings): EqualizerSettings = settings.copy(
+        bandGainsDb = settings.bandGainsDb.map { 0f },
+        preampDb = -compensationDb(settings).toFloat(),
+    )
 }
