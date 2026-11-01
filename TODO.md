@@ -179,8 +179,9 @@ terminó en estilo terminal/ASCII).
 - [ ] Revisar en el teléfono la gráfica de líneas, el modo A y el final del resultado
 - [x] Medir con el micrófono la curva real de Poweramp (Ajustes → Calibrar); el visualizador global no ve los efectos
 - [x] Medir con el micrófono en bocina: Timbra corta −7 dB y Poweramp cerca de −2 dB con la señal de prueba
-- [ ] Averiguar si Poweramp también corta menos con Spotify y no solo con la señal de prueba de Timbra
-- [ ] Si se confirma, ajustar la vista previa o el preset para compensar la diferencia
+- [x] Medir Poweramp con Spotify en bocina: también corta menos y además sube los agudos
+- [ ] Medir lo mismo con los FreeBuds, con un auricular pegado al micrófono
+- [ ] Guardar la medición como corrección por salida y aplicarla a la vista previa o al preset exportado
 - [x] Comprobado con sesiones en silencio: el comando de apagar suelta el efecto de Poweramp y el de encender lo recupera
 - [x] Abrir el preset en Poweramp desde Exportar y detectar cuando ya se importó
 - [x] Prueba a ciegas final: elegir entre Timbra y sin ecualizar sin saber cuál es
